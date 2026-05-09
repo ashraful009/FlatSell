@@ -32,7 +32,7 @@ const bookingSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type:    String,
-      enum:    ['unpaid', 'paid'],
+      enum:    ['unpaid', 'booking_paid', 'fully_paid'],
       default: 'unpaid',
     },
     message: {
@@ -41,9 +41,39 @@ const bookingSchema = new mongoose.Schema(
       default: '',
     },
     
-    // ── Amount (Optional/Future for online payments) ────────────────────────
+    // ── Financial Tracking ──────────────────────────────────────────────────
+    totalPrice: {
+      type:    Number,
+      default: null,
+    },
+    bookingMoneyPercentage: {
+      type:    Number,
+      default: 20,
+    },
     bookingAmount: {
       type:    Number,
+      default: null,
+    },
+
+    // ── KYC Data ────────────────────────────────────────────────────────────
+    kycData: {
+      type:    mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+
+    // ── Document uploads (Cloudinary URLs) ──────────────────────────────────
+    documents: {
+      type:    mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+
+    // ── Stripe Session References ───────────────────────────────────────────
+    bookingStripeSessionId: {
+      type:    String,
+      default: null,
+    },
+    duePaymentStripeSessionId: {
+      type:    String,
       default: null,
     },
   },

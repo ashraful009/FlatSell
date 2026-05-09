@@ -1,49 +1,58 @@
 import { Link } from 'react-router-dom';
 
 /**
- * PropertyCard — Reusable card for property listings
+ * PropertyCard — Full-bleed image card for property listings
  *
  * Props:
- *  - property: { _id, title, price, city, category, images[], status, companyId, totalFloors, unitsPerFloor }
+ *  - property: { _id, title, price, city, category, images[], status, companyId,
+ *                totalFloors, unitsPerFloor, bookingMoneyPercentage, bookingMoneyAmount }
  */
 const PropertyCard = ({ property }) => {
   const {
     _id, title, price, city, category,
-    mainImage, galleryImages, images, companyId, totalFloors, unitsPerFloor,
+    mainImage, galleryImages, images, companyId,
+    totalFloors, unitsPerFloor,
+    bookingMoneyPercentage, bookingMoneyAmount,
   } = property;
 
   const coverImage = mainImage || galleryImages?.[0] || images?.[0] || null;
-  const totalImgs = (mainImage ? 1 : 0) + (galleryImages?.length || 0) || images?.length || 0;
-  const totalUnits = totalFloors * unitsPerFloor;
+  const totalImgs  = (mainImage ? 1 : 0) + (galleryImages?.length || 0) || images?.length || 0;
+  const totalUnits = (totalFloors || 0) * (unitsPerFloor || 0);
 
-  const categoryColors = {
-    apartment:  'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    commercial: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-    land:       'bg-amber-500/20 text-amber-400 border-amber-500/30',
-    villa:      'bg-pink-500/20 text-pink-400 border-pink-500/30',
-    office:     'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+  // Compute booking money: use enriched value from API, else fallback to 20%
+  const bookingAmt = bookingMoneyAmount || Math.round((price || 0) * (bookingMoneyPercentage || 20) / 100);
+  const bookingPct = bookingMoneyPercentage || 20;
+
+  const categoryStyles = {
+    apartment: { bg: 'bg-blue-500/80',  text: 'text-white' },
+    land:      { bg: 'bg-amber-500/80', text: 'text-white' },
+    villa:     { bg: 'bg-pink-500/80',  text: 'text-white' },
   };
+  const catStyle = categoryStyles[category] || categoryStyles.apartment;
 
   return (
     <Link
       to={`/property/${_id}`}
-      className="group block glass-card overflow-hidden hover:border-primary-500/40
-                 hover:shadow-glow transition-all duration-300"
+      className="group block relative rounded-2xl overflow-hidden
+                 h-[340px] sm:h-[380px]
+                 hover:shadow-2xl hover:shadow-primary-500/10
+                 transition-all duration-500 ring-1 ring-white/[0.06]
+                 hover:ring-primary-500/30"
     >
-      {/* Image */}
-      <div className="relative h-48 sm:h-52 bg-dark-800 overflow-hidden flex-shrink-0">
+      {/* ── Full-bleed Background Image ─────────────────────────────────── */}
+      <div className="absolute inset-0">
         {coverImage ? (
           <img
             src={coverImage}
             alt={title}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105
-                       transition-transform duration-500"
+            className="w-full h-full object-cover
+                       group-hover:scale-110 transition-transform duration-700 ease-out"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center
-                          bg-gradient-to-br from-primary-950/50 to-dark-800">
-            <svg className="w-12 h-12 text-gray-600" fill="none" viewBox="0 0 24 24"
+                          bg-gradient-to-br from-primary-950/80 to-dark-900">
+            <svg className="w-16 h-16 text-gray-700" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9
@@ -52,82 +61,115 @@ const PropertyCard = ({ property }) => {
             </svg>
           </div>
         )}
+      </div>
 
-        {/* Category badge */}
-        <div className="absolute top-3 left-3">
-          <span className={`text-xs px-2.5 py-1 rounded-lg font-medium border
-                           backdrop-blur-sm ${categoryColors[category] || categoryColors.apartment}`}>
-            {category?.charAt(0).toUpperCase() + category?.slice(1)}
-          </span>
-        </div>
+      {/* ── Dark Gradient Overlay ────────────────────────────────────────── */}
+      <div className="absolute inset-0 bg-gradient-to-t
+                      from-black via-black/50 to-transparent
+                      opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
 
-        {/* Image count */}
+      {/* ── Top Row: Category Badge + Image Count ────────────────────────── */}
+      <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
+        <span className={`text-[11px] px-2.5 py-1 rounded-lg font-semibold uppercase tracking-wider
+                          backdrop-blur-md ${catStyle.bg} ${catStyle.text}`}>
+          {category}
+        </span>
+
         {totalImgs > 1 && (
-          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm
-                          text-white text-xs px-2 py-1 rounded-lg flex items-center gap-1">
+          <span className="bg-black/50 backdrop-blur-md text-white text-[11px]
+                           px-2 py-1 rounded-lg flex items-center gap-1">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
               <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2
                        2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0
                        00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             {totalImgs}
-          </div>
+          </span>
         )}
       </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <h3 className="font-semibold text-white text-sm sm:text-base line-clamp-1
-                       group-hover:text-primary-300 transition-colors mb-1">
-          {title}
-        </h3>
+      {/* ── Bottom Overlay Content ───────────────────────────────────────── */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+        <div className="flex items-end justify-between gap-3">
+          {/* Left: Title, Location, Stats */}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-white text-base sm:text-lg leading-tight
+                           line-clamp-1 group-hover:text-primary-300 transition-colors duration-300">
+              {title}
+            </h3>
 
-        {/* Location */}
-        <div className="flex items-center gap-1 text-gray-400 text-xs mb-3">
-          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827
-                 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          </svg>
-          <span className="truncate">{city}</span>
-        </div>
+            {/* Location */}
+            <div className="flex items-center gap-1 text-gray-300/80 text-xs mt-1.5">
+              <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827
+                     0l-4.244-4.243a8 8 0 1111.314 0z" />
+              </svg>
+              <span className="truncate">{city}</span>
+            </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-3 text-xs text-gray-500 mb-4">
-          <span className="flex items-center gap-1">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
-            </svg>
-            {totalFloors} Floor{totalFloors > 1 ? 's' : ''}
-          </span>
-          <span className="text-white/20">·</span>
-          <span>{totalUnits} Unit{totalUnits > 1 ? 's' : ''}</span>
-          {companyId?.name && (
-            <>
-              <span className="text-white/20">·</span>
-              <span className="truncate text-primary-500">{companyId.name}</span>
-            </>
-          )}
-        </div>
-
-        {/* Price */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-gray-500 mb-0.5">Booking Money</p>
-            <p className="text-lg font-bold text-white">
-              ৳{price?.toLocaleString()}
-            </p>
+            {/* Stats row */}
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-gray-400 mt-2">
+              {category === 'apartment' && (
+                <>
+                  <span className="flex items-center gap-0.5">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
+                    </svg>
+                    {totalFloors} Floor{totalFloors > 1 ? 's' : ''}
+                  </span>
+                  <span className="text-white/20">·</span>
+                  <span>{totalUnits} Unit{totalUnits > 1 ? 's' : ''}</span>
+                </>
+              )}
+              {category === 'villa' && (
+                <span className="flex items-center gap-0.5">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
+                  </svg>
+                  {property.villaDetails?.totalFloors || totalFloors} Floor{(property.villaDetails?.totalFloors || totalFloors) > 1 ? 's' : ''}
+                </span>
+              )}
+              {category === 'land' && property.landDetails?.totalSize > 0 && (
+                <span className="flex items-center gap-0.5">
+                  📐 {property.landDetails.totalSize} Katha
+                </span>
+              )}
+              {companyId?.name && (
+                <>
+                  {(category === 'apartment' || category === 'villa' || (category === 'land' && property.landDetails?.totalSize > 0)) && (
+                    <span className="text-white/20">·</span>
+                  )}
+                  <span className="truncate text-primary-400 font-medium">{companyId.name}</span>
+                </>
+              )}
+            </div>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-primary-500/15 border border-primary-500/30
-                          flex items-center justify-center group-hover:bg-primary-500/25
-                          transition-colors">
-            <svg className="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 5l7 7-7 7" />
-            </svg>
+
+          {/* Right: Booking Money + Arrow */}
+          <div className="flex-shrink-0 text-right flex flex-col items-end gap-2">
+            <div>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">
+                Booking ({bookingPct}%)
+              </p>
+              <p className="text-base sm:text-lg font-bold text-white leading-tight">
+                ৳{bookingAmt?.toLocaleString()}
+              </p>
+            </div>
+            <div className="w-9 h-9 rounded-xl bg-primary-500/20 border border-primary-500/30
+                            flex items-center justify-center
+                            group-hover:bg-primary-500 group-hover:border-primary-400
+                            transition-all duration-300">
+              <svg className="w-4 h-4 text-primary-400 group-hover:text-white
+                              group-hover:translate-x-0.5 transition-all duration-300"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                  d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>

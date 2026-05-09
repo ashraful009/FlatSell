@@ -34,6 +34,21 @@ const errorHandler = (err, req, res, next) => {
     error = { message, statusCode: 401 };
   }
 
+  // Multer Errors (e.g., File too large)
+  if (err.name === 'MulterError') {
+    let message = err.message || 'File upload error';
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      message = 'File too large. Maximum allowed size is 10 MB per image.';
+    }
+    error = { message, statusCode: 400 };
+  }
+
+  // Cloudinary Errors (e.g., unknown file format)
+  if (err.message && err.message.toLowerCase().includes('unknown file format')) {
+    const message = 'Unsupported file format. Please upload valid images (JPG, PNG, WebP) or documents (PDF).';
+    error = { message, statusCode: 400 };
+  }
+
   res.status(error.statusCode || 500).json({
     success: false,
     message: error.message || 'Server Error'

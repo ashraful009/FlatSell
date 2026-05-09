@@ -12,6 +12,7 @@ const CompanyApproval = () => {
   const [companies, setCompanies] = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [viewDoc,   setViewDoc]   = useState(null); // PDF URL
+  const [loadingIds, setLoadingIds] = useState(new Set()); // track per-company loading
 
   useEffect(() => {
     fetchCompanies();
@@ -29,13 +30,23 @@ const CompanyApproval = () => {
   };
 
   const handleStatusUpdate = async (id, status) => {
+    setLoadingIds((prev) => new Set(prev).add(id));
     try {
-      await axiosInstance.put(`/companies/${id}/status`, { status });
+      const { data } = await axiosInstance.put(`/companies/${id}/status`, { status });
       setCompanies((prev) => prev.map((c) => (c._id === id ? { ...c, status } : c)));
-      toast.success(`Company ${status} successfully`);
+      toast.success(data.message || `Company ${status} successfully`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update company status');
+    } finally {
+      setLoadingIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
     }
+  };
+
+  // Determine if the document URL is an image or PDF
+  const isImageUrl = (url) => {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return /\.(jpg|jpeg|png|webp|gif)(\?|$)/.test(lower) || lower.includes('/image/');
   };
 
   if (loading) return <div className="text-gray-400 py-10 text-center">Loading companies...</div>;
@@ -71,13 +82,15 @@ const CompanyApproval = () => {
               <div className="flex md:flex-col gap-2 flex-shrink-0">
                 <button 
                   onClick={() => handleStatusUpdate(c._id, 'approved')}
-                  className="btn-primary py-1.5 px-4 text-sm bg-emerald-600 border-none hover:bg-emerald-500">
-                  ✓ Approve
+                  disabled={loadingIds.has(c._id)}
+                  className="btn-primary py-1.5 px-4 text-sm bg-emerald-600 border-none hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {loadingIds.has(c._id) ? '⏳ Approving...' : '✓ Approve'}
                 </button>
                 <button 
                   onClick={() => handleStatusUpdate(c._id, 'rejected')}
-                  className="btn-secondary py-1.5 px-4 text-sm text-red-500 hover:bg-red-500/10">
-                  ✕ Reject
+                  disabled={loadingIds.has(c._id)}
+                  className="btn-secondary py-1.5 px-4 text-sm text-red-500 hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {loadingIds.has(c._id) ? '⏳ Processing...' : '✕ Reject'}
                 </button>
               </div>
             )}
@@ -94,9 +107,31 @@ const CompanyApproval = () => {
           <div className="glass-card w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center p-4 border-b border-white/10">
               <h3 className="text-white font-bold">Trade License Document</h3>
-              <button onClick={() => setViewDoc(null)} className="text-gray-400 hover:text-white">✕ Close</button>
+              <div className="flex items-center gap-3">
+                <a href={viewDoc} target="_blank" rel="noopener noreferrer"
+                   className="text-primary-400 text-sm hover:underline">
+                  ↗ Open in New Tab
+                </a>
+                <button onClick={() => setViewDoc(null)} className="text-gray-400 hover:text-white text-lg">✕</button>
+              </div>
             </div>
-            <iframe src={viewDoc} className="flex-1 w-full border-none bg-white rounded-b-xl" title="Trade License" />
+
+            {/* Image: render directly | PDF: render with Google Docs Viewer */}
+            {isImageUrl(viewDoc) ? (
+              <div className="flex-1 overflow-auto flex items-center justify-center p-4 bg-gray-900">
+                <img
+                  src={viewDoc}
+                  alt="Trade License"
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
+              </div>
+            ) : (
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(viewDoc)}&embedded=true`}
+                className="flex-1 w-full border-none bg-white rounded-b-xl"
+                title="Trade License"
+              />
+            )}
           </div>
         </div>
       )}

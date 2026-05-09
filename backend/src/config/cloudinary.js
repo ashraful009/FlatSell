@@ -21,33 +21,36 @@ const imageStorage = new CloudinaryStorage({
   }),
 });
 
-// ─── Multer Storage: Documents (Trade License - PDF) ─────────────────────────
-// resource_type: 'raw' (or 'auto') — CRITICAL for PDFs
-// Using 'auto' so Cloudinary auto-detects the file type
+// ─── Multer Storage: Documents (Trade License - PDF / Image) ─────────────
+// resource_type: 'auto' so Cloudinary auto-detects PDF vs image
 const documentStorage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => ({
-    folder:          'flatsell/documents',
-    resource_type:   'auto',   // ← handles PDFs correctly
-    allowed_formats: ['pdf'],
-    public_id:       `trade_license_${Date.now()}`,
-  }),
+  params: async (req, file) => {
+    const isPdf = file.mimetype === 'application/pdf';
+    return {
+      folder:          'flatsell/documents',
+      resource_type:   isPdf ? 'raw' : 'image',
+      allowed_formats: ['pdf', 'jpg', 'jpeg', 'png'],
+      public_id:       `trade_license_${Date.now()}`,
+    };
+  },
 });
 
 // ─── Multer Upload Instances ──────────────────────────────────────────────────
 const uploadImage = multer({
   storage: imageStorage,
-  limits:  { fileSize: 5 * 1024 * 1024 }, // 5MB per image
+  limits:  { fileSize: 10 * 1024 * 1024 }, // 10MB per image
 });
 
 const uploadDocument = multer({
   storage: documentStorage,
-  limits:  { fileSize: 10 * 1024 * 1024 }, // 10MB for PDFs
+  limits:  { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
+    const allowedMimes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF files are allowed for documents'), false);
+      cb(new Error('Only PDF and image files (JPG, PNG) are allowed for documents'), false);
     }
   },
 });

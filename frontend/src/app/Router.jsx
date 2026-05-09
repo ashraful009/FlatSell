@@ -18,6 +18,8 @@ const HomePage           = lazy(() => import('../pages/HomePage'));
 const PropertiesPage     = lazy(() => import('../pages/PropertiesPage'));
 const PropertyDetailPage = lazy(() => import('../pages/PropertyDetailPage'));
 const BecomeVendorPage   = lazy(() => import('../pages/BecomeVendorPage'));
+const BookingSuccessPage  = lazy(() => import('../pages/BookingSuccessPage'));
+const BookingCheckoutPage = lazy(() => import('../pages/BookingCheckoutPage'));
 const NotFoundPage       = lazy(() => import('../pages/NotFoundPage'));
 const UnauthorizedPage   = lazy(() => import('../pages/UnauthorizedPage'));
 
@@ -26,6 +28,7 @@ const SuperAdminDashboard   = lazy(() => import('../pages/dashboards/SuperAdminD
 const CompanyAdminDashboard = lazy(() => import('../pages/dashboards/CompanyAdminDashboard'));
 const SellerDashboard       = lazy(() => import('../pages/dashboards/SellerDashboard'));
 const CustomerDashboard     = lazy(() => import('../pages/dashboards/CustomerDashboard'));
+const MyPropertiesPage      = lazy(() => import('../pages/dashboard/MyPropertiesPage'));
 
 // ─────────────────────────────────────────────────────────────────────────────
 const AppRouter = () => {
@@ -68,7 +71,10 @@ const AppRouter = () => {
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={['customer', 'user']} />}>
-              <Route path="/customer-dashboard/*" element={<CustomerDashboard />} />
+              <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+              <Route path="/customer-dashboard/my-properties" element={<MyPropertiesPage />} />
+              <Route path="/booking-checkout/:unitId" element={<BookingCheckoutPage />} />
+              <Route path="/booking-success" element={<BookingSuccessPage />} />
             </Route>
 
             {/* Utility pages */}

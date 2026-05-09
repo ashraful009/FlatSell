@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../shared/hooks/useAuth';
-import axiosInstance from '../../shared/lib/axiosInstance';
-import { toast } from 'react-hot-toast';
 
 const STATUS_CONFIG = {
   available: { label: 'Available', color: 'text-emerald-400', bg: 'bg-emerald-500/15 border-emerald-500/30' },
@@ -11,11 +9,27 @@ const STATUS_CONFIG = {
 };
 
 /**
+ * Get flat type info for a unit based on its column index.
+ * Column mapping: col 0 → flatTypes[0], col 1 → flatTypes[1], ... last type extends to remaining columns.
+ */
+const getFlatTypeForUnit = (unit, property) => {
+  const flatTypes = property?.flatTypes;
+  if (!flatTypes?.length || property?.category !== 'apartment') return null;
+
+  // Extract column letter from unitNumber (e.g. "3B" → "B" → index 1)
+  const match = unit.unitNumber?.match(/\d+([A-Z]+)/i);
+  if (!match) return null;
+  const colIndex = match[1].charCodeAt(0) - 65; // A=0, B=1, C=2...
+  const typeIndex = Math.min(colIndex, flatTypes.length - 1);
+  return flatTypes[typeIndex] || null;
+};
+
+/**
  * UnitDetailModal — shown when user clicks a unit in the visualizer
  *
  * Props:
  *  - unit:      Unit object
- *  - property:  Property object (for base price fallback)
+ *  - property:  Property object (for base price fallback + flatTypes)
  *  - onClose:   () => void
  */
 const UnitDetailModal = ({ unit, property, onClose }) => {
@@ -27,26 +41,12 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
 
   if (!unit) return null;
 
-  const displayPrice = unit.price || property?.price;
   const cfg = STATUS_CONFIG[unit.status];
+  const flatType = getFlatTypeForUnit(unit, property);
+  const displayPrice = flatType?.pricePerUnit || unit.price || property?.price;
 
-  const handleBooking = async () => {
-    setLoading(true);
-    try {
-      await axiosInstance.post('/bookings', {
-        unitId: unit._id,
-        message
-      });
-      toast.success('Booking requested successfully!');
-      setTimeout(() => {
-        onClose();
-        // optionally refresh parent or redirect, but for now we instruct the user to check dashboard
-        navigate('/customer-dashboard');
-      }, 1500);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to request booking');
-      setLoading(false);
-    }
+  const handleBooking = () => {
+    navigate(`/booking-checkout/${unit._id}`);
   };
 
   return (
@@ -54,8 +54,8 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
                     bg-black/70 backdrop-blur-sm animate-fadeIn px-0 sm:px-4"
          onClick={(e) => e.target === e.currentTarget && onClose()}>
 
-      <div className="w-full sm:max-w-sm glass-card rounded-t-3xl sm:rounded-2xl
-                      p-6 pb-8 sm:pb-6 animate-slideUp">
+      <div className="w-full sm:max-w-md glass-card rounded-t-3xl sm:rounded-2xl
+                      p-6 pb-8 sm:pb-6 animate-slideUp max-h-[90vh] overflow-y-auto">
 
         {/* Handle bar (mobile) */}
         <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-5 sm:hidden" />
@@ -63,12 +63,20 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
         {/* Header */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <p className="text-gray-400 text-xs uppercase tracking-widest mb-1">
-              Floor {unit.floor}
-            </p>
-            <h2 className="text-2xl font-black text-white">
-              Unit {unit.unitNumber}
-            </h2>
+            {property?.category === 'apartment' ? (
+              <>
+                <p className="text-gray-400 text-xs uppercase tracking-widest mb-1">
+                  Floor {unit.floor}
+                </p>
+                <h2 className="text-2xl font-black text-white">
+                  Unit {unit.unitNumber}
+                </h2>
+              </>
+            ) : (
+              <h2 className="text-2xl font-black text-white capitalize">
+                {property?.category} Booking
+              </h2>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <span className={`text-xs px-2.5 py-1 rounded-lg border font-semibold
@@ -86,24 +94,65 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
           </div>
         </div>
 
-        {/* Details grid */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          {[
-            { label: 'Type',   value: unit.type   || '—' },
-            { label: 'Size',   value: unit.size   || '—' },
-            { label: 'Facing', value: unit.facing || '—' },
-            {
-              label: 'Price',
-              value: displayPrice ? `৳${displayPrice.toLocaleString()}` : '—'
-            },
-          ].map(({ label, value }) => (
-            <div key={label}
-              className="bg-dark-800/60 border border-white/8 rounded-xl px-3 py-2.5">
-              <p className="text-gray-500 text-xs mb-0.5">{label}</p>
-              <p className="text-white font-semibold text-sm">{value}</p>
+        {/* ── Flat Type Details (Apartment category) ──────────────────────── */}
+        {flatType ? (
+          <div className="space-y-4 mb-5">
+            {/* Type header */}
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-primary-500/10 border border-primary-500/20">
+              <span className="text-primary-400 text-sm">🏷️</span>
+              <span className="text-primary-300 font-semibold text-sm">
+                {flatType.label || 'Unnamed Type'}
+              </span>
             </div>
-          ))}
-        </div>
+
+            {/* Details grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { icon: '📐', label: 'Square Feet',     value: flatType.sqft ? `${flatType.sqft} sft` : '—' },
+                { icon: '💰', label: 'Price (BDT)',      value: flatType.pricePerUnit ? `৳${Number(flatType.pricePerUnit).toLocaleString()}` : '—' },
+                { icon: '🛏️', label: 'Bedrooms',         value: flatType.bedrooms ?? '—' },
+                { icon: '🚿', label: 'Washrooms',        value: flatType.bathrooms ?? '—' },
+                { icon: '🍳', label: 'Kitchen',          value: flatType.kitchen || '—' },
+                { icon: '🍽️', label: 'Dining',           value: flatType.dining || '—' },
+                { icon: '🖼️', label: 'Drawing',          value: flatType.drawing || '—' },
+                { icon: '🅿️', label: 'Parking Area',     value: flatType.parking || '—' },
+              ].map(({ icon, label, value }) => (
+                <div key={label}
+                  className="bg-dark-800/60 border border-white/8 rounded-xl px-3 py-2.5">
+                  <p className="text-gray-500 text-xs mb-0.5">{icon} {label}</p>
+                  <p className="text-white font-semibold text-sm">{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Type Description */}
+            {flatType.description && (
+              <div className="bg-dark-800/60 border border-white/8 rounded-xl px-3 py-2.5">
+                <p className="text-gray-500 text-xs mb-1">📝 Type Description</p>
+                <p className="text-gray-300 text-sm leading-relaxed">{flatType.description}</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Fallback: generic unit details (non-apartment or no flatTypes) */
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            {[
+              { label: 'Type',   value: unit.type   || '—' },
+              { label: 'Size',   value: unit.size   || '—' },
+              { label: 'Facing', value: unit.facing || '—' },
+              {
+                label: 'Price',
+                value: displayPrice ? `৳${displayPrice.toLocaleString()}` : '—'
+              },
+            ].map(({ label, value }) => (
+              <div key={label}
+                className="bg-dark-800/60 border border-white/8 rounded-xl px-3 py-2.5">
+                <p className="text-gray-500 text-xs mb-0.5">{label}</p>
+                <p className="text-white font-semibold text-sm">{value}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Features */}
         {unit.features?.length > 0 && (

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axiosInstance from '../../shared/lib/axiosInstance';
 
 const YES_NO = ['Yes', 'No'];
-const CATEGORIES = ['Apartments', 'Villas', 'Commercial', 'Land', 'Office'];
+const CATEGORIES = ['Apartments', 'Villas', 'Land'];
 
 const defaultFlatType = () => ({
   label: '', sqft: '', pricePerUnit: '', bedrooms: 1, bathrooms: 1,
@@ -94,7 +94,7 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
 
     try {
       const { data } = await axiosInstance.put(`/properties/${property._id}`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': undefined },
       });
       onUpdated(data.data.property);
       onClose();

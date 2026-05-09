@@ -25,8 +25,9 @@ const VendorApplicationForm = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type !== 'application/pdf') {
-      setError('Only PDF files are accepted for Trade License.');
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (file && !allowedTypes.includes(file.type)) {
+      setError('Only PDF and image files (JPG, PNG) are accepted for Trade License.');
       setPdfFile(null);
       return;
     }
@@ -60,7 +61,7 @@ const VendorApplicationForm = () => {
 
     try {
       await axiosInstance.post('/companies/apply', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': undefined },
       });
       setSubmitted(true);
     } catch (err) {
@@ -143,7 +144,7 @@ const VendorApplicationForm = () => {
 
       {/* ── Trade License Upload ──────────────────────────────────────────── */}
       <div>
-        <label className="form-label">Trade License (PDF) *</label>
+        <label className="form-label">Trade License (PDF or Image) *</label>
         <label
           htmlFor="tradeLicense"
           className={`flex flex-col items-center gap-3 px-6 py-8 rounded-xl border-2
@@ -177,10 +178,10 @@ const VendorApplicationForm = () => {
               </svg>
               <div className="text-center">
                 <p className="text-gray-300 font-medium text-sm">
-                  Drop your Trade License PDF here
+                  Drop your Trade License here
                 </p>
                 <p className="text-gray-500 text-xs mt-1">
-                  PDF only · Max 10 MB
+                  PDF, JPG, or PNG · Max 10 MB
                 </p>
               </div>
             </>
@@ -188,7 +189,7 @@ const VendorApplicationForm = () => {
           <input
             id="tradeLicense"
             type="file"
-            accept="application/pdf"
+            accept="application/pdf,image/jpeg,image/png"
             onChange={handleFileChange}
             className="hidden"
           />

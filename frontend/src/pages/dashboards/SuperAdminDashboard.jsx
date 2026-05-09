@@ -1,17 +1,22 @@
 import { useState } from 'react';
-import useAuth           from '../../shared/hooks/useAuth';
-import AddPropertyWizard from '../../features/properties/AddPropertyWizard';
-import ManageProperties  from '../../features/properties/ManageProperties';
-import PropertyRequests  from '../../features/properties/PropertyRequests';
-import CompanyApproval   from '../../features/companies/CompanyApproval';
+import useAuth            from '../../shared/hooks/useAuth';
+import AddPropertyWizard  from '../../features/properties/AddPropertyWizard';
+import ManageProperties   from '../../features/properties/ManageProperties';
+import PropertyRequests   from '../../features/properties/PropertyRequests';
+import CompanyApproval    from '../../features/companies/CompanyApproval';
+import MarginTracking     from '../../features/commissions/MarginTracking';
+import SalesReport        from '../../features/bookings/SalesReport';
 
 const TABS = [
-  { id: 'pending',  label: '⏳ Pending Properties' },
-  { id: 'manage',   label: '📦 Manage All'         },
-  { id: 'add',      label: '➕ Add Property'        },
-  { id: 'companies',label: '🏢 Company Applications'},
-  { id: 'settings', label: '⚙️ Platform Settings'   },
+  { id: 'pending',   label: '⏳ Pending Properties'  },
+  { id: 'manage',    label: '📦 Manage All'           },
+  { id: 'add',       label: '➕ Add Property'         },
+  { id: 'companies', label: '🏢 Company Applications' },
+  { id: 'margin',    label: '💰 Revenue & Margin'     },
+  { id: 'sales',     label: '📈 Sales Report'         },
+  { id: 'settings',  label: '⚙️ Platform Settings'   },
 ];
+
 
 const SuperAdminDashboard = () => {
   const { user } = useAuth();
@@ -111,6 +116,16 @@ const SuperAdminDashboard = () => {
             <h2 className="text-xl font-bold text-white mb-6">Vendor Applications</h2>
             <CompanyApproval />
           </div>
+        )}
+
+        {/* Revenue & Margin */}
+        {activeTab === 'margin' && (
+          <MarginTracking />
+        )}
+
+        {/* Sales Report */}
+        {activeTab === 'sales' && (
+          <SalesReport mode="admin" />
         )}
 
         {/* Platform Settings */}

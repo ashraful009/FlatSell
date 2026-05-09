@@ -1,0 +1,261 @@
+import { useState, useEffect } from 'react';
+import axiosInstance from '../../shared/lib/axiosInstance';
+import { toast } from 'react-hot-toast';
+
+const MarginTracking = () => {
+  const [overview, setOverview] = useState({ totalCommission: 0, totalSalesVolume: 0, totalBookings: 0 });
+  const [companies, setCompanies] = useState([]);
+  const [loadingOverview, setLoadingOverview] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+  
+  // Drill-down states
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [companyProperties, setCompanyProperties] = useState([]);
+  const [loadingProperties, setLoadingProperties] = useState(false);
+
+  useEffect(() => {
+    fetchOverview();
+    fetchCompanies();
+  }, []);
+
+  const fetchOverview = async () => {
+    try {
+      const { data } = await axiosInstance.get('/commissions/overview');
+      setOverview(data.data);
+    } catch (error) {
+      toast.error('Failed to load commission overview');
+    } finally {
+      setLoadingOverview(false);
+    }
+  };
+
+  const fetchCompanies = async () => {
+    try {
+      const { data } = await axiosInstance.get('/commissions/companies');
+      setCompanies(data.data.companies || []);
+    } catch (error) {
+      toast.error('Failed to load companies commission breakdown');
+    }
+  };
+
+  const fetchCompanyProperties = async (company) => {
+    setSelectedCompany(company);
+    setLoadingProperties(true);
+    setCompanyProperties([]); // Reset while loading
+    try {
+      const { data } = await axiosInstance.get(`/commissions/companies/${company._id}/properties`);
+      setCompanyProperties(data.data.properties || []);
+    } catch (error) {
+      toast.error('Failed to load property breakdown for company');
+    } finally {
+      setLoadingProperties(false);
+    }
+  };
+
+  const handleDownloadMarginReport = async () => {
+    setDownloading(true);
+    try {
+      const res = await axiosInstance.get('/commissions/margin-report/pdf', {
+        responseType: 'blob',
+      });
+      const url     = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const link    = document.createElement('a');
+      link.href     = url;
+      link.download = `FlatSell-Margin-Report-${Date.now()}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      toast.success('Margin report downloaded!');
+    } catch {
+      toast.error('Failed to generate margin report PDF');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const formatCurrency = (amount) => `৳${Number(amount || 0).toLocaleString()}`;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap justify-between items-end mb-6 gap-4">
+        <div>
+          <h2 className="text-xl font-bold text-white">Platform Revenue & Margin</h2>
+          <p className="text-gray-400 text-sm mt-1">
+            Track commissions generated from all vendor property sales.
+          </p>
+        </div>
+
+        <button
+          onClick={handleDownloadMarginReport}
+          disabled={downloading || loadingOverview}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl
+                     bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600
+                     text-white text-sm font-semibold transition-all duration-200
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+        >
+          {downloading
+            ? (<><span className="animate-spin">⏳</span> Generating...</>)
+            : (<>📥 Download Margin Report</>)
+          }
+        </button>
+      </div>
+
+      {/* ── Level 1: Platform Overview ──────────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="glass-card p-6 border border-emerald-500/30 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl">
+              💰
+            </div>
+            <div>
+              <p className="text-gray-400 text-sm font-medium">Total Platform Commission</p>
+              <h3 className="text-3xl font-black text-white mt-1">
+                {loadingOverview ? '...' : formatCurrency(overview.totalCommission)}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-card p-6 border border-primary-500/30 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-primary-500/20 text-primary-400 flex items-center justify-center text-2xl">
+              📊
+            </div>
+            <div>
+              <p className="text-gray-400 text-sm font-medium">Total Sales Volume</p>
+              <h3 className="text-3xl font-black text-white mt-1">
+                {loadingOverview ? '...' : formatCurrency(overview.totalSalesVolume)}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-card p-6 border border-blue-500/30 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl">
+              📝
+            </div>
+            <div>
+              <p className="text-gray-400 text-sm font-medium">Total Successful Bookings</p>
+              <h3 className="text-3xl font-black text-white mt-1">
+                {loadingOverview ? '...' : overview.totalBookings}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Level 2 & 3 Container ─────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start mt-8">
+        
+        {/* Level 2: Company Breakdown */}
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-bold text-white mb-4 border-b border-white/10 pb-3">
+            🏢 Commission Breakdown by Company
+          </h3>
+          
+          <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+            {companies.length === 0 ? (
+              <p className="text-gray-400 text-sm text-center py-8">No commission data available yet.</p>
+            ) : (
+              companies.map((company) => (
+                <div 
+                  key={company._id}
+                  onClick={() => fetchCompanyProperties(company)}
+                  className={`p-4 rounded-xl border cursor-pointer transition-all duration-200
+                    ${selectedCompany?._id === company._id 
+                      ? 'bg-primary-500/15 border-primary-500/50 shadow-[0_0_15px_rgba(var(--color-primary-500),0.15)]' 
+                      : 'bg-dark-800/50 border-white/5 hover:border-white/20 hover:bg-dark-800'
+                    }`}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-bold text-white truncate max-w-[60%]">{company.companyName || 'Unknown Company'}</h4>
+                    <span className="text-emerald-400 font-bold">{formatCurrency(company.totalCommission)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>{company.totalBookings} Bookings</span>
+                    <span>Volume: {formatCurrency(company.totalSalesVolume)}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Level 3: Property Breakdown Modal / Sub-view */}
+        <div className="glass-card p-6 min-h-[400px]">
+          {selectedCompany ? (
+            <div>
+              <div className="mb-4 border-b border-white/10 pb-3 flex justify-between items-end">
+                <div>
+                  <h3 className="text-lg font-bold text-white">🏠 Property Breakdown</h3>
+                  <p className="text-primary-400 text-xs mt-1 font-medium">{selectedCompany.companyName}</p>
+                </div>
+                <button 
+                  onClick={() => setSelectedCompany(null)}
+                  className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded bg-white/5 hover:bg-white/10 transition-colors"
+                >
+                  Close ✕
+                </button>
+              </div>
+
+              {loadingProperties ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mb-4"></div>
+                  <p className="text-gray-400 text-sm">Loading properties...</p>
+                </div>
+              ) : companyProperties.length === 0 ? (
+                <p className="text-gray-400 text-sm text-center py-8">No properties found for this company.</p>
+              ) : (
+                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                  {companyProperties.map((prop) => (
+                    <div key={prop._id} className="p-4 rounded-xl bg-dark-800/30 border border-white/5">
+                      <div className="flex justify-between items-start mb-2 gap-2">
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-gray-200 truncate" title={prop.propertyTitle}>
+                            {prop.propertyTitle || 'Unknown Property'}
+                          </h4>
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] uppercase font-semibold tracking-wider bg-white/10 text-gray-300">
+                            {prop.category} ({prop.commissionPercentage}%)
+                          </span>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-emerald-400 font-bold text-sm">
+                            {formatCurrency(prop.totalCommission)}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            From {prop.bookingCount} Booking{prop.bookingCount > 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-xs mt-3 pt-3 border-t border-white/5">
+                        <span className="text-gray-500">Property Volume</span>
+                        <span className="text-gray-300">{formatCurrency(prop.totalSalesVolume)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-center py-20 opacity-50">
+              <span className="text-5xl mb-4">👈</span>
+              <p className="text-gray-300 font-medium">Select a company</p>
+              <p className="text-gray-500 text-sm mt-1 max-w-[200px]">
+                Click on any company from the list to view its exact property-level commission breakdown.
+              </p>
+            </div>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default MarginTracking;

@@ -1,5 +1,6 @@
 const Company = require('./company.model');
 const User    = require('../auth/user.model');
+const { sendVendorApprovalEmail } = require('../../utils/sendEmail');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // @desc    Apply to become a vendor (Company Admin)
@@ -21,7 +22,7 @@ const applyForVendor = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({
       success: false,
-      message: 'Trade License PDF is required',
+      message: 'Trade License document is required (PDF or Image)',
     });
   }
 
@@ -111,7 +112,7 @@ const updateCompanyStatus = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Status must be approved or rejected' });
   }
 
-  const company = await Company.findById(req.params.id).populate('ownerId');
+  const company = await Company.findById(req.params.id).populate('ownerId', 'name email');
   if (!company) {
     return res.status(404).json({ success: false, message: 'Company not found' });
   }
@@ -131,9 +132,44 @@ const updateCompanyStatus = async (req, res) => {
 
   await company.save();
 
+  // ── Send approval confirmation email ───────────────────────────────────
+  let emailSent = false;
+  if (status === 'approved') {
+    // Determine vendor email — prefer owner's registered email, fallback to company email
+    const ownerEmail   = company.ownerId?.email;
+    const companyEmail = company.email;
+    const vendorEmail  = ownerEmail || companyEmail;
+    const vendorName   = company.ownerId?.name || 'Vendor';
+
+    console.log(`📧 Attempting vendor approval email...`);
+    console.log(`   → Vendor Name:  ${vendorName}`);
+    console.log(`   → Company Name: ${company.name}`);
+    console.log(`   → Owner Email:  ${ownerEmail || 'N/A'}`);
+    console.log(`   → Company Email: ${companyEmail}`);
+    console.log(`   → Sending to:   ${vendorEmail}`);
+
+    try {
+      await sendVendorApprovalEmail({
+        vendorName,
+        companyName: company.name,
+        vendorEmail,
+      });
+      emailSent = true;
+      console.log(`✅ Vendor approval email sent successfully → ${vendorEmail}`);
+    } catch (emailErr) {
+      console.error(`❌ Failed to send vendor approval email to ${vendorEmail}:`);
+      console.error(`   Error: ${emailErr.message}`);
+      console.error(emailErr.stack);
+    }
+  }
+
+  const emailMsg = status === 'approved'
+    ? (emailSent ? '. Approval email sent to vendor.' : '. Warning: Approval email could not be sent.')
+    : '';
+
   res.status(200).json({
     success: true,
-    message: `Company ${status} successfully`,
+    message: `Company ${status} successfully${emailMsg}`,
     data:    { company },
   });
 };

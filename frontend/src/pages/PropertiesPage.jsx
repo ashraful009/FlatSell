@@ -8,9 +8,7 @@ const CATEGORIES = [
   { value: '', label: 'All Types' },
   { value: 'apartment',  label: '🏢 Apartments'  },
   { value: 'villa',      label: '🏡 Villas'       },
-  { value: 'commercial', label: '🏬 Commercial'   },
   { value: 'land',       label: '🌿 Land'         },
-  { value: 'office',     label: '🏛️ Offices'      },
 ];
 
 const SORT_OPTIONS = [

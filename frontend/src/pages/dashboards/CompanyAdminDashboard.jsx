@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import useAuth           from '../../shared/hooks/useAuth';
-import AddPropertyWizard from '../../features/properties/AddPropertyWizard';
-import ManageProperties  from '../../features/properties/ManageProperties';
-import PropertyRequests  from '../../features/properties/PropertyRequests';
-import BookingManagement from '../../features/bookings/BookingManagement';
+import useAuth                  from '../../shared/hooks/useAuth';
+import AddPropertyWizard        from '../../features/properties/AddPropertyWizard';
+import ManageProperties         from '../../features/properties/ManageProperties';
+import PropertyRequests         from '../../features/properties/PropertyRequests';
+import BookingManagement        from '../../features/bookings/BookingManagement';
+import BookingPoliciesSettings  from '../../features/companies/BookingPoliciesSettings';
+import SalesReport              from '../../features/bookings/SalesReport';
 
 const TABS = [
   { id: 'manage',  label: '📦 Manage Properties' },
   { id: 'add',     label: '➕ Add Property'       },
   { id: 'pending', label: '📋 My Submissions'     },
   { id: 'bookings',label: '📅 Bookings / Leads'   },
+  { id: 'sales',   label: '📈 Sales Report'       },
   { id: 'settings',label: '⚙️ Settings'            },
 ];
 
@@ -104,11 +107,16 @@ const CompanyAdminDashboard = () => {
 
         {/* Settings */}
         {activeTab === 'settings' && (
-          <div className="glass-card p-8 text-center text-gray-400">
-            <span className="text-4xl block mb-4">⚙️</span>
-            Company settings (Logo upload, name change, seller management) will be placed here.
+          <div>
+            <BookingPoliciesSettings />
           </div>
         )}
+
+        {/* Sales Report */}
+        {activeTab === 'sales' && (
+          <SalesReport mode="company" />
+        )}
+
       </div>
     </div>
   );

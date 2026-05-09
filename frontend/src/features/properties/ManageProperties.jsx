@@ -16,7 +16,7 @@ const STATUS_ICON = {
 };
 
 const CATEGORY_ICONS = {
-  Apartments: '🏢', Villas: '🏡', Commercial: '🏪', Land: '🌾', Office: '🏬',
+  Apartments: '🏢', Villas: '🏡', Land: '🌾',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

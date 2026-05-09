@@ -56,6 +56,9 @@ app.use('/api/properties', require('./features/properties/property.routes'));
 app.use('/api/units',      require('./features/units/unit.routes'));
 // app.use('/api/users',      require('./features/users/user.routes'));       // Phase 9
 app.use('/api/bookings',   require('./features/bookings/booking.routes'));
+app.use('/api/checkout',          require('./features/checkout/checkout.routes'));
+app.use('/api/booking-policies',  require('./features/policies/bookingPolicy.routes'));
+app.use('/api/commissions',       require('./features/commissions/commission.routes'));
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {

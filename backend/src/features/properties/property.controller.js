@@ -1,6 +1,7 @@
-const Property = require('./property.model');
-const Company  = require('../companies/company.model');
-const Unit     = require('../units/unit.model');
+const Property      = require('./property.model');
+const Company       = require('../companies/company.model');
+const Unit          = require('../units/unit.model');
+const BookingPolicy = require('../policies/bookingPolicy.model');
 const { generateUnitsForProperty } = require('../units/unit.controller');
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -17,6 +18,19 @@ const parseFlatTypes = (raw) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Helper: parse JSON object from form-data string (villaDetails / landDetails)
+// ─────────────────────────────────────────────────────────────────────────────
+const parseJsonObject = (raw) => {
+  if (!raw) return undefined;
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // @desc    Create a new property
 //          Super Admin    → auto-approved, appears on homepage immediately
 //          Company Admin  → pending, goes to Super Admin review queue
@@ -29,6 +43,8 @@ const createProperty = async (req, res) => {
     category, totalFloors, unitsPerFloor,
     landSize, handoverTime, totalUnitsCount,
     lat, lng, flatTypes: flatTypesRaw,
+    villaDetails: villaDetailsRaw,
+    landDetails: landDetailsRaw,
   } = req.body;
 
   if (!title || !description || !price || !address || !city || !category) {
@@ -77,12 +93,14 @@ const createProperty = async (req, res) => {
   const galleryUrls     = (files.galleryImages || []).map((f) => f.path);
 
   const flatTypes = parseFlatTypes(flatTypesRaw);
+  const villaDetails = parseJsonObject(villaDetailsRaw);
+  const landDetails  = parseJsonObject(landDetailsRaw);
 
   // ── For Super Admin: auto-approve
   const status     = isSuperAdmin ? 'approved' : 'pending';
   const approvedAt = isSuperAdmin ? new Date()  : undefined;
 
-  const property = await Property.create({
+  const propertyData = {
     title,
     description,
     price:           Number(price),
@@ -105,7 +123,13 @@ const createProperty = async (req, res) => {
     },
     status,
     approvedAt,
-  });
+  };
+
+  // Attach category-specific details
+  if (category === 'villa' && villaDetails) propertyData.villaDetails = villaDetails;
+  if (category === 'land'  && landDetails)  propertyData.landDetails  = landDetails;
+
+  const property = await Property.create(propertyData);
 
   // ── If Super Admin adding — auto-generate units immediately
   if (isSuperAdmin) {
@@ -139,6 +163,8 @@ const updateProperty = async (req, res) => {
     title, description, price, address, city, category,
     totalFloors, unitsPerFloor, landSize, handoverTime,
     totalUnitsCount, lat, lng, flatTypes: flatTypesRaw,
+    villaDetails: villaDetailsRaw,
+    landDetails: landDetailsRaw,
   } = req.body;
 
   const files = req.files || {};
@@ -157,6 +183,8 @@ const updateProperty = async (req, res) => {
   if (lat)             property.location.lat    = parseFloat(lat);
   if (lng)             property.location.lng    = parseFloat(lng);
   if (flatTypesRaw)    property.flatTypes       = parseFlatTypes(flatTypesRaw);
+  if (villaDetailsRaw) property.villaDetails     = parseJsonObject(villaDetailsRaw);
+  if (landDetailsRaw)  property.landDetails      = parseJsonObject(landDetailsRaw);
 
   // Replace images if new files uploaded
   if (files.mainImage?.[0]) {
@@ -281,13 +309,45 @@ const getApprovedProperties = async (req, res) => {
     .populate('companyId', 'name logo')
     .sort('-approvedAt')
     .skip(skip)
-    .limit(Number(limit));
+    .limit(Number(limit))
+    .lean();
+
+  // ── Batch-fetch booking policies for all company+category combos ───────
+  const policyKeys = [...new Set(
+    properties.map((p) => `${p.companyId?._id || p.companyId}_${p.category}`)
+  )];
+
+  const policyConditions = policyKeys.map((key) => {
+    const [companyId, cat] = key.split('_');
+    return { companyId, category: cat };
+  });
+
+  const policies = policyConditions.length
+    ? await BookingPolicy.find({ $or: policyConditions }).lean()
+    : [];
+
+  // Build lookup map: "companyId_category" -> bookingMoneyPercentage
+  const policyMap = {};
+  policies.forEach((p) => {
+    policyMap[`${p.companyId}_${p.category}`] = p.bookingMoneyPercentage;
+  });
+
+  // Attach booking info to each property
+  const enriched = properties.map((p) => {
+    const key = `${p.companyId?._id || p.companyId}_${p.category}`;
+    const pct = policyMap[key] || 20; // default 20%
+    return {
+      ...p,
+      bookingMoneyPercentage: pct,
+      bookingMoneyAmount:     Math.round(p.price * pct / 100),
+    };
+  });
 
   const total = await Property.countDocuments(filter);
 
   res.status(200).json({
     success: true,
-    data:    { properties, total, page: Number(page), limit: Number(limit) },
+    data:    { properties: enriched, total, page: Number(page), limit: Number(limit) },
   });
 };
 

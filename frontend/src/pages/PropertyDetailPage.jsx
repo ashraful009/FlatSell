@@ -8,7 +8,7 @@ import UnitDetailModal from '../features/units/UnitDetailModal';
 const TABS = ['Overview', 'Floor Plan', 'Location'];
 
 const CATEGORY_ICONS = {
-  apartment: '🏢', commercial: '🏬', land: '🌿', villa: '🏡', office: '🏛️',
+  apartment: '🏢', villa: '🏡', land: '🌿',
 };
 
 // ── Skeleton ─────────────────────────────────────────────────────────────────
@@ -72,8 +72,11 @@ const PropertyDetailPage = () => {
 
   const {
     title, description, price, city, address, category,
-    mainImage, galleryImages, images, totalFloors, unitsPerFloor, companyId, addedBy, location,
+    mainImage, galleryImages, images, totalFloors, unitsPerFloor,
+    companyId, addedBy, location, villaDetails, landDetails,
   } = property;
+
+  const cat = category?.toLowerCase();
 
   const allImages = [];
   if (mainImage) allImages.push(mainImage);
@@ -182,14 +185,24 @@ const PropertyDetailPage = () => {
               </span>
             </div>
 
-            {/* Quick stats */}
+            {/* Quick stats — category-aware */}
             <div className="flex flex-wrap gap-4 mb-6 text-sm">
-              {[
+              {(cat === 'villa' ? [
+                { label: 'Floors',   value: villaDetails?.totalFloors || '—' },
+                { label: 'Bedrooms', value: villaDetails?.bedrooms   || '—' },
+                { label: 'Bathrooms',value: villaDetails?.bathrooms  || '—' },
+                { label: 'Land Size',value: villaDetails?.totalLandSize ? `${villaDetails.totalLandSize} Katha` : '—' },
+              ] : cat === 'land' ? [
+                { label: 'Size',     value: landDetails?.totalSize ? `${landDetails.totalSize} Katha` : '—' },
+                { label: 'Shape',    value: landDetails?.plotShape  || '—' },
+                { label: 'Type',     value: landDetails?.landType   || '—' },
+                { label: 'Road',     value: landDetails?.roadAccess || '—' },
+              ] : [
                 { label: 'Floors',       value: totalFloors   },
                 { label: 'Units/Floor',  value: unitsPerFloor },
                 { label: 'Total Units',  value: unitData.stats?.total || (totalFloors * unitsPerFloor) },
                 { label: 'Available',    value: unitData.stats?.available ?? '—' },
-              ].map(({ label, value }) => (
+              ]).map(({ label, value }) => (
                 <div key={label} className="flex flex-col items-center px-4 py-2.5
                                              bg-dark-800/60 border border-white/8 rounded-xl">
                   <span className="text-lg font-bold text-white">{value}</span>
@@ -217,21 +230,127 @@ const PropertyDetailPage = () => {
 
             {/* Tab content */}
             {activeTab === 'Overview' && (
-              <div className="animate-fadeIn">
-                <h2 className="text-white font-semibold mb-3">About this Property</h2>
-                <p className="text-gray-400 leading-relaxed text-sm whitespace-pre-line">
-                  {description}
-                </p>
+              <div className="animate-fadeIn space-y-6">
+                <div>
+                  <h2 className="text-white font-semibold mb-3">About this Property</h2>
+                  <p className="text-gray-400 leading-relaxed text-sm whitespace-pre-line">
+                    {description}
+                  </p>
+                </div>
+
+                {/* Villa-specific details */}
+                {cat === 'villa' && villaDetails && (
+                  <>
+                    <div>
+                      <h3 className="text-white font-semibold mb-3 text-sm">Construction Details</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {[
+                          { l: 'Year',        v: villaDetails.constructionYear || '—' },
+                          { l: 'Developer',   v: villaDetails.developerName    || '—' },
+                          { l: 'Materials',   v: villaDetails.materialsQuality || '—' },
+                          { l: 'Earthquake',  v: villaDetails.earthquakeResistant || '—' },
+                        ].map(({ l, v }) => (
+                          <div key={l} className="bg-dark-800/50 border border-white/5 rounded-xl px-3 py-2">
+                            <p className="text-white text-sm">{v}</p>
+                            <p className="text-gray-500 text-xs">{l}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-3 text-sm">Features & Amenities</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          ['privatePool',    '🏊 Pool'],
+                          ['garden',         '🌳 Garden'],
+                          ['garage',         '🚗 Garage'],
+                          ['rooftopTerrace', '🌇 Rooftop'],
+                          ['servantRoom',    '🛏️ Servant Room'],
+                          ['securitySystem', '🔒 Security'],
+                        ].map(([key, label]) => (
+                          <span key={key}
+                            className={`text-xs px-3 py-1.5 rounded-lg border ${
+                              villaDetails[key] === 'Yes'
+                                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                                : 'bg-white/5 border-white/10 text-gray-500'
+                            }`}>
+                            {label}: {villaDetails[key] || 'No'}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Land-specific details */}
+                {cat === 'land' && landDetails && (
+                  <>
+                    <div>
+                      <h3 className="text-white font-semibold mb-3 text-sm">Legal Information</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {[
+                          { l: 'Khatian',    v: landDetails.khatianNumber  || '—' },
+                          { l: 'Dag',         v: landDetails.dagNumber      || '—' },
+                          { l: 'Ownership',   v: landDetails.landOwnership  || '—' },
+                          { l: 'Dispute',     v: landDetails.anyDispute     || '—' },
+                        ].map(({ l, v }) => (
+                          <div key={l} className="bg-dark-800/50 border border-white/5 rounded-xl px-3 py-2">
+                            <p className="text-white text-sm">{v}</p>
+                            <p className="text-gray-500 text-xs">{l}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-3 text-sm">Utilities</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          ['electricityLine',    '⚡ Electricity'],
+                          ['gasWaterConnection',  '💧 Gas/Water'],
+                          ['drainageSystem',      '🚰 Drainage'],
+                        ].map(([key, label]) => (
+                          <span key={key}
+                            className={`text-xs px-3 py-1.5 rounded-lg border ${
+                              landDetails[key] === 'Yes'
+                                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                                : 'bg-white/5 border-white/10 text-gray-500'
+                            }`}>
+                            {label}: {landDetails[key] || 'No'}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    {(landDetails.nearbySchool || landDetails.nearbyHospital || landDetails.nearbyMarket) && (
+                      <div>
+                        <h3 className="text-white font-semibold mb-3 text-sm">Nearby Facilities</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {[
+                            { l: '🏫 School',   v: landDetails.nearbySchool },
+                            { l: '🏥 Hospital', v: landDetails.nearbyHospital },
+                            { l: '🏪 Market',   v: landDetails.nearbyMarket },
+                          ].filter(({ v }) => v).map(({ l, v }) => (
+                            <div key={l} className="bg-dark-800/50 border border-white/5 rounded-xl px-3 py-2">
+                              <p className="text-gray-500 text-xs mb-0.5">{l}</p>
+                              <p className="text-white text-sm">{v}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
 
             {activeTab === 'Floor Plan' && (
               <div className="animate-fadeIn">
                 <h2 className="text-white font-semibold mb-4">
-                  Interactive Floor Plan
-                  <span className="text-gray-500 font-normal text-sm ml-2">
-                    — click an available unit to view details
-                  </span>
+                  {cat === 'villa' ? 'Villa Visualizer' : cat === 'land' ? 'Plot Visualizer' : 'Interactive Floor Plan'}
+                  {cat === 'apartment' && (
+                    <span className="text-gray-500 font-normal text-sm ml-2">
+                      — click an available unit to view details
+                    </span>
+                  )}
                 </h2>
                 <UnitVisualizer
                   units={unitData.units}
@@ -278,21 +397,40 @@ const PropertyDetailPage = () => {
           <div className="space-y-4">
             {/* Price card */}
             <div className="glass-card p-5 sticky top-20">
-              <p className="text-gray-400 text-xs mb-1">Booking Money</p>
+              <p className="text-gray-400 text-xs mb-1">Total Price</p>
               <p className="text-3xl font-black text-white mb-1">
-                ৳{price?.toLocaleString()}
+                {cat === 'villa' && villaDetails?.totalPrice
+                  ? `৳${villaDetails.totalPrice.toLocaleString()}`
+                  : cat === 'land' && landDetails?.totalPrice
+                    ? `৳${landDetails.totalPrice.toLocaleString()}`
+                    : `৳${price?.toLocaleString()}`}
               </p>
-              <p className="text-gray-500 text-xs mb-5">per unit</p>
+              {cat === 'apartment' && <p className="text-gray-500 text-xs mb-5">per unit (varies by type)</p>}
+              {cat !== 'apartment' && <div className="mb-5" />}
 
               <button
                 onClick={() => setActiveTab('Floor Plan')}
-                className="btn-primary w-full mb-3"
+                className={`${cat === 'apartment' ? 'btn-primary' : 'btn-secondary'} w-full mb-3`}
               >
-                🏗️ View Floor Plan
+                {cat === 'apartment' ? '🏗️ View Floor Plan' : cat === 'villa' ? '🏡 View Villa Preview' : '🌿 View Land Preview'}
               </button>
-              <p className="text-center text-gray-500 text-xs">
-                Click a unit in the floor plan to book
-              </p>
+              
+              {cat === 'apartment' ? (
+                <p className="text-center text-gray-500 text-xs">
+                  Click a unit in the floor plan to book
+                </p>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (unitData.units.length > 0) {
+                      setSelectedUnit(unitData.units[0]);
+                    }
+                  }}
+                  className="btn-primary w-full"
+                >
+                  📋 Request Booking
+                </button>
+              )}
             </div>
 
             {/* Company card */}

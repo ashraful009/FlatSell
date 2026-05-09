@@ -7,11 +7,9 @@ import PropertyCardSkeleton from '../shared/components/PropertyCardSkeleton';
 const CITIES = ['Dhaka', 'Chittagong', 'Sylhet', 'Rajshahi', 'Khulna', 'Barishal'];
 
 const CATEGORIES = [
-  { key: 'apartment',  icon: '🏢', label: 'Apartments', gradient: 'from-blue-600/25 to-blue-900/20',    border: 'hover:border-blue-500/40'   },
-  { key: 'villa',      icon: '🏡', label: 'Villas',      gradient: 'from-pink-600/25 to-pink-900/20',    border: 'hover:border-pink-500/40'   },
-  { key: 'commercial', icon: '🏬', label: 'Commercial',  gradient: 'from-purple-600/25 to-purple-900/20', border: 'hover:border-purple-500/40' },
-  { key: 'land',       icon: '🌿', label: 'Land',        gradient: 'from-green-600/25 to-green-900/20',  border: 'hover:border-green-500/40'  },
-  { key: 'office',     icon: '🏛️', label: 'Offices',     gradient: 'from-cyan-600/25 to-cyan-900/20',   border: 'hover:border-cyan-500/40'   },
+  { key: 'apartment',  icon: '🏢', label: 'Apartments', gradient: 'from-blue-600/25 to-blue-900/20',   border: 'hover:border-blue-500/40'  },
+  { key: 'villa',      icon: '🏡', label: 'Villas',     gradient: 'from-pink-600/25 to-pink-900/20',   border: 'hover:border-pink-500/40'  },
+  { key: 'land',       icon: '🌿', label: 'Land',       gradient: 'from-green-600/25 to-green-900/20', border: 'hover:border-green-500/40' },
 ];
 
 // ── Counter animation hook ────────────────────────────────────────────────────
@@ -118,7 +116,7 @@ const HomePage = () => {
 
             <p className="text-gray-400 text-lg sm:text-xl mb-10 max-w-xl leading-relaxed">
               Browse thousands of verified properties from trusted companies.
-              Apartments, villas, commercial spaces — all in one place.
+              Apartments, villas, land — all in one place.
             </p>
 
             {/* Search bar */}
@@ -185,7 +183,7 @@ const HomePage = () => {
             <h2 className="section-title mb-2">Browse by Category</h2>
             <p className="text-gray-400">Find exactly what you&apos;re looking for</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4">
             {CATEGORIES.map(({ key, icon, label, gradient, border }) => (
               <button
                 key={key}

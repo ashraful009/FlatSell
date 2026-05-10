@@ -78,10 +78,20 @@ const createCheckoutSession = async (req, res) => {
     // Use default
   }
 
-  const bookingAmount = Math.round(totalPrice * (bookingMoneyPercentage / 100));
+  let bookingAmount = Math.round(totalPrice * (bookingMoneyPercentage / 100));
 
   if (bookingAmount <= 0) {
     return res.status(400).json({ success: false, message: 'Calculated booking amount is 0' });
+  }
+
+  // Handle Stripe's BDT limit (৳999,999.99) by converting to USD for large amounts
+  let stripeCurrency = 'bdt';
+  let stripeUnitAmount = bookingAmount * 100;
+  
+  if (bookingAmount > 999999) {
+    stripeCurrency = 'usd';
+    const usdAmount = Math.round(bookingAmount / 120); // Approx exchange rate
+    stripeUnitAmount = usdAmount * 100;
   }
 
   // ── Create pending booking record ──────────────────────────────────────
@@ -120,12 +130,12 @@ const createCheckoutSession = async (req, res) => {
       line_items: [
         {
           price_data: {
-            currency: 'bdt',
+            currency: stripeCurrency,
             product_data: {
               name: `Booking Money for ${property.title}${unit.unitNumber ? ` - Unit ${unit.unitNumber}` : ''}`,
               description: `${bookingMoneyPercentage}% of total price ৳${totalPrice.toLocaleString()} | Category: ${property.category}`,
             },
-            unit_amount: bookingAmount * 100, // Stripe expects smallest currency unit
+            unit_amount: stripeUnitAmount,
           },
           quantity: 1,
         },
@@ -137,6 +147,7 @@ const createCheckoutSession = async (req, res) => {
         unitId:    unit._id.toString(),
         userId:    req.user._id.toString(),
         type:      'booking',
+        exactBdtAmount: bookingAmount.toString(),
       },
     });
 
@@ -180,9 +191,19 @@ const createDuePaymentSession = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Booking money has not been paid yet, or already fully paid.' });
   }
 
-  const dueAmount = (booking.totalPrice || 0) - (booking.bookingAmount || 0);
+  let dueAmount = (booking.totalPrice || 0) - (booking.bookingAmount || 0);
   if (dueAmount <= 0) {
     return res.status(400).json({ success: false, message: 'No due amount remaining' });
+  }
+
+  // Handle Stripe's BDT limit (৳999,999.99) by converting to USD for large amounts
+  let stripeCurrency = 'bdt';
+  let stripeUnitAmount = dueAmount * 100;
+
+  if (dueAmount > 999999) {
+    stripeCurrency = 'usd';
+    const usdAmount = Math.round(dueAmount / 120); // Approx exchange rate
+    stripeUnitAmount = usdAmount * 100;
   }
 
   const property = booking.propertyId;
@@ -199,12 +220,12 @@ const createDuePaymentSession = async (req, res) => {
       line_items: [
         {
           price_data: {
-            currency: 'bdt',
+            currency: stripeCurrency,
             product_data: {
               name: `Due Payment for ${property?.title || 'Property'}`,
               description: `Remaining balance: ৳${dueAmount.toLocaleString()}`,
             },
-            unit_amount: dueAmount * 100,
+            unit_amount: stripeUnitAmount,
           },
           quantity: 1,
         },
@@ -215,6 +236,7 @@ const createDuePaymentSession = async (req, res) => {
         bookingId: booking._id.toString(),
         userId:    req.user._id.toString(),
         type:      'due',
+        exactBdtAmount: dueAmount.toString(),
       },
     });
 

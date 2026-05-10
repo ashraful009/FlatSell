@@ -172,19 +172,35 @@ const confirmStripeBooking = async (req, res) => {
         });
       }
 
-      booking.paymentStatus = 'fully_paid';
-      await booking.save();
-
-      // Mark unit as sold
-      const unit = await Unit.findById(booking.unitId);
-      if (unit) {
-        unit.status = 'sold';
-        await unit.save();
+      // Add the paid amount to the existing bookingAmount
+      let paidAmount = session.amount_total / 100;
+      if (session.metadata?.exactBdtAmount) {
+        paidAmount = Number(session.metadata.exactBdtAmount);
+      } else if (session.currency && session.currency.toLowerCase() === 'usd') {
+        paidAmount = paidAmount * 120;
       }
+      
+      booking.bookingAmount = (booking.bookingAmount || 0) + paidAmount;
+
+      // Check if the property is now fully paid
+      if (booking.bookingAmount >= booking.totalPrice) {
+        booking.paymentStatus = 'fully_paid';
+        
+        // Mark unit as sold
+        const unit = await Unit.findById(booking.unitId);
+        if (unit) {
+          unit.status = 'sold';
+          await unit.save();
+        }
+      }
+
+      await booking.save();
 
       return res.status(200).json({
         success: true,
-        message: 'Full payment confirmed! Property is now yours.',
+        message: booking.paymentStatus === 'fully_paid' 
+          ? 'Full payment confirmed! Property is now yours.' 
+          : `Partial payment of ৳${paidAmount.toLocaleString()} confirmed.`,
         data: { booking },
       });
     }
@@ -202,6 +218,13 @@ const confirmStripeBooking = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Unit not found' });
       }
 
+      let fallbackPaidAmount = session.amount_total / 100;
+      if (session.metadata?.exactBdtAmount) {
+        fallbackPaidAmount = Number(session.metadata.exactBdtAmount);
+      } else if (session.currency && session.currency.toLowerCase() === 'usd') {
+        fallbackPaidAmount = fallbackPaidAmount * 120;
+      }
+
       booking = await Booking.create({
         propertyId:   unit.propertyId._id,
         unitId:       unit._id,
@@ -209,7 +232,7 @@ const confirmStripeBooking = async (req, res) => {
         companyId:    unit.propertyId.companyId,
         status:       'confirmed',
         paymentStatus:'booking_paid',
-        bookingAmount: session.amount_total / 100,
+        bookingAmount: fallbackPaidAmount,
       });
 
       unit.status = 'booked';
@@ -223,7 +246,7 @@ const confirmStripeBooking = async (req, res) => {
       await booking.save();
     }
 
-    // ── Generate Commission Record ───────────────────────────────────────
+    // ── Generate Commission Record 
     await booking.populate('propertyId', 'category');
     
     if (booking.propertyId && booking.totalPrice) {

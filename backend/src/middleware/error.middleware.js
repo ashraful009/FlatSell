@@ -49,6 +49,12 @@ const errorHandler = (err, req, res, next) => {
     error = { message, statusCode: 400 };
   }
 
+  // Cloudinary Timeout Error
+  if (err.name === 'TimeoutError' || err.http_code === 499) {
+    const message = 'Image upload timed out. Please try again with smaller images or check your internet connection.';
+    error = { message, statusCode: 408 };
+  }
+
   res.status(error.statusCode || 500).json({
     success: false,
     message: error.message || 'Server Error'

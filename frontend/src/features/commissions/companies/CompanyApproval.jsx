@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axiosInstance from '../../shared/lib/axiosInstance';
+import axiosInstance from '../../../shared/lib/axiosInstance';
 import { toast } from 'react-hot-toast';
 
 const STATUS_COLORS = {

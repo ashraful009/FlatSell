@@ -2,6 +2,7 @@ import { useState, useRef, useMemo } from 'react';
 import { useNavigate }     from 'react-router-dom';
 import axiosInstance       from '../../shared/lib/axiosInstance';
 import LocationPicker      from '../vendor/LocationPicker';
+import PropertyPriceSection from './PropertyPriceSection';
 
 // ─────────────────────────────────────────────────────────────────────────────
 const CATEGORIES = ['Apartments', 'Villas', 'Land'];
@@ -36,7 +37,6 @@ const VILLA_DEFAULTS = {
   earthquakeResistant: 'No',
   privatePool: 'No', garden: 'No', garage: 'No',
   rooftopTerrace: 'No', servantRoom: 'No', securitySystem: 'No',
-  totalPrice: '', 
 };
 
 const LAND_DEFAULTS = {
@@ -46,7 +46,6 @@ const LAND_DEFAULTS = {
   khatianNumber: '', dagNumber: '', landOwnership: 'Single owner', anyDispute: 'No',
   electricityLine: 'No', gasWaterConnection: 'No', drainageSystem: 'No',
   nearbySchool: '', nearbyHospital: '', nearbyMarket: '', futureDevelopment: '',
-  totalPrice: '',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -262,17 +261,15 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
       fd.append('flatTypes', JSON.stringify(flatTypes));
     } else if (isVilla) {
       const sanitizedVilla = { ...villaForm };
-      ['totalLandSize', 'totalFloors', 'bedrooms', 'bathrooms', 'constructionYear', 'totalPrice'].forEach(key => {
+      ['totalLandSize', 'totalFloors', 'bedrooms', 'bathrooms', 'constructionYear'].forEach(key => {
         if (sanitizedVilla[key] === '') sanitizedVilla[key] = 0;
         else sanitizedVilla[key] = Number(sanitizedVilla[key]);
       });
       fd.append('villaDetails', JSON.stringify(sanitizedVilla));
     } else if (isLand) {
       const sanitizedLand = { ...landForm };
-      ['totalSize', 'totalPrice'].forEach(key => {
-        if (sanitizedLand[key] === '') sanitizedLand[key] = 0;
-        else sanitizedLand[key] = Number(sanitizedLand[key]);
-      });
+      if (sanitizedLand.totalSize === '') sanitizedLand.totalSize = 0;
+      else sanitizedLand.totalSize = Number(sanitizedLand.totalSize);
       fd.append('landDetails', JSON.stringify(sanitizedLand));
     }
 
@@ -304,9 +301,9 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
           Your property is pending review. It will appear publicly once approved by the admin.
         </p>
         <div className="flex gap-3 justify-center">
-          <button onClick={() => { 
-            setSubmitted(false); 
-            setForm({ title:'', description:'', price:'', address:'', city:'', category:'Apartments', totalFloors:5, unitsPerFloor:4, totalUnitsCount:'', landSize:'', handoverTime:'' }); 
+          <button onClick={() => {
+            setSubmitted(false);
+            setForm({ title:'', description:'', price:'', address:'', city:'', category:'Apartments', totalFloors:5, unitsPerFloor:4, totalUnitsCount:'', landSize:'', handoverTime:'' });
             setVillaForm({ ...VILLA_DEFAULTS });
             setLandForm({ ...LAND_DEFAULTS });
             setFlatTypes([defaultFlatType()]); 
@@ -370,12 +367,6 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
                 placeholder="e.g. Skyline Residences Block A" />
             </FormField>
           </div>
-
-          {/* Price */}
-          <FormField label="Total Price (BDT)" required>
-            <input name="price" type="number" required min="0" value={form.price}
-              onChange={handleChange} className="form-input" placeholder="2500000" />
-          </FormField>
 
           {/* City */}
           <FormField label="City" required>
@@ -764,15 +755,6 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
             </div>
           </section>
 
-          <section className="glass-card p-6">
-            <SectionHeader icon="💰" title="Price & Financial Info" subtitle="Property cost details" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField label="Total Price (BDT)">
-                <input name="totalPrice" type="number" min="0" value={villaForm.totalPrice}
-                  onChange={handleVilla} className="form-input" placeholder="50000000" />
-              </FormField>
-            </div>
-          </section>
         </>
       )}
 
@@ -893,17 +875,15 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
             </div>
           </section>
 
-          <section className="glass-card p-6">
-            <SectionHeader icon="💰" title="Price Info" subtitle="Cost details" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField label="Total Price (BDT)">
-                <input name="totalPrice" type="number" min="0" value={landForm.totalPrice}
-                  onChange={handleLand} className="form-input" placeholder="10000000" />
-              </FormField>
-            </div>
-          </section>
         </>
       )}
+
+      {/* ── Unified Price Section (all categories) ────────────────────── */}
+      <PropertyPriceSection
+        category={form.category}
+        price={form.price}
+        onChange={handleChange}
+      />
 
       {/* ── SECTION 6: Location ───────────────────────────────────────── */}
       <section className="glass-card p-6">

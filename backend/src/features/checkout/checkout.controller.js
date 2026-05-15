@@ -8,30 +8,18 @@ const BookingPolicy = require('../policies/bookingPolicy.model');
 // Helper: Calculate total price for a unit/property based on category
 // ─────────────────────────────────────────────────────────────────────────────
 const calculateTotalPrice = (property, unit) => {
-  const cat = property.category;
-
-  if (cat === 'apartment' && property.flatTypes?.length > 0) {
-    // Use flat type price based on unit column mapping
+  // Apartments: derive price from the matching flat type's pricePerUnit
+  if (property.category === 'apartment' && property.flatTypes?.length > 0) {
     const match = unit.unitNumber?.match(/\d+([A-Z]+)/i);
     if (match) {
-      const colIndex = match[1].charCodeAt(0) - 65;
+      const colIndex  = match[1].charCodeAt(0) - 65;
       const typeIndex = Math.min(colIndex, property.flatTypes.length - 1);
-      const flatType = property.flatTypes[typeIndex];
+      const flatType  = property.flatTypes[typeIndex];
       if (flatType?.pricePerUnit) return flatType.pricePerUnit;
     }
-    // Fallback to property price
-    return property.price || 0;
   }
 
-  if (cat === 'villa' && property.villaDetails?.totalPrice) {
-    return property.villaDetails.totalPrice;
-  }
-
-  if (cat === 'land' && property.landDetails?.totalPrice) {
-    return property.landDetails.totalPrice;
-  }
-
-  // Fallback
+  // All categories: authoritative price lives on the root property document
   return property.price || 0;
 };
 

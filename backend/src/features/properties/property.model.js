@@ -48,9 +48,7 @@ const villaDetailsSchema = new mongoose.Schema(
     rooftopTerrace:   { type: String, enum: ['Yes', 'No'], default: 'No' },
     servantRoom:      { type: String, enum: ['Yes', 'No'], default: 'No' },
     securitySystem:   { type: String, enum: ['Yes', 'No'], default: 'No' },
-
-    // Price & Financial
-    totalPrice:       { type: Number, default: 0 },
+    // Price is stored on the root property document (property.price)
   },
   { _id: false }
 );
@@ -87,9 +85,7 @@ const landDetailsSchema = new mongoose.Schema(
     nearbyHospital:    { type: String, default: '' },
     nearbyMarket:      { type: String, default: '' },
     futureDevelopment: { type: String, default: '' },
-
-    // Price Info
-    totalPrice:        { type: Number, default: 0 },
+    // Price is stored on the root property document (property.price)
   },
   { _id: false }
 );

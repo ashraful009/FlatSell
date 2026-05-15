@@ -4,19 +4,29 @@ const PDFDocument = require('pdfkit');
  * generateReportPDF
  * Builds a generic tabular PDF report in memory and returns a Buffer.
  *
- * @param {Object} opts
- * @param {string} opts.title         - Report title (e.g. "Sales Report")
- * @param {string} opts.subtitle      - e.g. company name or "Platform-Wide"
- * @param {string} opts.dateRange     - e.g. "01 Jan 2025 – 31 Jan 2025"
- * @param {string[]} opts.columns     - Column header labels
- * @param {number[]} opts.colWidths   - Width for each column in pts
- * @param {string[][]} opts.rows      - 2D array of cell values
- * @param {Object[]} opts.summaryRows - [{ label, value }] summary shown at bottom
+ * @param {Object}   opts
+ * @param {string}   opts.title        - Report title
+ * @param {string}   opts.subtitle     - Company name or scope label
+ * @param {string}   opts.dateRange    - Human-readable date range string
+ * @param {string[]} opts.columns      - Column header labels
+ * @param {number[]} opts.colWidths    - Width for each column (must sum to 495)
+ * @param {Array[]}  opts.rows         - 2D array of cell values
+ * @param {Object[]} opts.summaryRows  - [{ label, value }] shown at the bottom
+ * @param {Object[]} opts.summaryBox   - [{ label, value }] 3-metric card row below the title
  * @returns {Promise<Buffer>}
  */
-const generateReportPDF = ({ title, subtitle, dateRange, columns, colWidths, rows, summaryRows = [] }) => {
+const generateReportPDF = ({
+  title,
+  subtitle,
+  dateRange,
+  columns,
+  colWidths,
+  rows,
+  summaryRows = [],
+  summaryBox  = [],
+}) => {
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    const doc     = new PDFDocument({ margin: 50, size: 'A4' });
     const buffers = [];
 
     doc.on('data',  (chunk) => buffers.push(chunk));
@@ -29,10 +39,9 @@ const generateReportPDF = ({ title, subtitle, dateRange, columns, colWidths, row
     const TEXT_DARK = '#1e293b';
     const TEXT_GRAY = '#64748b';
     const LIGHT_BG  = '#f8f9ff';
-    const SUCCESS   = '#16a34a';
-    const W         = 495; // A4 595 - 2*50 margin
+    const W         = 495; // A4 (595) - 2 × 50 margin
 
-    // ── Header ────────────────────────────────────────────────────────────────
+    // ── Page Header ───────────────────────────────────────────────────────────
     doc.rect(0, 0, 595, 90).fill(DARK);
 
     doc.fillColor('#ffffff')
@@ -47,38 +56,72 @@ const generateReportPDF = ({ title, subtitle, dateRange, columns, colWidths, row
        .fontSize(8)
        .text('01611-652333  |  House No. 2, Road No. 11, Block F, Banani, Dhaka-1213', 50, 66);
 
-    // ── Title Block ───────────────────────────────────────────────────────────
+    // ── Report Title Block ────────────────────────────────────────────────────
     const tY = 108;
     doc.fillColor(TEXT_DARK).fontSize(18).font('Helvetica-Bold').text(title, 50, tY);
 
     doc.fillColor(TEXT_GRAY).fontSize(10).font('Helvetica');
-    if (subtitle)   doc.text(subtitle, 50, tY + 24);
+    if (subtitle)   doc.text(subtitle,              50, tY + 24);
     if (dateRange)  doc.text(`Period: ${dateRange}`, 50, tY + (subtitle ? 38 : 24));
 
     doc.fillColor(TEXT_GRAY).fontSize(8)
-       .text(`Generated: ${new Date().toLocaleString('en-BD')}`, 50, tY + 54, { align: 'right', width: W });
+       .text(
+         `Generated: ${new Date().toLocaleString('en-BD')}`,
+         50, tY + 54,
+         { align: 'right', width: W }
+       );
 
-    doc.moveTo(50, tY + 68).lineTo(545, tY + 68).strokeColor('#e2e8f0').lineWidth(1).stroke();
+    doc.moveTo(50, tY + 68).lineTo(545, tY + 68)
+       .strokeColor('#e2e8f0').lineWidth(1).stroke();
 
-    // ── Table ─────────────────────────────────────────────────────────────────
+    // ── Summary Metric Cards ──────────────────────────────────────────────────
     let tableY = tY + 80;
 
-    // Header row
+    if (summaryBox.length > 0) {
+      const BOX_COLORS  = ['#eef2ff', '#f0fdf4', '#fff7ed'];
+      const ACCENT_BARS = ['#4f52e6', '#16a34a', '#d97706'];
+      const VAL_COLORS  = ['#4f52e6', '#16a34a', '#d97706'];
+      const boxStartY   = tY + 78;
+      const boxH        = 60;
+      const n           = summaryBox.length;
+
+      summaryBox.forEach(({ label, value }, i) => {
+        const boxW   = Math.floor(W / n);
+        const bx     = 50 + i * boxW;
+        // Last card absorbs any rounding remainder
+        const actualW = i === n - 1 ? W - i * boxW : boxW;
+
+        doc.rect(bx, boxStartY, actualW, boxH).fill(BOX_COLORS[i % BOX_COLORS.length]);
+        doc.rect(bx, boxStartY, 3, boxH).fill(ACCENT_BARS[i % ACCENT_BARS.length]);
+
+        doc.fillColor(TEXT_GRAY).fontSize(7.5).font('Helvetica')
+           .text(label, bx + 10, boxStartY + 10, { width: actualW - 14 });
+
+        doc.fillColor(VAL_COLORS[i % VAL_COLORS.length]).fontSize(14).font('Helvetica-Bold')
+           .text(String(value), bx + 10, boxStartY + 28, { width: actualW - 14 });
+      });
+
+      tableY = boxStartY + boxH + 18;
+    }
+
+    // ── Table Header Row ──────────────────────────────────────────────────────
     doc.rect(50, tableY, W, 22).fill(PRIMARY);
+
     let xCursor = 50;
     columns.forEach((col, i) => {
       doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold')
          .text(col, xCursor + 4, tableY + 6, { width: colWidths[i] - 4, ellipsis: true });
       xCursor += colWidths[i];
     });
-
     tableY += 22;
 
-    // Data rows
+    // ── Data Rows ─────────────────────────────────────────────────────────────
     if (rows.length === 0) {
       doc.rect(50, tableY, W, 30).fill(LIGHT_BG).stroke('#e2e8f0');
       doc.fillColor(TEXT_GRAY).fontSize(9).font('Helvetica')
-         .text('No data available for the selected period.', 50, tableY + 10, { align: 'center', width: W });
+         .text('No data available for the selected period.', 50, tableY + 10, {
+           align: 'center', width: W,
+         });
       tableY += 30;
     } else {
       rows.forEach((row, rowIdx) => {
@@ -99,7 +142,6 @@ const generateReportPDF = ({ title, subtitle, dateRange, columns, colWidths, row
 
         tableY += rowH;
 
-        // Page break guard
         if (tableY > 720) {
           doc.addPage();
           tableY = 50;
@@ -107,7 +149,7 @@ const generateReportPDF = ({ title, subtitle, dateRange, columns, colWidths, row
       });
     }
 
-    // ── Summary Footer ─────────────────────────────────────────────────────────
+    // ── Summary Footer ────────────────────────────────────────────────────────
     if (summaryRows.length > 0) {
       tableY += 16;
       doc.moveTo(50, tableY).lineTo(545, tableY).strokeColor('#e2e8f0').stroke();
@@ -123,10 +165,12 @@ const generateReportPDF = ({ title, subtitle, dateRange, columns, colWidths, row
     }
 
     // ── Page Footer ───────────────────────────────────────────────────────────
-    const footY = 790;
     doc.fillColor(TEXT_GRAY).fontSize(7).font('Helvetica')
-       .text(`© ${new Date().getFullYear()} FlatSell. Confidential Report. All Rights Reserved.`,
-         50, footY, { align: 'center', width: W });
+       .text(
+         `© ${new Date().getFullYear()} FlatSell. Confidential Report. All Rights Reserved.`,
+         50, 790,
+         { align: 'center', width: W }
+       );
 
     doc.end();
   });

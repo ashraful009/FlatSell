@@ -3,7 +3,7 @@ import useAuth            from '../../shared/hooks/useAuth';
 import AddPropertyWizard  from '../../features/properties/AddPropertyWizard';
 import ManageProperties   from '../../features/properties/ManageProperties';
 import PropertyRequests   from '../../features/properties/PropertyRequests';
-import CompanyApproval    from '../../features/companies/CompanyApproval';
+import CompanyApproval    from '../../features/commissions/companies/CompanyApproval';
 import MarginTracking     from '../../features/commissions/MarginTracking';
 import SalesReport        from '../../features/bookings/SalesReport';
 

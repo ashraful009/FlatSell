@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../shared/lib/axiosInstance';
 import LocationPicker from '../vendor/LocationPicker';
+import PropertyPriceSection from './PropertyPriceSection';
 
 const CATEGORIES = ['apartment', 'villa', 'land'];
 
@@ -33,7 +34,6 @@ const VILLA_DEFAULTS = {
   earthquakeResistant: 'No',
   privatePool: 'No', garden: 'No', garage: 'No',
   rooftopTerrace: 'No', servantRoom: 'No', securitySystem: 'No',
-  totalPrice: '', bookingMoney: '',
 };
 
 const LAND_DEFAULTS = {
@@ -43,7 +43,6 @@ const LAND_DEFAULTS = {
   khatianNumber: '', dagNumber: '', landOwnership: 'Single owner', anyDispute: 'No',
   electricityLine: 'No', gasWaterConnection: 'No', drainageSystem: 'No',
   nearbySchool: '', nearbyHospital: '', nearbyMarket: '', futureDevelopment: '',
-  bookingMoney: '', totalPrice: '',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -174,10 +173,6 @@ const AddPropertyForm = () => {
             <input name="title" type="text" required value={form.title}
               onChange={handleChange} className="form-input"
               placeholder="Skyline Residences Block A" />
-          </Field>
-          <Field label="Booking Money (BDT) *">
-            <input name="price" type="number" required min="0" value={form.price}
-              onChange={handleChange} className="form-input" placeholder="2500000" />
           </Field>
           <Field label="Category *">
             <select name="category" value={form.category} onChange={handleChange} className="form-input">
@@ -368,20 +363,6 @@ const AddPropertyForm = () => {
             </div>
           </section>
 
-          {/* Price & Financial */}
-          <section>
-            <SectionTitle>Price &amp; Financial Info</SectionTitle>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Total Price (BDT)">
-                <input name="totalPrice" type="number" min="0" value={villaForm.totalPrice}
-                  onChange={handleVilla} className="form-input" placeholder="50000000" />
-              </Field>
-              <Field label="Booking Money (BDT)">
-                <input name="bookingMoney" type="number" min="0" value={villaForm.bookingMoney}
-                  onChange={handleVilla} className="form-input" placeholder="5000000" />
-              </Field>
-            </div>
-          </section>
         </>
       )}
 
@@ -508,22 +489,15 @@ const AddPropertyForm = () => {
             </div>
           </section>
 
-          {/* Price */}
-          <section>
-            <SectionTitle>Price Info</SectionTitle>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Booking Money (BDT)">
-                <input name="bookingMoney" type="number" min="0" value={landForm.bookingMoney}
-                  onChange={handleLand} className="form-input" placeholder="500000" />
-              </Field>
-              <Field label="Total Price (BDT)">
-                <input name="totalPrice" type="number" min="0" value={landForm.totalPrice}
-                  onChange={handleLand} className="form-input" placeholder="10000000" />
-              </Field>
-            </div>
-          </section>
         </>
       )}
+
+      {/* ── Unified Price Section (all categories) ────────────────────────── */}
+      <PropertyPriceSection
+        category={form.category}
+        price={form.price}
+        onChange={handleChange}
+      />
 
       {/* ── Location on Map (shared) ──────────────────────────────────────── */}
       <section>

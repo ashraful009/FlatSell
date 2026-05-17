@@ -179,6 +179,15 @@ const createDuePaymentSession = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Booking money has not been paid yet, or already fully paid.' });
   }
 
+  // Installment plan active → block lump-sum due payment; customer must pay
+  // each installment individually through the installments endpoints.
+  if (booking.installmentPlan?.active) {
+    return res.status(400).json({
+      success: false,
+      message: 'An installment plan is active for this booking. Pay installments individually instead.',
+    });
+  }
+
   let dueAmount = (booking.totalPrice || 0) - (booking.bookingAmount || 0);
   if (dueAmount <= 0) {
     return res.status(400).json({ success: false, message: 'No due amount remaining' });

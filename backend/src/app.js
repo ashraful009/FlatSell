@@ -59,6 +59,7 @@ app.use('/api/bookings',   require('./features/bookings/booking.routes'));
 app.use('/api/checkout',          require('./features/checkout/checkout.routes'));
 app.use('/api/booking-policies',  require('./features/policies/bookingPolicy.routes'));
 app.use('/api/commissions',       require('./features/commissions/commission.routes'));
+app.use('/api/installments',      require('./features/installments/installment.routes'));
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {

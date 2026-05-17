@@ -76,6 +76,18 @@ const bookingSchema = new mongoose.Schema(
       type:    String,
       default: null,
     },
+
+    // ── Installment Plan (snapshot — line items live in `installments` coll.)
+    // When active, the customer pays the remaining `dueAmount` in N
+    // monthly installments instead of one lump-sum "due" payment.
+    installmentPlan: {
+      active:                   { type: Boolean, default: false },
+      totalCount:               { type: Number,  default: 0     },  // 1–24
+      extraChargePercentage:    { type: Number,  default: 0     },  // 0, 7, or 12
+      baseAmountPerInstallment: { type: Number,  default: 0     },  // floor(dueAmount / N)
+      totalDueAmount:           { type: Number,  default: 0     },  // dueAmount at plan creation
+      createdAt:                { type: Date                    },
+    },
   },
   { timestamps: true }
 );

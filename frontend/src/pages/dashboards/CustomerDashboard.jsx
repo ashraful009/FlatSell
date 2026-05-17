@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import axiosInstance from '../../shared/lib/axiosInstance';
 import useAuth from '../../shared/hooks/useAuth';
 import { toast } from 'react-hot-toast';
+import InstallmentSetupModal from '../../features/installments/InstallmentSetupModal';
+import InstallmentListModal  from '../../features/installments/InstallmentListModal';
 
 const STATUS_COLORS = {
   pending:   'bg-amber-500/20  text-amber-400  border-amber-500/30',
@@ -24,17 +26,22 @@ const CustomerDashboard = () => {
   const [loading,  setLoading]  = useState(true);
   const [payingDue, setPayingDue] = useState(null);
 
+  // Installment modals
+  const [setupBooking, setSetupBooking] = useState(null);  // booking object → opens setup modal
+  const [listBookingId, setListBookingId] = useState(null); // bookingId → opens list modal
+
+  const fetchBookings = async () => {
+    try {
+      const { data } = await axiosInstance.get('/bookings/my');
+      setBookings(data.data.bookings);
+    } catch {
+      setBookings([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const { data } = await axiosInstance.get('/bookings/my');
-        setBookings(data.data.bookings);
-      } catch {
-        setBookings([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBookings();
   }, []);
 
@@ -115,13 +122,19 @@ const CustomerDashboard = () => {
       ) : bookings.length > 0 ? (
         <div className="space-y-4">
           {bookings.map((b) => {
-            const paymentCfg    = PAYMENT_CONFIG[b.paymentStatus] || PAYMENT_CONFIG.unpaid;
-            const bookingAmount = b.bookingAmount || 0;
-            const totalPrice    = b.totalPrice || 0;
-            const dueAmount     = totalPrice - bookingAmount;
-            const isBookingPaid = b.paymentStatus === 'booking_paid' || b.paymentStatus === 'paid';
-            const isFullyPaid   = b.paymentStatus === 'fully_paid';
-            const showDueBtn    = isBookingPaid && dueAmount > 0;
+            const paymentCfg     = PAYMENT_CONFIG[b.paymentStatus] || PAYMENT_CONFIG.unpaid;
+            const bookingAmount  = b.bookingAmount || 0;
+            const totalPrice     = b.totalPrice || 0;
+            const dueAmount      = totalPrice - bookingAmount;
+            const isBookingPaid  = b.paymentStatus === 'booking_paid' || b.paymentStatus === 'paid';
+            const isFullyPaid    = b.paymentStatus === 'fully_paid';
+            const hasInstallPlan = !!b.installmentPlan?.active;
+            // "Pay Due" lump-sum is only available when no installment plan is active
+            const showDueBtn     = isBookingPaid && dueAmount > 0 && !hasInstallPlan;
+            // "Set Installment" only available when booking paid, dues remain, and no plan yet
+            const showSetupBtn   = isBookingPaid && dueAmount > 0 && !hasInstallPlan && !isFullyPaid;
+            // "Pay Installment" replaces the due button once a plan is active
+            const showPayInstallBtn = hasInstallPlan && !isFullyPaid;
 
             // Get property image
             const propImage = b.propertyId?.mainImage || (b.propertyId?.galleryImages?.length > 0 ? b.propertyId.galleryImages[0] : null);
@@ -143,13 +156,31 @@ const CustomerDashboard = () => {
                 {/* Info */}
                 <div className="flex-1 min-w-0 flex flex-col justify-between">
                   <div>
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start mb-2 gap-3">
                       <Link to={`/property/${b.propertyId?._id}`} className="text-lg font-bold text-white hover:text-primary-400 transition-colors truncate">
                         {b.propertyId?.title || 'Unknown Property'}
                       </Link>
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${STATUS_COLORS[b.status]}`}>
-                        {b.status.toUpperCase()}
-                      </span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {showSetupBtn && (
+                          <button
+                            onClick={() => setSetupBooking(b)}
+                            className="px-2.5 py-1 rounded-lg text-xs font-semibold border
+                                       bg-primary-500/15 text-primary-300 border-primary-500/30
+                                       hover:bg-primary-500/25 hover:border-primary-500/50 transition-all"
+                          >
+                            📅 Set Installment
+                          </button>
+                        )}
+                        {hasInstallPlan && (
+                          <span className="px-2.5 py-1 rounded-lg text-[10px] font-semibold border
+                                           bg-blue-500/15 text-blue-300 border-blue-500/30">
+                            📅 {b.installmentPlan.totalCount}-Installment Plan
+                          </span>
+                        )}
+                        <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${STATUS_COLORS[b.status]}`}>
+                          {b.status.toUpperCase()}
+                        </span>
+                      </div>
                     </div>
                     <p className="text-gray-400 text-sm mb-3">
                       {b.unitId?.floor && <span className="font-medium text-gray-300">Floor {b.unitId.floor}</span>}
@@ -182,6 +213,15 @@ const CustomerDashboard = () => {
                         <p className="text-gray-500 mb-0.5">Due</p>
                         {isFullyPaid ? (
                           <p className="text-emerald-400 font-semibold">৳0 ✓</p>
+                        ) : showPayInstallBtn ? (
+                          <button
+                            onClick={() => setListBookingId(b._id)}
+                            className="mt-0.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600
+                                       text-white text-xs font-bold hover:from-blue-600 hover:to-indigo-700
+                                       transition-all duration-200 shadow-sm"
+                          >
+                            💳 Pay Installment
+                          </button>
                         ) : showDueBtn ? (
                           <button
                             onClick={() => handleDuePayment(b._id)}
@@ -237,6 +277,19 @@ const CustomerDashboard = () => {
           </Link>
         </div>
       )}
+
+      {/* ── Installment Modals ──────────────────────────────────────────── */}
+      <InstallmentSetupModal
+        open={!!setupBooking}
+        booking={setupBooking}
+        onClose={() => setSetupBooking(null)}
+        onSuccess={() => fetchBookings()}
+      />
+      <InstallmentListModal
+        open={!!listBookingId}
+        bookingId={listBookingId}
+        onClose={() => setListBookingId(null)}
+      />
     </div>
   );
 };

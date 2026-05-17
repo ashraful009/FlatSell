@@ -19,43 +19,48 @@ const BookingSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const sessionId   = searchParams.get('session_id');
-  const paymentType = searchParams.get('type') || 'booking'; // 'booking' or 'due'
-  const [status, setStatus] = useState('processing'); // processing, success, error
+  const paymentType = searchParams.get('type') || 'booking'; // 'booking' | 'due' | 'installment'
+  // Initialise to 'error' immediately when session_id is missing — avoids
+  // setting state inside the effect for that branch.
+  const [status, setStatus] = useState(() => (sessionId ? 'processing' : 'error'));
   const called = useRef(false);
 
-  const isDuePayment = paymentType === 'due';
+  const isDuePayment        = paymentType === 'due';
+  const isInstallmentPayment = paymentType === 'installment';
 
   useEffect(() => {
-    if (!sessionId) {
-      setStatus('error');
-      return;
-    }
+    if (!sessionId) return;
 
-    const confirmBooking = async () => {
+    const confirm = async () => {
       if (called.current) return;
       called.current = true;
       try {
-        await axiosInstance.post('/bookings/confirm', { sessionId });
+        // Installment payments use a separate confirmation endpoint
+        const endpoint = isInstallmentPayment
+          ? '/installments/confirm'
+          : '/bookings/confirm';
+        await axiosInstance.post(endpoint, { sessionId });
         setStatus('success');
         toast.success(
-          isDuePayment
-            ? 'Full payment successful! Property is now yours.'
-            : 'Payment successful! Booking confirmed.'
+          isInstallmentPayment
+            ? 'Installment paid successfully!'
+            : isDuePayment
+              ? 'Full payment successful! Property is now yours.'
+              : 'Payment successful! Booking confirmed.'
         );
-        
-        // Redirect to My Properties after a short delay
+
         setTimeout(() => {
-          navigate('/customer-dashboard/my-properties');
+          navigate(isInstallmentPayment ? '/customer-dashboard' : '/customer-dashboard/my-properties');
         }, 3000);
       } catch (error) {
         console.error('Confirmation error:', error);
         setStatus('error');
-        toast.error(error.response?.data?.message || 'Failed to confirm booking.');
+        toast.error(error.response?.data?.message || 'Failed to confirm payment.');
       }
     };
 
-    confirmBooking();
-  }, [sessionId, navigate, isDuePayment]);
+    confirm();
+  }, [sessionId, navigate, isDuePayment, isInstallmentPayment]);
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

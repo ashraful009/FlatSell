@@ -4,7 +4,7 @@ import AddPropertyWizard        from '../../features/properties/AddPropertyWizar
 import ManageProperties         from '../../features/properties/ManageProperties';
 import PropertyRequests         from '../../features/properties/PropertyRequests';
 import BookingManagement        from '../../features/bookings/BookingManagement';
-import BookingPoliciesSettings  from '../../features/companies/BookingPoliciesSettings';
+import BookingPoliciesSettings  from '../../features/commissions/companies/BookingPoliciesSettings';
 import SalesReport              from '../../features/bookings/SalesReport';
 
 const TABS = [

@@ -72,6 +72,25 @@ const AddPropertyForm = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ── Auto Geocode on Address Blur ─────────────────────────────────────────
+  const handleAddressBlur = async () => {
+    if (!form.address) return;
+    const query = `${form.address}, ${form.city || ''}, Bangladesh`.trim();
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&email=mdashrafulislam0807@gmail.com`);
+      const data = await res.json();
+      if (data && data.length > 0) {
+        setLocation({
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+          address: data[0].display_name
+        });
+      }
+    } catch (err) {
+      console.error('Geocoding error:', err);
+    }
+  };
+
   const handleVilla = (e) => {
     const { name, value } = e.target;
     setVillaForm((prev) => ({ ...prev, [name]: value }));
@@ -189,9 +208,18 @@ const AddPropertyForm = () => {
           </Field>
           <Field label="Full Address *">
             <input name="address" type="text" required value={form.address}
-              onChange={handleChange} className="form-input"
+              onChange={handleChange} onBlur={handleAddressBlur} className="form-input"
               placeholder="Road 10, Block C, Gulshan" />
           </Field>
+
+          {/* Location on Map (Moved up) */}
+          <div className="sm:col-span-2">
+            <label className="form-label flex justify-between items-end">
+              <span>Location on Map <span className="text-gray-500 font-normal text-sm">(auto-updated from address)</span></span>
+            </label>
+            <LocationPicker value={location} onChange={setLocation} />
+          </div>
+
           <Field label="Description *" span2>
             <textarea name="description" required rows={3} value={form.description}
               onChange={handleChange} className="form-input resize-none"
@@ -499,13 +527,6 @@ const AddPropertyForm = () => {
         onChange={handleChange}
       />
 
-      {/* ── Location on Map (shared) ──────────────────────────────────────── */}
-      <section>
-        <SectionTitle>
-          Location on Map <span className="text-gray-500 font-normal text-sm">(optional)</span>
-        </SectionTitle>
-        <LocationPicker value={location} onChange={setLocation} />
-      </section>
 
       {/* ── Property Images (shared) ──────────────────────────────────────── */}
       <section>

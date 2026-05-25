@@ -138,6 +138,25 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ── Auto Geocode on Address Blur ─────────────────────────────────────────
+  const handleAddressBlur = async () => {
+    if (!form.address) return;
+    const query = `${form.address}, ${form.city || ''}, Bangladesh`.trim();
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&email=mdashrafulislam0807@gmail.com`);
+      const data = await res.json();
+      if (data && data.length > 0) {
+        setLocation({
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+          address: data[0].display_name
+        });
+      }
+    } catch (err) {
+      console.error('Geocoding error:', err);
+    }
+  };
+
   const handleVilla = (e) => {
     const { name, value } = e.target;
     setVillaForm((prev) => ({ ...prev, [name]: value }));
@@ -378,9 +397,17 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
           <div className="sm:col-span-2">
             <FormField label="Full Address" required>
               <input name="address" type="text" required value={form.address}
-                onChange={handleChange} className="form-input"
+                onChange={handleChange} onBlur={handleAddressBlur} className="form-input"
                 placeholder="Road 10, Block C, Gulshan, Dhaka" />
             </FormField>
+          </div>
+
+          {/* Location on Map (Moved up) */}
+          <div className="sm:col-span-2">
+            <label className="form-label flex justify-between items-end">
+              <span>Location on Map <span className="text-gray-500 font-normal text-sm">(auto-updated from address)</span></span>
+            </label>
+            <LocationPicker value={location} onChange={setLocation} />
           </div>
           
           {/* Shared Description */}
@@ -884,16 +911,6 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
         price={form.price}
         onChange={handleChange}
       />
-
-      {/* ── SECTION 6: Location ───────────────────────────────────────── */}
-      <section className="glass-card p-6">
-        <SectionHeader
-          icon="📍"
-          title="Location on Map"
-          subtitle="Optional — pin the exact location for customers"
-        />
-        <LocationPicker value={location} onChange={setLocation} />
-      </section>
 
       {/* ── SECTION 7: Images ─────────────────────────────────────────── */}
       <section className="glass-card p-6">

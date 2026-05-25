@@ -47,7 +47,8 @@ const createProperty = async (req, res) => {
     landDetails: landDetailsRaw,
   } = req.body;
 
-  if (!title || !description || !price || !address || !city || !category) {
+  // If category is apartment, price might be auto-calculated later, so it's not strictly required here
+  if (!title || !description || (!price && category !== 'apartment') || !address || !city || !category) {
     return res.status(400).json({ success: false, message: 'All required fields must be filled.' });
   }
 
@@ -96,6 +97,12 @@ const createProperty = async (req, res) => {
   const villaDetails = parseJsonObject(villaDetailsRaw);
   const landDetails  = parseJsonObject(landDetailsRaw);
 
+  let calculatedPrice = Number(price) || 0;
+  if (category === 'apartment' && flatTypes.length > 0) {
+    const validPrices = flatTypes.map((f) => Number(f.pricePerUnit) || 0).filter((p) => p > 0);
+    if (validPrices.length > 0) calculatedPrice = Math.min(...validPrices);
+  }
+
   // ── For Super Admin: auto-approve
   const status     = isSuperAdmin ? 'approved' : 'pending';
   const approvedAt = isSuperAdmin ? new Date()  : undefined;
@@ -103,7 +110,7 @@ const createProperty = async (req, res) => {
   const propertyData = {
     title,
     description,
-    price:           Number(price),
+    price:           calculatedPrice,
     category,
     mainImage:       mainImageUrl,
     galleryImages:   galleryUrls,
@@ -171,7 +178,6 @@ const updateProperty = async (req, res) => {
 
   if (title)           property.title           = title;
   if (description)     property.description     = description;
-  if (price)           property.price           = Number(price);
   if (address)         property.address         = address;
   if (city)            property.city            = city;
   if (category)        property.category        = category;
@@ -183,8 +189,18 @@ const updateProperty = async (req, res) => {
   if (lat)             property.location.lat    = parseFloat(lat);
   if (lng)             property.location.lng    = parseFloat(lng);
   if (flatTypesRaw)    property.flatTypes       = parseFlatTypes(flatTypesRaw);
-  if (villaDetailsRaw) property.villaDetails     = parseJsonObject(villaDetailsRaw);
-  if (landDetailsRaw)  property.landDetails      = parseJsonObject(landDetailsRaw);
+  if (villaDetailsRaw) property.villaDetails    = parseJsonObject(villaDetailsRaw);
+  if (landDetailsRaw)  property.landDetails     = parseJsonObject(landDetailsRaw);
+
+  // Auto calculate price for apartment based on flatTypes minimum
+  if (property.category === 'apartment' && property.flatTypes?.length > 0) {
+    const validPrices = property.flatTypes.map((f) => Number(f.pricePerUnit) || 0).filter((p) => p > 0);
+    if (validPrices.length > 0) {
+      property.price = Math.min(...validPrices);
+    }
+  } else if (price) {
+    property.price = Number(price);
+  }
 
   // Replace images if new files uploaded
   if (files.mainImage?.[0]) {
@@ -332,7 +348,19 @@ const getApprovedProperties = async (req, res) => {
     policyMap[`${p.companyId}_${p.category}`] = p.bookingMoneyPercentage;
   });
 
-  // Attach booking info to each property
+  // ── Batch-fetch unit statuses for villa & land properties ──────────────
+  const villaOrLandPropIds = properties
+    .filter((p) => p.category === 'villa' || p.category === 'land')
+    .map((p) => p._id);
+  const units = villaOrLandPropIds.length
+    ? await Unit.find({ propertyId: { $in: villaOrLandPropIds } }).lean()
+    : [];
+  const unitStatusMap = {};
+  units.forEach((u) => {
+    unitStatusMap[u.propertyId.toString()] = u.status;
+  });
+
+  // Attach booking info and unit status to each property
   const enriched = properties.map((p) => {
     const key = `${p.companyId?._id || p.companyId}_${p.category}`;
     const pct = policyMap[key] || 20; // default 20%
@@ -340,6 +368,7 @@ const getApprovedProperties = async (req, res) => {
       ...p,
       bookingMoneyPercentage: pct,
       bookingMoneyAmount:     Math.round(p.price * pct / 100),
+      unitStatus:             unitStatusMap[p._id.toString()] || 'available',
     };
   });
 
@@ -363,9 +392,26 @@ const getCompanyProperties = async (req, res) => {
     isActive:  true,
   })
     .populate('companyId', 'name logo')
-    .sort('-approvedAt');
+    .sort('-approvedAt')
+    .lean();
 
-  res.status(200).json({ success: true, data: { properties } });
+  const villaOrLandPropIds = properties
+    .filter((p) => p.category === 'villa' || p.category === 'land')
+    .map((p) => p._id);
+  const units = villaOrLandPropIds.length
+    ? await Unit.find({ propertyId: { $in: villaOrLandPropIds } }).lean()
+    : [];
+  const unitStatusMap = {};
+  units.forEach((u) => {
+    unitStatusMap[u.propertyId.toString()] = u.status;
+  });
+
+  const enriched = properties.map((p) => ({
+    ...p,
+    unitStatus: unitStatusMap[p._id.toString()] || 'available',
+  }));
+
+  res.status(200).json({ success: true, data: { properties: enriched } });
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -413,13 +459,22 @@ const getAllProperties = async (req, res) => {
 const getSingleProperty = async (req, res) => {
   const property = await Property.findById(req.params.id)
     .populate('companyId', 'name logo email phone location')
-    .populate('addedBy', 'name email');
+    .populate('addedBy', 'name email')
+    .lean();
 
   if (!property) {
     return res.status(404).json({ success: false, message: 'Property not found' });
   }
 
-  res.status(200).json({ success: true, data: { property } });
+  let unitStatus = 'available';
+  if (property.category === 'villa' || property.category === 'land') {
+    const unit = await Unit.findOne({ propertyId: property._id }).lean();
+    if (unit) {
+      unitStatus = unit.status;
+    }
+  }
+
+  res.status(200).json({ success: true, data: { property: { ...property, unitStatus } } });
 };
 
 module.exports = {

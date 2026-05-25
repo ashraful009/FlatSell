@@ -31,7 +31,7 @@ const shouldShowVendorBtn = (isAuthenticated, roles = []) => {
 const NAV_LINKS = [
   { label: 'Home',       path: '/' },
   { label: 'Properties', path: '/properties' },
-  { label: 'Companies',  path: '/companies' },
+  
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

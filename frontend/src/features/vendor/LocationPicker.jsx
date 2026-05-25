@@ -1,5 +1,5 @@
-
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 // ── Fix broken Leaflet marker icons in Vite ───────────────────────────────
@@ -38,13 +38,18 @@ const ClickHandler = ({ onPick }) => {
   return null;
 };
 
-/**
- * LocationPicker — Interactive Leaflet map for vendor location selection
- *
- * Props:
- *  - value: { lat, lng, address }
- *  - onChange: (location) => void
- */
+// ── Auto center map when center prop changes ───────────────────────────────
+const MapUpdater = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.flyTo(center, 15);
+    }
+  }, [center[0], center[1], map]);
+  return null;
+};
+
+
 const LocationPicker = ({ value, onChange }) => {
   // Default center: Dhaka, Bangladesh
   const DEFAULT_CENTER = [23.8103, 90.4125];
@@ -60,9 +65,10 @@ const LocationPicker = ({ value, onChange }) => {
           className="rounded-xl"
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
+          <MapUpdater center={center} />
           <ClickHandler onPick={onChange} />
           {value?.lat && (
             <Marker position={[value.lat, value.lng]} />

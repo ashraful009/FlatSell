@@ -138,13 +138,15 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
           <div className="grid grid-cols-2 gap-3 mb-5">
             {[
               { label: 'Type',   value: unit.type   || '—' },
-              { label: 'Size',   value: unit.size   || '—' },
-              { label: 'Facing', value: unit.facing || '—' },
+              { label: 'Size',   value: unit.size || property?.landSize || (property?.landDetails?.totalSize ? `${property.landDetails.totalSize} Katha` : null) || (property?.villaDetails?.totalLandSize ? `${property.villaDetails.totalLandSize} Katha` : null) || '—' },
+              { label: 'Facing', value: unit.facing || '—', hide: !unit.facing },
               {
                 label: 'Price',
                 value: displayPrice ? `৳${displayPrice.toLocaleString()}` : '—'
               },
-            ].map(({ label, value }) => (
+            ]
+              .filter((item) => !item.hide)
+              .map(({ label, value }) => (
               <div key={label}
                 className="bg-dark-800/60 border border-white/8 rounded-xl px-3 py-2.5">
                 <p className="text-gray-500 text-xs mb-0.5">{label}</p>

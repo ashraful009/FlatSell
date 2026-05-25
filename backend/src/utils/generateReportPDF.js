@@ -1,6 +1,23 @@
 const PDFDocument = require('pdfkit');
 
 /**
+ * pdfkit ships with Helvetica (WinAnsi) only, which cannot encode the Bangladeshi
+ * Taka symbol (৳, U+09F3) or other non-Latin glyphs — they render as garbage
+ * (e.g. "Ÿ3 As A"). This sanitizer normalizes them to the ASCII fallback "BDT "
+ * so existing callers don't have to remember the constraint.
+ *
+ * If full Unicode is ever needed (Bengali property names, etc.), register a
+ * TTF via `doc.registerFont('Body', '/path/to/NotoSansBengali-Regular.ttf')`
+ * and switch every `doc.font('Helvetica…')` call to the registered name.
+ */
+const sanitizeForWinAnsi = (val) => {
+  if (val === null || val === undefined) return '—';
+  return String(val)
+    .replace(/৳\s*/g, 'BDT ')   // BDT Taka sign
+    .replace(/[ঀ-৿]/g, '?'); // any remaining Bengali code points
+};
+
+/**
  * generateReportPDF
  * Builds a generic tabular PDF report in memory and returns a Buffer.
  *
@@ -58,11 +75,12 @@ const generateReportPDF = ({
 
     // ── Report Title Block ────────────────────────────────────────────────────
     const tY = 108;
-    doc.fillColor(TEXT_DARK).fontSize(18).font('Helvetica-Bold').text(title, 50, tY);
+    doc.fillColor(TEXT_DARK).fontSize(18).font('Helvetica-Bold')
+       .text(sanitizeForWinAnsi(title), 50, tY);
 
     doc.fillColor(TEXT_GRAY).fontSize(10).font('Helvetica');
-    if (subtitle)   doc.text(subtitle,              50, tY + 24);
-    if (dateRange)  doc.text(`Period: ${dateRange}`, 50, tY + (subtitle ? 38 : 24));
+    if (subtitle)   doc.text(sanitizeForWinAnsi(subtitle),              50, tY + 24);
+    if (dateRange)  doc.text(`Period: ${sanitizeForWinAnsi(dateRange)}`, 50, tY + (subtitle ? 38 : 24));
 
     doc.fillColor(TEXT_GRAY).fontSize(8)
        .text(
@@ -95,10 +113,10 @@ const generateReportPDF = ({
         doc.rect(bx, boxStartY, 3, boxH).fill(ACCENT_BARS[i % ACCENT_BARS.length]);
 
         doc.fillColor(TEXT_GRAY).fontSize(7.5).font('Helvetica')
-           .text(label, bx + 10, boxStartY + 10, { width: actualW - 14 });
+           .text(sanitizeForWinAnsi(label), bx + 10, boxStartY + 10, { width: actualW - 14 });
 
         doc.fillColor(VAL_COLORS[i % VAL_COLORS.length]).fontSize(14).font('Helvetica-Bold')
-           .text(String(value), bx + 10, boxStartY + 28, { width: actualW - 14 });
+           .text(sanitizeForWinAnsi(value), bx + 10, boxStartY + 28, { width: actualW - 14 });
       });
 
       tableY = boxStartY + boxH + 18;
@@ -110,7 +128,7 @@ const generateReportPDF = ({
     let xCursor = 50;
     columns.forEach((col, i) => {
       doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold')
-         .text(col, xCursor + 4, tableY + 6, { width: colWidths[i] - 4, ellipsis: true });
+         .text(sanitizeForWinAnsi(col), xCursor + 4, tableY + 6, { width: colWidths[i] - 4, ellipsis: true });
       xCursor += colWidths[i];
     });
     tableY += 22;
@@ -132,7 +150,7 @@ const generateReportPDF = ({
         xCursor = 50;
         row.forEach((cell, colIdx) => {
           doc.fillColor(TEXT_DARK).fontSize(8).font('Helvetica')
-             .text(String(cell ?? '—'), xCursor + 4, tableY + 6, {
+             .text(sanitizeForWinAnsi(cell), xCursor + 4, tableY + 6, {
                width: colWidths[colIdx] - 8,
                ellipsis: true,
                lineBreak: false,
@@ -158,8 +176,8 @@ const generateReportPDF = ({
       summaryRows.forEach(({ label, value }) => {
         doc.rect(350, tableY, W - 300, 24).fill(PRIMARY);
         doc.fillColor('#ffffff').fontSize(9).font('Helvetica-Bold')
-           .text(label, 358, tableY + 7)
-           .text(String(value), 460, tableY + 7, { align: 'right', width: 77 });
+           .text(sanitizeForWinAnsi(label), 358, tableY + 7)
+           .text(sanitizeForWinAnsi(value), 460, tableY + 7, { align: 'right', width: 77 });
         tableY += 26;
       });
     }

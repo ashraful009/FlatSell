@@ -5,11 +5,13 @@ const PropertyPriceSection = ({ category, price, onChange }) => {
   const isApartment = category === 'Apartments' || category === 'apartment';
   const isVilla     = category === 'Villas'     || category === 'villa';
 
-  const placeholder = isVilla ? '50000000' : isApartment ? '2500000' : '10000000';
+  if (isApartment) {
+    return null;
+  }
 
-  const hint = isApartment
-    ? '💡 Base listing price shown on property cards. Per-unit prices are set in the Unit Types section.'
-    : "💡 Booking money is calculated automatically from your company's Booking Policy settings.";
+  const placeholder = isVilla ? '50000000' : '10000000';
+
+  const hint = "💡 Booking money is calculated automatically from your company's Booking Policy settings.";
 
   return (
     <section className="glass-card p-6">

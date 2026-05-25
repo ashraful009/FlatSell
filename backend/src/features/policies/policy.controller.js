@@ -16,8 +16,13 @@ const DEFAULT_VENDOR_POLICY = `
 <p>All property listings submitted by vendors are subject to review and approval by FlatSell administrators before they appear publicly on the platform. Vendors must ensure that all property information is accurate, up-to-date, and not misleading. False or exaggerated property descriptions are a violation of these terms and may result in suspension.</p>
 
 <h3>4. Fees & Commission</h3>
-<p>FlatSell charges a platform commission on successful bookings made through the marketplace. The exact commission percentage will be communicated to you upon approval of your vendor application. FlatSell reserves the right to update its fee structure with 30 days written notice to all active vendors.</p>
-
+<p>FlatSell charges a platform margin (commission) on every successful property booking processed through the marketplace. To ensure absolute transparency for our partners, our commission structure is strictly categorized by property type as follows:</p>
+<ul>
+  <li><strong>Apartments:</strong> 3% platform margin will be deducted from the total booking amount.</li>
+  <li><strong>Villas:</strong> 5% platform margin will be deducted from the total booking amount.</li>
+  <li><strong>Land:</strong> 7% platform margin will be deducted from the total booking amount.</li>
+</ul>
+<p>This margin covers platform maintenance, secure Stripe payment processing, automated invoicing, and marketing efforts. FlatSell reserves the right to review and update its fee structure. Any modifications to the commission rates will be communicated to all active vendors with a 30-day written notice prior to implementation.</p>
 <h3>5. Content Standards</h3>
 <p>All images, descriptions, and content uploaded by vendors must be original and must not infringe on any third-party intellectual property rights. Vendors are prohibited from uploading obscene, defamatory, or illegal content. FlatSell may remove any content that violates these standards without prior notice.</p>
 

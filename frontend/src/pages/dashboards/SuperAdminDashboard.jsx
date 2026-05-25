@@ -11,10 +11,10 @@ const TABS = [
   { id: 'pending',   label: '⏳ Pending Properties'  },
   { id: 'manage',    label: '📦 Manage All'           },
   { id: 'add',       label: '➕ Add Property'         },
-  { id: 'companies', label: '🏢 Company Applications' },
-  { id: 'margin',    label: '💰 Revenue & Margin'     },
+  { id: 'companies', label: '🏢 Company' },
+  { id: 'margin',    label: '💰 Margin'     },
   { id: 'sales',     label: '📈 Sales Report'         },
-  { id: 'settings',  label: '⚙️ Platform Settings'   },
+ 
 ];
 
 

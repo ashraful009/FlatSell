@@ -270,7 +270,9 @@ const getMarginReportPDF = async (req, res) => {
   const matchArr   = Object.keys(matchStage).length ? [{ $match: matchStage }] : [];
   const dateLabel  = buildDateLabel({ filter_type, start_date, end_date });
   const shortLabel = buildShortPeriodLabel({ filter_type, start_date, end_date });
-  const fmt        = (n) => `৳${Number(n || 0).toLocaleString()}`;
+  // Use 'BDT ' prefix instead of the ৳ glyph — pdfkit's built-in Helvetica
+  // (WinAnsi) cannot render U+09F3 and emits replacement chars in the PDF.
+  const fmt        = (n) => `BDT ${Number(n || 0).toLocaleString('en-US')}`;
 
   // ── Run overview + per-company aggregations in parallel ───────────────────
   const [overviewResult, companies] = await Promise.all([

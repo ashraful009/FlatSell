@@ -13,6 +13,7 @@ const PropertyCard = ({ property }) => {
     mainImage, galleryImages, images, companyId,
     totalFloors, unitsPerFloor,
     bookingMoneyPercentage, bookingMoneyAmount,
+    unitStatus,
   } = property;
 
   const coverImage = mainImage || galleryImages?.[0] || images?.[0] || null;
@@ -149,27 +150,36 @@ const PropertyCard = ({ property }) => {
             </div>
           </div>
 
-          {/* Right: Booking Money + Arrow */}
-          <div className="flex-shrink-0 text-right flex flex-col items-end gap-2">
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">
-                Booking ({bookingPct}%)
-              </p>
-              <p className="text-base sm:text-lg font-bold text-white leading-tight">
-                ৳{bookingAmt?.toLocaleString()}
-              </p>
-            </div>
-            <div className="w-9 h-9 rounded-xl bg-primary-500/20 border border-primary-500/30
-                            flex items-center justify-center
-                            group-hover:bg-primary-500 group-hover:border-primary-400
-                            transition-all duration-300">
-              <svg className="w-4 h-4 text-primary-400 group-hover:text-white
-                              group-hover:translate-x-0.5 transition-all duration-300"
-                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
-                  d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
+          {/* Right: Booking Money + Arrow or Status Badge */}
+          <div className="flex-shrink-0 text-right flex flex-col items-end justify-center">
+            {(category === 'villa' || category === 'land') && (unitStatus === 'booked' || unitStatus === 'sold') ? (
+              <div className={`px-3 py-1.5 rounded-lg font-bold text-sm border 
+                ${unitStatus === 'booked' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'}`}>
+                {unitStatus === 'booked' ? 'Booked' : 'Sold Out'}
+              </div>
+            ) : (
+              <div className="flex flex-col items-end gap-2">
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">
+                    Booking ({bookingPct}%)
+                  </p>
+                  <p className="text-base sm:text-lg font-bold text-white leading-tight">
+                    ৳{bookingAmt?.toLocaleString()}
+                  </p>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-primary-500/20 border border-primary-500/30
+                                flex items-center justify-center
+                                group-hover:bg-primary-500 group-hover:border-primary-400
+                                transition-all duration-300">
+                  <svg className="w-4 h-4 text-primary-400 group-hover:text-white
+                                  group-hover:translate-x-0.5 transition-all duration-300"
+                       fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                      d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

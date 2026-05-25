@@ -7,7 +7,7 @@
 /* ─── Base ─────────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; color-scheme: dark; }
 
   body {
     @apply bg-dark-900 text-gray-100 font-sans antialiased;
@@ -19,6 +19,32 @@
   ::-webkit-scrollbar-track { @apply bg-dark-800; }
   ::-webkit-scrollbar-thumb { @apply bg-primary-700 rounded-full; }
   ::-webkit-scrollbar-thumb:hover { @apply bg-primary-600; }
+
+  /* ── Global Select / Option styling ─────────────────────────── */
+  /* Native <select> options are OS-rendered — must use solid colors */
+  select {
+    background-color: #13111f !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(139, 92, 246, 0.25);
+  }
+  select option {
+    background-color: #1c1830;
+    color: #e2e8f0;
+    padding: 8px 12px;
+  }
+  select option:hover,
+  select option:focus,
+  select option:checked {
+    background-color: #5b21b6;
+    color: #ffffff;
+  }
+
+  /* Date / time inputs — match dark theme */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    color-scheme: dark;
+  }
 }
 
 /* ─── Components ────────────────────────────────────────────────── */
@@ -61,10 +87,30 @@
 
   /* Form input */
   .form-input {
-    @apply w-full bg-white/5 border border-white/15 text-gray-100 placeholder-gray-500
+    @apply w-full border border-white/15 text-gray-100 placeholder-gray-500
            rounded-xl px-4 py-3 text-sm
-           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent
            transition-all duration-200;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  /* Select-specific override — must use solid bg so OS-rendered options are visible */
+  select.form-input,
+  select {
+    background-color: #13111f !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    cursor: pointer;
+  }
+  select.form-input:focus,
+  select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
+    border-color: rgba(139, 92, 246, 0.6) !important;
+  }
+  select.form-input:hover,
+  select:hover {
+    border-color: rgba(139, 92, 246, 0.5) !important;
+    background-color: #1a1630 !important;
   }
 
   .form-label {

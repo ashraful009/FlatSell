@@ -80,7 +80,7 @@ const CompanyAdminDashboard = () => {
 
         {/* Add Property */}
         {activeTab === 'add' && (
-          <div className="max-w-4xl mx-auto">
+          <div>
             <div className="mb-6">
               <h2 className="text-xl font-bold text-gray-900">Add New Property</h2>
               <p className="text-gray-500 text-sm mt-1">

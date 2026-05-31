@@ -5,29 +5,19 @@ import axiosInstance from '../shared/lib/axiosInstance';
 import UnitVisualizer from '../features/units/UnitVisualizer';
 import UnitDetailModal from '../features/units/UnitDetailModal';
 
+// Modular components
+import PropertyDetailSkeleton from './property-detail/components/PropertyDetailSkeleton';
+import PropertyHeroGallery from './property-detail/components/PropertyHeroGallery';
+import PropertyQuickStats from './property-detail/components/PropertyQuickStats';
+import PropertyAboutTab from './property-detail/components/PropertyAboutTab';
+import PropertySidebar from './property-detail/components/PropertySidebar';
+
 const TABS = ['Overview', 'Floor Plan', 'Location'];
 
 const CATEGORY_ICONS = {
   apartment: '🏢', villa: '🏡', land: '🌿',
 };
 
-// ── Skeleton ─────────────────────────────────────────────────────────────────
-const PropertyDetailSkeleton = () => (
-  <div className="container-main py-8 animate-pulse">
-    <div className="skeleton h-72 sm:h-96 rounded-2xl mb-6" />
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-4">
-        <div className="skeleton-text w-2/3 h-8" />
-        <div className="skeleton-text w-1/3 h-4" />
-        <div className="skeleton-text w-full" />
-        <div className="skeleton-text w-5/6" />
-      </div>
-      <div className="skeleton h-48 rounded-2xl" />
-    </div>
-  </div>
-);
-
-// ─────────────────────────────────────────────────────────────────────────────
 const PropertyDetailPage = () => {
   const { id } = useParams();
 
@@ -73,7 +63,7 @@ const PropertyDetailPage = () => {
   const {
     title, description, price, city, address, category,
     mainImage, galleryImages, images, totalFloors, unitsPerFloor,
-    companyId, addedBy, location, villaDetails, landDetails,
+    companyId, location, villaDetails, landDetails,
   } = property;
 
   const cat = category?.toLowerCase();
@@ -88,78 +78,14 @@ const PropertyDetailPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* ── Hero Image Gallery ──────────────────────────────────────────── */}
-      <div className="bg-gray-100">
-        <div className="container-main pt-6 pb-4">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-            <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/properties" className="hover:text-gray-900 transition-colors">Properties</Link>
-            <span>/</span>
-            <span className="text-gray-600 truncate max-w-xs">{title}</span>
-          </nav>
-
-          {allImages.length > 0 ? (
-            <>
-              {/* Main image */}
-              <div className="relative h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden mb-3">
-                <img
-                  src={allImages[activeImg]}
-                  alt={title}
-                  className="w-full h-full object-cover transition-all duration-500"
-                />
-                {/* Navigation arrows if multiple images */}
-                {allImages.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setActiveImg((i) => (i - 1 + allImages.length) % allImages.length)}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
-                                 bg-black/50 backdrop-blur-sm text-white flex items-center
-                                 justify-center hover:bg-black/70 transition-colors"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      onClick={() => setActiveImg((i) => (i + 1) % allImages.length)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
-                                 bg-black/50 backdrop-blur-sm text-white flex items-center
-                                 justify-center hover:bg-black/70 transition-colors"
-                    >
-                      ›
-                    </button>
-                  </>
-                )}
-                {/* Image count badge */}
-                <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm
-                                text-white text-xs px-2.5 py-1 rounded-lg">
-                  {activeImg + 1} / {allImages.length}
-                </div>
-              </div>
-
-              {/* Thumbnails */}
-              {allImages.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  {allImages.map((img, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveImg(i)}
-                      className={`w-16 h-12 flex-shrink-0 rounded-lg overflow-hidden border-2
-                                  transition-all duration-200
-                                  ${i === activeImg ? 'border-primary-500' : 'border-transparent opacity-60 hover:opacity-80'}`}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="h-64 rounded-2xl bg-white flex items-center justify-center mb-3">
-              <span className="text-6xl">{CATEGORY_ICONS[category] || '🏢'}</span>
-            </div>
-          )}
-        </div>
-      </div>
+      <PropertyHeroGallery
+        title={title}
+        category={category}
+        allImages={allImages}
+        activeImg={activeImg}
+        setActiveImg={setActiveImg}
+        categoryIcons={CATEGORY_ICONS}
+      />
 
       {/* ── Main Content ─────────────────────────────────────────────────── */}
       <div className="container-main py-6">
@@ -186,30 +112,14 @@ const PropertyDetailPage = () => {
             </div>
 
             {/* Quick stats — category-aware */}
-            <div className="flex flex-wrap gap-4 mb-6 text-sm">
-              {(cat === 'villa' ? [
-                { label: 'Floors',   value: villaDetails?.totalFloors || '—' },
-                { label: 'Bedrooms', value: villaDetails?.bedrooms   || '—' },
-                { label: 'Bathrooms',value: villaDetails?.bathrooms  || '—' },
-                { label: 'Land Size',value: villaDetails?.totalLandSize ? `${villaDetails.totalLandSize} Katha` : '—' },
-              ] : cat === 'land' ? [
-                { label: 'Size',     value: landDetails?.totalSize ? `${landDetails.totalSize} Katha` : '—' },
-                { label: 'Shape',    value: landDetails?.plotShape  || '—' },
-                { label: 'Type',     value: landDetails?.landType   || '—' },
-                { label: 'Road',     value: landDetails?.roadAccess || '—' },
-              ] : [
-                { label: 'Floors',       value: totalFloors   },
-                { label: 'Units/Floor',  value: unitsPerFloor },
-                { label: 'Total Units',  value: unitData.stats?.total || (totalFloors * unitsPerFloor) },
-                { label: 'Available',    value: unitData.stats?.available ?? '—' },
-              ]).map(({ label, value }) => (
-                <div key={label} className="flex flex-col items-center px-4 py-2.5
-                                             bg-slate-50 border border-blue-100 rounded-xl">
-                  <span className="text-lg font-bold text-gray-900">{value}</span>
-                  <span className="text-gray-500 text-xs">{label}</span>
-                </div>
-              ))}
-            </div>
+            <PropertyQuickStats
+              cat={cat}
+              villaDetails={villaDetails}
+              landDetails={landDetails}
+              totalFloors={totalFloors}
+              unitsPerFloor={unitsPerFloor}
+              unitData={unitData}
+            />
 
             {/* ── Tabs ─────────────────────────────────────────────────────── */}
             <div className="flex gap-1 mb-6 bg-slate-50 p-1 rounded-xl">
@@ -230,116 +140,12 @@ const PropertyDetailPage = () => {
 
             {/* Tab content */}
             {activeTab === 'Overview' && (
-              <div className="animate-fadeIn space-y-6">
-                <div>
-                  <h2 className="text-gray-900 font-semibold mb-3">About this Property</h2>
-                  <p className="text-gray-500 leading-relaxed text-sm whitespace-pre-line">
-                    {description}
-                  </p>
-                </div>
-
-                {/* Villa-specific details */}
-                {cat === 'villa' && villaDetails && (
-                  <>
-                    <div>
-                      <h3 className="text-gray-900 font-semibold mb-3 text-sm">Construction Details</h3>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {[
-                          { l: 'Year',        v: villaDetails.constructionYear || '—' },
-                          { l: 'Developer',   v: villaDetails.developerName    || '—' },
-                          { l: 'Materials',   v: villaDetails.materialsQuality || '—' },
-                          { l: 'Earthquake',  v: villaDetails.earthquakeResistant || '—' },
-                        ].map(({ l, v }) => (
-                          <div key={l} className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
-                            <p className="text-gray-900 text-sm">{v}</p>
-                            <p className="text-gray-500 text-xs">{l}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-gray-900 font-semibold mb-3 text-sm">Features & Amenities</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          ['privatePool',    '🏊 Pool'],
-                          ['garden',         '🌳 Garden'],
-                          ['garage',         '🚗 Garage'],
-                          ['rooftopTerrace', '🌇 Rooftop'],
-                          ['servantRoom',    '🛏️ Servant Room'],
-                          ['securitySystem', '🔒 Security'],
-                        ].map(([key, label]) => (
-                          <span key={key}
-                            className={`text-xs px-3 py-1.5 rounded-lg border ${
-                              villaDetails[key] === 'Yes'
-                                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
-                                : 'bg-slate-50 border-blue-100 text-gray-500'
-                            }`}>
-                            {label}: {villaDetails[key] || 'No'}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Land-specific details */}
-                {cat === 'land' && landDetails && (
-                  <>
-                    <div>
-                      <h3 className="text-gray-900 font-semibold mb-3 text-sm">Legal Information</h3>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {[
-                          { l: 'Khatian',    v: landDetails.khatianNumber  || '—' },
-                          { l: 'Dag',         v: landDetails.dagNumber      || '—' },
-                          { l: 'Ownership',   v: landDetails.landOwnership  || '—' },
-                          { l: 'Dispute',     v: landDetails.anyDispute     || '—' },
-                        ].map(({ l, v }) => (
-                          <div key={l} className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
-                            <p className="text-gray-900 text-sm">{v}</p>
-                            <p className="text-gray-500 text-xs">{l}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-gray-900 font-semibold mb-3 text-sm">Utilities</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          ['electricityLine',    '⚡ Electricity'],
-                          ['gasWaterConnection',  '💧 Gas/Water'],
-                          ['drainageSystem',      '🚰 Drainage'],
-                        ].map(([key, label]) => (
-                          <span key={key}
-                            className={`text-xs px-3 py-1.5 rounded-lg border ${
-                              landDetails[key] === 'Yes'
-                                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
-                                : 'bg-slate-50 border-blue-100 text-gray-500'
-                            }`}>
-                            {label}: {landDetails[key] || 'No'}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    {(landDetails.nearbySchool || landDetails.nearbyHospital || landDetails.nearbyMarket) && (
-                      <div>
-                        <h3 className="text-gray-900 font-semibold mb-3 text-sm">Nearby Facilities</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {[
-                            { l: '🏫 School',   v: landDetails.nearbySchool },
-                            { l: '🏥 Hospital', v: landDetails.nearbyHospital },
-                            { l: '🏪 Market',   v: landDetails.nearbyMarket },
-                          ].filter(({ v }) => v).map(({ l, v }) => (
-                            <div key={l} className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
-                              <p className="text-gray-500 text-xs mb-0.5">{l}</p>
-                              <p className="text-gray-900 text-sm">{v}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+              <PropertyAboutTab
+                cat={cat}
+                description={description}
+                villaDetails={villaDetails}
+                landDetails={landDetails}
+              />
             )}
 
             {activeTab === 'Floor Plan' && (
@@ -394,65 +200,16 @@ const PropertyDetailPage = () => {
           </div>
 
           {/* ── Right sidebar — Price + Company ──────────────────────────── */}
-          <div className="space-y-4">
-            {/* Price card */}
-            <div className="glass-card p-5 sticky top-20">
-              <p className="text-gray-500 text-xs mb-1">Total Price</p>
-              <p className="text-3xl font-black text-gray-900 mb-1">
-                {cat === 'villa' && villaDetails?.totalPrice
-                  ? `৳${villaDetails.totalPrice.toLocaleString()}`
-                  : cat === 'land' && landDetails?.totalPrice
-                    ? `৳${landDetails.totalPrice.toLocaleString()}`
-                    : `৳${price?.toLocaleString()}`}
-              </p>
-              {cat === 'apartment' && <p className="text-gray-500 text-xs mb-5">per unit (varies by type)</p>}
-              {cat !== 'apartment' && <div className="mb-5" />}
-
-              <button
-                onClick={() => setActiveTab('Floor Plan')}
-                className={`${cat === 'apartment' ? 'btn-primary' : 'btn-secondary'} w-full mb-3`}
-              >
-                {cat === 'apartment' ? '🏗️ View Floor Plan' : cat === 'villa' ? '🏡 View Villa Preview' : '🌿 View Land Preview'}
-              </button>
-              
-              {cat === 'apartment' ? (
-                <p className="text-center text-gray-500 text-xs">
-                  Click a unit in the floor plan to book
-                </p>
-              ) : (
-                <button
-                  onClick={() => {
-                    if (unitData.units.length > 0) {
-                      setSelectedUnit(unitData.units[0]);
-                    }
-                  }}
-                  className="btn-primary w-full"
-                >
-                  📋 Request Booking
-                </button>
-              )}
-            </div>
-
-            {/* Company card */}
-            {companyId && (
-              <div className="glass-card p-5">
-                <p className="text-gray-500 text-xs uppercase tracking-wider mb-3">Listed by</p>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-600/30
-                                  to-primary-800/30 border border-primary-500/20 flex items-center
-                                  justify-center flex-shrink-0 text-lg">
-                    🏢
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-gray-900 font-semibold text-sm truncate">{companyId.name}</p>
-                    {companyId.email && (
-                      <p className="text-gray-500 text-xs truncate">{companyId.email}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <PropertySidebar
+            cat={cat}
+            price={price}
+            villaDetails={villaDetails}
+            landDetails={landDetails}
+            unitData={unitData}
+            companyId={companyId}
+            setActiveTab={setActiveTab}
+            setSelectedUnit={setSelectedUnit}
+          />
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import axiosInstance from '../../shared/lib/axiosInstance';
 import { toast } from 'react-hot-toast';
 
@@ -27,6 +27,24 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
   const [count,    setCount]    = useState('');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
+
+  const [settings, setSettings] = useState({
+    inactivityCancelMonths: 3,
+    inactivityWarnMonths: 2,
+    refundWindowDays: 30,
+    refundRetentionPercentage: 20,
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    axiosInstance.get('/settings/public')
+      .then(({ data }) => {
+        if (data?.data?.settings) {
+          setSettings(data.data.settings);
+        }
+      })
+      .catch((err) => console.error('Failed to load public policy settings', err));
+  }, [open]);
 
   const dueAmount = useMemo(
     () => Math.max(0, (booking?.totalPrice || 0) - (booking?.bookingAmount || 0)),
@@ -123,38 +141,90 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-5 space-y-5">
 
-          {/* Policy Card */}
-          <section className="bg-slate-50 border border-blue-100 rounded-xl p-4">
-            <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-              📋 Installment Policy
-            </h3>
-            <ul className="space-y-2 text-xs text-gray-600">
-              <li className="flex gap-2">
-                <span className="text-emerald-600 font-bold">a.</span>
-                Up to <strong>4 installments</strong>: 0% extra charge (Free).
-              </li>
-              <li className="flex gap-2">
-                <span className="text-amber-600 font-bold">b.</span>
-                <span><strong>5 to 12 installments</strong>: a 7% charge is added per installment.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-orange-600 font-bold">c.</span>
-                <span><strong>13 to 24 installments</strong>: a 12% charge is added per installment.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-red-600 font-bold">d.</span>
-                <span>Maximum allowed limit is <strong>24 installments</strong>.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-blue-600 font-bold">e.</span>
-                Every installment must be paid between the <strong>1st and 15th</strong> of the running month.
-              </li>
-              <li className="flex gap-2">
-                <span className="text-rose-600 font-bold">f.</span>
-                <span>If an installment is missed (paid after the 15th), a <strong>৳5,000 BDT fine</strong> is added to that specific installment.</span>
-              </li>
-            </ul>
-          </section>
+          {/* Policy Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Column 1: Installment Policy */}
+            <div className="bg-gradient-to-br from-blue-50/40 to-slate-50 border border-blue-100 rounded-xl p-4 flex flex-col justify-between">
+              <div>
+                <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <span>📅</span> Installment Policy
+                </h3>
+                <ul className="space-y-2 text-[11px] text-slate-600">
+                  <li className="flex gap-1.5">
+                    <span className="text-emerald-600 font-bold">•</span>
+                    <span>Up to <strong>4 installments</strong>: 0% extra charge (Free).</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span><strong>5 to 12 installments</strong>: 7% charge added per installment.</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-orange-600 font-bold">•</span>
+                    <span><strong>13 to 24 installments</strong>: 12% charge added per installment.</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-red-600 font-bold">•</span>
+                    <span>Max limit: <strong>24 installments</strong>.</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-indigo-600 font-bold">•</span>
+                    <span>Due Date: Pay between the <strong>1st and 15th</strong> of the month.</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-rose-600 font-bold">•</span>
+                    <span>Missed/Late payment adds a <strong>৳5,000 late fee</strong>.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Column 2: Voluntary Refund Policy */}
+            <div className="bg-gradient-to-br from-emerald-50/40 to-slate-50 border border-emerald-100 rounded-xl p-4 flex flex-col justify-between">
+              <div>
+                <h3 className="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <span>↩️</span> Refund Policy
+                </h3>
+                <ul className="space-y-2 text-[11px] text-slate-600">
+                  <li className="flex gap-1.5">
+                    <span className="text-emerald-600 font-bold">•</span>
+                    <span>Refund requests are valid within <strong>{settings.refundWindowDays} days</strong> of booking.</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>A non-refundable retention fee of <strong>{settings.refundRetentionPercentage}%</strong> is kept.</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-rose-600 font-bold">•</span>
+                    <span>No refunds are permitted after the {settings.refundWindowDays}-day window expires.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Column 3: Auto-Cancellation Policy */}
+            <div className="bg-gradient-to-br from-amber-50/40 to-slate-50 border border-amber-100 rounded-xl p-4 flex flex-col justify-between">
+              <div>
+                <h3 className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <span>🚫</span> Inactivity Cancellation
+                </h3>
+                <ul className="space-y-2 text-[11px] text-slate-600">
+                  <li className="flex gap-1.5">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>Inactivity warning is sent after <strong>{settings.inactivityWarnMonths} months</strong> of no payment.</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-red-600 font-bold">•</span>
+                    <span>Auto-cancellation occurs after <strong>{settings.inactivityCancelMonths} months</strong> of total payment inactivity.</span>
+                  </li>
+                  <li className="flex gap-1.5">
+                    <span className="text-rose-600 font-bold">•</span>
+                    <span>In case of auto-cancellation, <strong>0% refund</strong> is provided.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
 
           {/* Due summary */}
           <div className="grid grid-cols-3 gap-3">

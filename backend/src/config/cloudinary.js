@@ -37,10 +37,41 @@ const documentStorage = new CloudinaryStorage({
   },
 });
 
+// ─── Multer Storage: Booking KYC Documents (customer photo, NID, TIN, etc.) ──
+// Each file gets a unique public_id (fieldname + timestamp + random) so multiple
+// documents uploaded in one request never collide.
+const bookingDocStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const isPdf = file.mimetype === 'application/pdf';
+    return {
+      folder:        'flatsell/booking-documents',
+      resource_type: isPdf ? 'raw' : 'image',
+      public_id:     `${file.fieldname}_${Date.now()}_${Math.round(Math.random() * 1e9)}`,
+    };
+  },
+});
+
 // ─── Multer Upload Instances ──────────────────────────────────────────────────
 const uploadImage = multer({
   storage: imageStorage,
   limits:  { fileSize: 10 * 1024 * 1024 }, // 10MB per image
+});
+
+const uploadBookingDocs = multer({
+  storage: bookingDocStorage,
+  limits:  { fileSize: 10 * 1024 * 1024 }, // 10MB per document
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      'application/pdf',
+      'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif',
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF and image files are allowed for booking documents'), false);
+    }
+  },
 });
 
 const uploadDocument = multer({
@@ -79,5 +110,6 @@ module.exports = {
   cloudinary,
   uploadImage,
   uploadDocument,
+  uploadBookingDocs,
   uploadToCloudinary,
 };

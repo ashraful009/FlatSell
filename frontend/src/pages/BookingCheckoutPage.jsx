@@ -3,66 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../shared/lib/axiosInstance';
 import { toast } from 'react-hot-toast';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Field metadata — maps field keys to labels, types, and sections
-// ─────────────────────────────────────────────────────────────────────────────
-const FIELD_META = {
-  // Personal
-  fullName:          { label: 'Full Name (as per NID/Passport)', type: 'text',   section: 'Personal Information',  icon: '👤' },
-  fatherMotherName:  { label: "Father's / Mother's Name",       type: 'text',   section: 'Personal Information',  icon: '👤' },
-  spouseName:        { label: 'Spouse Name',                     type: 'text',   section: 'Personal Information',  icon: '👤' },
-  dob:               { label: 'Date of Birth',                  type: 'date',   section: 'Personal Information',  icon: '👤' },
-  nidPassportNumber: { label: 'NID / Passport Number',          type: 'text',   section: 'Personal Information',  icon: '👤' },
-  profession:        { label: 'Profession / Company',           type: 'text',   section: 'Personal Information',  icon: '👤' },
-  nationality:       { label: 'Nationality',                    type: 'text',   section: 'Personal Information',  icon: '👤' },
-  // Contact
-  mobile:            { label: 'Mobile Number',                  type: 'tel',    section: 'Contact Information',   icon: '📞' },
-  email:             { label: 'Email Address',                  type: 'email',  section: 'Contact Information',   icon: '📞' },
-  presentAddress:    { label: 'Present Address',                type: 'textarea', section: 'Contact Information', icon: '📞' },
-  permanentAddress:  { label: 'Permanent Address',              type: 'textarea', section: 'Contact Information', icon: '📞' },
-  // Financial
-  tinCertificate:    { label: 'TIN Certificate Number',         type: 'text',   section: 'Financial Information', icon: '💳' },
-  paymentSource:     { label: 'Payment Source',                 type: 'text',   section: 'Financial Information', icon: '💳' },
-  bankDetails:       { label: 'Bank Details',                   type: 'textarea', section: 'Financial Information', icon: '💳' },
-  // Property
-  projectNameLocation:{ label: 'Project Name / Location',       type: 'text',   section: 'Property Details',     icon: '🏠' },
-  sizeFloor:          { label: 'Size / Floor',                   type: 'text',   section: 'Property Details',     icon: '🏠' },
-  unitNumber:         { label: 'Unit Number',                    type: 'text',   section: 'Property Details',     icon: '🏠' },
-  carParking:         { label: 'Car Parking Preference',         type: 'text',   section: 'Property Details',     icon: '🏠' },
-  installmentPreference: { label: 'Installment Preference',     type: 'select', section: 'Property Details',     icon: '🏠', options: ['Monthly', 'Quarterly', 'Half-yearly', 'Yearly', 'Lump Sum'] },
-  // Nominee
-  nomineeName:       { label: 'Nominee Name',                   type: 'text',   section: 'Nominee Information',  icon: '👥' },
-  nomineeRelation:   { label: 'Relation with Nominee',          type: 'text',   section: 'Nominee Information',  icon: '👥' },
-  nomineeNid:        { label: 'Nominee NID Number',             type: 'text',   section: 'Nominee Information',  icon: '👥' },
-  // Documents
-  customerPhoto:     { label: 'Customer Photo',                 type: 'file',   section: 'Required Documents',   icon: '📄' },
-  nidCopy:           { label: 'NID Copy',                       type: 'file',   section: 'Required Documents',   icon: '📄' },
-  tinCopy:           { label: 'TIN Certificate Copy',           type: 'file',   section: 'Required Documents',   icon: '📄' },
-  nomineePhoto:      { label: 'Nominee Photo',                  type: 'file',   section: 'Required Documents',   icon: '📄' },
-  nomineeNidCopy:    { label: 'Nominee NID Copy',               type: 'file',   section: 'Required Documents',   icon: '📄' },
-};
+// Constants
+import { FIELD_META, SECTION_ORDER, SECTION_ICONS } from './booking-checkout/checkout.constants';
 
-const SECTION_ORDER = [
-  'Personal Information',
-  'Contact Information',
-  'Financial Information',
-  'Property Details',
-  'Nominee Information',
-  'Required Documents',
-];
+// Modular Components
+import CheckoutHeader from './booking-checkout/components/CheckoutHeader';
+import CheckoutPropertySummary from './booking-checkout/components/CheckoutPropertySummary';
+import CheckoutForm from './booking-checkout/components/CheckoutForm';
+import CheckoutSidebarSummary from './booking-checkout/components/CheckoutSidebarSummary';
 
-const SECTION_ICONS = {
-  'Personal Information':  '👤',
-  'Contact Information':   '📞',
-  'Financial Information': '💳',
-  'Property Details':      '🏠',
-  'Nominee Information':   '👥',
-  'Required Documents':    '📄',
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BookingCheckoutPage
-// ─────────────────────────────────────────────────────────────────────────────
 const BookingCheckoutPage = () => {
   const { unitId } = useParams();
   const navigate   = useNavigate();
@@ -219,12 +168,17 @@ const BookingCheckoutPage = () => {
         }
       });
 
-      // For now, documents will be stored as placeholders — file upload integration
-      // would use FormData to upload to Cloudinary. Simplified for the checkout flow.
-      const documents = {};
-      Object.keys(fileData).forEach((key) => {
-        documents[key] = fileData[key]?.name || null;
-      });
+      // Upload the KYC documents to Cloudinary first
+      let documents = {};
+      const fileKeys = Object.keys(fileData).filter((k) => fileData[k]);
+      if (fileKeys.length > 0) {
+        const docForm = new FormData();
+        fileKeys.forEach((key) => docForm.append(key, fileData[key]));
+        const uploadRes = await axiosInstance.post('/checkout/upload-documents', docForm, {
+          headers: { 'Content-Type': undefined },
+        });
+        documents = uploadRes.data?.data?.documents || {};
+      }
 
       const response = await axiosInstance.post('/checkout/create-session', {
         unitId: unit._id,
@@ -300,229 +254,41 @@ const BookingCheckoutPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="container-main py-8">
-        {/* ── Header ────────────────────────────────────────────────────── */}
-        <div className="mb-8">
-          <button onClick={() => navigate(-1)} className="text-gray-500 hover:text-gray-900 text-sm mb-4 flex items-center gap-1 transition-colors">
-            ← Back to Property
-          </button>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Booking Checkout</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Complete the form below to proceed with your booking payment
-          </p>
-        </div>
+        {/* Header */}
+        <CheckoutHeader navigate={navigate} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* ── Left: Dynamic Form ──────────────────────────────────────── */}
-          <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Property Summary Card */}
-              <div className="glass-card p-5 flex gap-4">
-                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-white">
-                  {property.mainImage ? (
-                    <img src={property.mainImage} alt={property.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-2xl">🏠</div>
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-gray-900 font-bold text-lg truncate">{property.title}</h3>
-                  <p className="text-gray-500 text-xs mt-0.5">📍 {property.address}, {property.city}</p>
-                  <div className="flex items-center gap-3 mt-2">
-                    <span className="text-xs px-2 py-1 rounded-lg bg-primary-500/15 border border-primary-500/30 text-primary-600 capitalize">
-                      {property.category}
-                    </span>
-                    {unit.unitNumber && (
-                      <span className="text-xs text-gray-500">Unit: {unit.unitNumber}</span>
-                    )}
-                    {unit.floor && (
-                      <span className="text-xs text-gray-500">Floor: {unit.floor}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Dynamic Form Sections ────────────────────────────────── */}
-              {hasFields ? (
-                SECTION_ORDER.map((sectionName) => {
-                  const sectionFields = groupedFields[sectionName];
-                  if (!sectionFields?.length) return null;
-
-                  return (
-                    <div key={sectionName} className="glass-card p-5">
-                      <div className="flex items-center gap-2 mb-5 pb-3 border-b border-blue-100">
-                        <span className="text-xl">{SECTION_ICONS[sectionName]}</span>
-                        <h3 className="text-gray-900 font-semibold text-sm">{sectionName}</h3>
-                        <span className="text-xs text-gray-600 ml-auto">
-                          {sectionFields.length} field{sectionFields.length > 1 ? 's' : ''}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {sectionFields.map(({ key, label, type, options }) => (
-                          <div key={key} className={type === 'textarea' ? 'sm:col-span-2' : ''}>
-                            <label className="form-label">
-                              {label} <span className="text-red-600">*</span>
-                            </label>
-
-                            {type === 'textarea' ? (
-                              <textarea
-                                rows={2}
-                                value={formData[key] || ''}
-                                onChange={(e) => handleChange(key, e.target.value)}
-                                className={`form-input resize-none ${errors[key] ? 'border-red-500/50' : ''}`}
-                                placeholder={`Enter ${label.toLowerCase()}`}
-                              />
-                            ) : type === 'select' ? (
-                              <select
-                                value={formData[key] || ''}
-                                onChange={(e) => handleChange(key, e.target.value)}
-                                className={`form-input ${errors[key] ? 'border-red-500/50' : ''}`}
-                              >
-                                <option value="">Select {label}</option>
-                                {options?.map((o) => (
-                                  <option key={o} value={o}>{o}</option>
-                                ))}
-                              </select>
-                            ) : type === 'file' ? (
-                              <div>
-                                <label className={`flex items-center gap-3 p-3 rounded-xl border-2 border-dashed
-                                  cursor-pointer transition-all duration-200
-                                  ${fileData[key]
-                                    ? 'border-emerald-500/40 bg-emerald-500/5'
-                                    : errors[key]
-                                      ? 'border-red-500/40 hover:border-red-500/60'
-                                      : 'border-blue-200 hover:border-primary-500/40 hover:bg-slate-50'
-                                  }`}
-                                >
-                                  <span className="text-lg">{fileData[key] ? '✅' : '📎'}</span>
-                                  <div className="min-w-0 flex-1">
-                                    <p className={`text-sm truncate ${fileData[key] ? 'text-emerald-300' : 'text-gray-500'}`}>
-                                      {fileData[key]?.name || `Upload ${label}`}
-                                    </p>
-                                    <p className="text-xs text-gray-600">JPG, PNG, PDF · Max 5MB</p>
-                                  </div>
-                                  <input
-                                    type="file"
-                                    className="hidden"
-                                    accept="image/*,.pdf"
-                                    onChange={(e) => handleFileChange(key, e.target.files[0])}
-                                  />
-                                </label>
-                              </div>
-                            ) : (
-                              <input
-                                type={type}
-                                value={formData[key] || ''}
-                                onChange={(e) => handleChange(key, e.target.value)}
-                                className={`form-input ${errors[key] ? 'border-red-500/50' : ''}`}
-                                placeholder={`Enter ${label.toLowerCase()}`}
-                              />
-                            )}
-
-                            {errors[key] && (
-                              <p className="text-red-600 text-xs mt-1">{errors[key]}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="glass-card p-6 text-center">
-                  <span className="text-3xl block mb-2">📋</span>
-                  <p className="text-gray-500 text-sm">
-                    No additional information required. You can proceed directly to payment.
-                  </p>
-                </div>
-              )}
-
-              {/* ── Refund Policy (Policy 2) + Acknowledgment ───────────── */}
-              <div className="glass-card p-5 border border-amber-500/20">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xl">↩️</span>
-                  <h3 className="text-gray-900 font-semibold text-sm">Refund Policy</h3>
-                </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                  You may request a refund within{' '}
-                  <strong className="text-amber-300">{refundWindowDays} days</strong> of booking.{' '}
-                  <strong className="text-amber-300">{retentionPct}%</strong> of your paid amount
-                  will be retained (non-refundable). After this period,{' '}
-                  <strong className="text-amber-300">no refund will be accepted</strong>. Refunds are
-                  paid from the vendor&apos;s account.
-                </p>
-                <label className="flex items-start gap-3 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={refundAccepted}
-                    onChange={(e) => setRefundAccepted(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 accent-primary-500 cursor-pointer"
-                  />
-                  <span className="text-sm text-gray-600">
-                    I have read and acknowledge the refund policy above.
-                  </span>
-                </label>
-              </div>
-
-              {/* ── Submit Button ────────────────────────────────────────── */}
-              <button
-                type="submit"
-                disabled={submitting || !refundAccepted}
-                className="btn-primary w-full py-4 text-base font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {submitting ? (
-                  <>
-                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    Processing...
-                  </>
-                ) : (
-                  <>💳 Proceed to Payment — ৳{bookingMoney.toLocaleString()}</>
-                )}
-              </button>
-            </form>
+          {/* Left: Dynamic Form */}
+          <div className="lg:col-span-2 space-y-6">
+            <CheckoutPropertySummary property={property} unit={unit} />
+            <CheckoutForm
+              hasFields={hasFields}
+              sectionOrder={SECTION_ORDER}
+              groupedFields={groupedFields}
+              sectionIcons={SECTION_ICONS}
+              formData={formData}
+              fileData={fileData}
+              errors={errors}
+              handleChange={handleChange}
+              handleFileChange={handleFileChange}
+              refundAccepted={refundAccepted}
+              setRefundAccepted={setRefundAccepted}
+              refundWindowDays={refundWindowDays}
+              retentionPct={retentionPct}
+              submitting={submitting}
+              bookingMoney={bookingMoney}
+              handleSubmit={handleSubmit}
+            />
           </div>
 
-          {/* ── Right: Payment Summary ──────────────────────────────────── */}
+          {/* Right: Payment Summary */}
           <div>
-            <div className="glass-card p-5 sticky top-20 space-y-4">
-              <h3 className="text-gray-900 font-bold text-sm border-b border-blue-100 pb-3">
-                💰 Payment Summary
-              </h3>
-
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Total Price</span>
-                  <span className="text-gray-900 font-semibold">৳{totalPrice.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Booking Money ({percentage}%)</span>
-                  <span className="text-emerald-600 font-bold">৳{bookingMoney.toLocaleString()}</span>
-                </div>
-                <div className="border-t border-blue-100 pt-3 flex justify-between text-sm">
-                  <span className="text-gray-500">Due After Booking</span>
-                  <span className="text-amber-600 font-semibold">৳{dueAmount.toLocaleString()}</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-primary-500/10 border border-primary-500/20 rounded-xl">
-                <p className="text-primary-600 text-xs leading-relaxed">
-                  💡 You will pay <strong>৳{bookingMoney.toLocaleString()}</strong> now as booking money.
-                  The remaining <strong>৳{dueAmount.toLocaleString()}</strong> can be paid later from your dashboard.
-                </p>
-              </div>
-
-              {/* Security badges */}
-              <div className="flex flex-wrap gap-2 pt-2">
-                {['🔒 Secure', '💳 Stripe', '🛡️ Protected'].map((badge) => (
-                  <span key={badge} className="text-xs px-2.5 py-1 bg-slate-50 border border-blue-100 rounded-lg text-gray-500">
-                    {badge}
-                  </span>
-                ))}
-              </div>
-            </div>
+            <CheckoutSidebarSummary
+              totalPrice={totalPrice}
+              percentage={percentage}
+              bookingMoney={bookingMoney}
+              dueAmount={dueAmount}
+            />
           </div>
         </div>
       </div>

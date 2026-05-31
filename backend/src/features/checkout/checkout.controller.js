@@ -275,7 +275,32 @@ const createDuePaymentSession = async (req, res) => {
   }
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// @desc    Upload booking KYC documents to Cloudinary (before checkout)
+// @route   POST /api/checkout/upload-documents
+// @access  Protected
+// Returns { documents: { <fieldname>: { name, type, url } } } for storage on the
+// booking. Files are received via multer (uploadBookingDocs.any()).
+// ─────────────────────────────────────────────────────────────────────────────
+const uploadBookingDocuments = async (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ success: false, message: 'No files uploaded' });
+  }
+
+  const documents = {};
+  req.files.forEach((file) => {
+    documents[file.fieldname] = {
+      name: file.originalname,
+      type: file.mimetype,
+      url:  file.path, // Cloudinary secure URL (set by multer-storage-cloudinary)
+    };
+  });
+
+  res.status(200).json({ success: true, data: { documents } });
+};
+
 module.exports = {
   createCheckoutSession,
   createDuePaymentSession,
+  uploadBookingDocuments,
 };

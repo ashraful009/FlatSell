@@ -277,7 +277,14 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
 
     // Category Specific Payloads
     if (isApartment) {
-      fd.append('flatTypes', JSON.stringify(flatTypes));
+      const sanitizedFlatTypes = flatTypes.map((ft) => ({
+        ...ft,
+        sqft: ft.sqft === '' ? 0 : Number(ft.sqft),
+        pricePerUnit: ft.pricePerUnit === '' ? 0 : Number(ft.pricePerUnit),
+        bedrooms: ft.bedrooms === '' ? 1 : Number(ft.bedrooms),
+        bathrooms: ft.bathrooms === '' ? 1 : Number(ft.bathrooms),
+      }));
+      fd.append('flatTypes', JSON.stringify(sanitizedFlatTypes));
     } else if (isVilla) {
       const sanitizedVilla = { ...villaForm };
       ['totalLandSize', 'totalFloors', 'bedrooms', 'bathrooms', 'constructionYear'].forEach(key => {
@@ -504,14 +511,14 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
                     {/* Bedrooms */}
                     <FormField label="Bedrooms">
                       <input type="number" min="0" max="10" value={ft.bedrooms}
-                        onChange={(e) => updateFlatType(idx, 'bedrooms', Number(e.target.value))}
+                        onChange={(e) => updateFlatType(idx, 'bedrooms', e.target.value === '' ? '' : Number(e.target.value))}
                         className="form-input" />
                     </FormField>
 
                     {/* Bathrooms */}
                     <FormField label="Washrooms">
                       <input type="number" min="0" max="10" value={ft.bathrooms}
-                        onChange={(e) => updateFlatType(idx, 'bathrooms', Number(e.target.value))}
+                        onChange={(e) => updateFlatType(idx, 'bathrooms', e.target.value === '' ? '' : Number(e.target.value))}
                         className="form-input" />
                     </FormField>
 

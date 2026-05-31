@@ -274,10 +274,6 @@ const ApartmentVisualizer = ({ units, grouped, stats, property, onUnitClick }) =
   const flatTypes = property?.flatTypes || [];
   const hasFlatTypes = flatTypes.length > 0;
 
-  const floorNumbers = Object.keys(grouped)
-    .map(Number)
-    .sort((a, b) => b - a);
-
   const filteredGrouped = filter === 'all'
     ? grouped
     : Object.fromEntries(

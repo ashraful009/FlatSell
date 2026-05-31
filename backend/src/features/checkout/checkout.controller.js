@@ -195,6 +195,10 @@ const createDuePaymentSession = async (req, res) => {
     return res.status(404).json({ success: false, message: 'Booking not found' });
   }
 
+  if (booking.status === 'cancelled') {
+    return res.status(400).json({ success: false, message: 'This booking has been cancelled. Payments are no longer accepted.' });
+  }
+
   if (String(booking.customerId) !== String(req.user._id)) {
     return res.status(403).json({ success: false, message: 'Not authorized' });
   }

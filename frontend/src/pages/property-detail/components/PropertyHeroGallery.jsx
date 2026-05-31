@@ -24,7 +24,7 @@ const PropertyHeroGallery = ({
         {allImages.length > 0 ? (
           <>
             {/* Main image */}
-            <div className="relative h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden mb-3">
+            <div className="relative h-64 sm:h-80 lg:h-[700px] rounded-2xl overflow-hidden mb-3">
               <img
                 src={allImages[activeImg]}
                 alt={title}

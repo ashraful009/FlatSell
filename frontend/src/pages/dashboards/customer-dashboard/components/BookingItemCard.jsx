@@ -22,20 +22,20 @@ const BookingItemCard = ({
   const bookingAmount  = b.bookingAmount || 0;
   const totalPrice     = b.totalPrice || 0;
   const dueAmount      = totalPrice - bookingAmount;
+  const isCancelled    = b.status === 'cancelled';
   const isBookingPaid  = b.paymentStatus === 'booking_paid' || b.paymentStatus === 'paid';
   const isFullyPaid    = b.paymentStatus === 'fully_paid';
   const hasInstallPlan = !!b.installmentPlan?.active;
   // "Pay Due" lump-sum is only available when no installment plan is active
-  const showDueBtn     = isBookingPaid && dueAmount > 0 && !hasInstallPlan;
+  const showDueBtn     = !isCancelled && isBookingPaid && dueAmount > 0 && !hasInstallPlan;
   // "Set Installment" only available when booking paid, dues remain, and no plan yet
-  const showSetupBtn   = isBookingPaid && dueAmount > 0 && !hasInstallPlan && !isFullyPaid;
+  const showSetupBtn   = !isCancelled && isBookingPaid && dueAmount > 0 && !hasInstallPlan && !isFullyPaid;
   // "Pay Installment" replaces the due button once a plan is active
-  const showPayInstallBtn = hasInstallPlan && !isFullyPaid;
+  const showPayInstallBtn = !isCancelled && hasInstallPlan && !isFullyPaid;
 
   // ── Policy 1: inactivity warning (client-side mirror of the cron) ──
   const warnMonths     = settings?.inactivityWarnMonths ?? 2;
   const cancelMonths   = settings?.inactivityCancelMonths ?? 3;
-  const isCancelled    = b.status === 'cancelled';
   const cancelledNoRefund = isCancelled && b.noRefund;
   const isActiveUnsettled = (b.status === 'pending' || b.status === 'confirmed') && !isFullyPaid;
   const inactivityRef =

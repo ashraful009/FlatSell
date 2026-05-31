@@ -88,7 +88,14 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
 
     const fd = new FormData();
     Object.entries(form).forEach(([k, v]) => fd.append(k, v));
-    fd.append('flatTypes', JSON.stringify(showFlatTypes ? flatTypes : []));
+    const sanitizedFlatTypes = flatTypes.map((ft) => ({
+      ...ft,
+      sqft: ft.sqft === '' ? 0 : Number(ft.sqft),
+      pricePerUnit: ft.pricePerUnit === '' ? 0 : Number(ft.pricePerUnit),
+      bedrooms: ft.bedrooms === '' ? 1 : Number(ft.bedrooms),
+      bathrooms: ft.bathrooms === '' ? 1 : Number(ft.bathrooms),
+    }));
+    fd.append('flatTypes', JSON.stringify(showFlatTypes ? sanitizedFlatTypes : []));
     if (newMainImage) fd.append('mainImage', newMainImage);
     newGallery.forEach((img) => fd.append('galleryImages', img));
 
@@ -239,12 +246,12 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
                       </FormField>
                       <FormField label="Beds">
                         <input type="number" min="0" max="10" value={ft.bedrooms}
-                          onChange={(e) => updateFlatType(idx, 'bedrooms', Number(e.target.value))}
+                          onChange={(e) => updateFlatType(idx, 'bedrooms', e.target.value === '' ? '' : Number(e.target.value))}
                           className="form-input" />
                       </FormField>
                       <FormField label="Baths">
                         <input type="number" min="0" max="10" value={ft.bathrooms}
-                          onChange={(e) => updateFlatType(idx, 'bathrooms', Number(e.target.value))}
+                          onChange={(e) => updateFlatType(idx, 'bathrooms', e.target.value === '' ? '' : Number(e.target.value))}
                           className="form-input" />
                       </FormField>
                       {['kitchen','dining','drawing','parking'].map((f) => (

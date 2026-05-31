@@ -507,12 +507,11 @@ const checkMyBookingLimit = async (req, res) => {
     };
   } else if (
     companyId &&
-    status.vendorActive >= status.perVendorLimit &&
-    status.vendorPaid === 0
+    status.vendorActive >= status.perVendorLimit
   ) {
     blocked = {
       code:   'VENDOR_LIMIT',
-      reason: `You already have ${status.perVendorLimit} active bookings with this vendor. Please complete payment on one to proceed.`,
+      reason: `You already have ${status.perVendorLimit} active bookings with this vendor. Please complete full payment on one to proceed.`,
     };
   }
 

@@ -17,6 +17,7 @@ const fmtDate = (d) =>
 const InstallmentListModal = ({ open, onClose, bookingId }) => {
   const [plan,          setPlan]          = useState(null);
   const [installments,  setInstallments]  = useState([]);
+  const [bookingStatus, setBookingStatus] = useState('pending');
   const [loading,       setLoading]       = useState(true);
   const [payingId,      setPayingId]      = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
@@ -28,6 +29,7 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
       const { data } = await axiosInstance.get(`/installments/booking/${bookingId}`);
       setPlan(data.data.plan);
       setInstallments(data.data.installments || []);
+      setBookingStatus(data.data.bookingStatus || 'pending');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to load installments.');
       setInstallments([]);
@@ -215,6 +217,10 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
                         >
                           {downloadingId === inst._id ? '...' : '📥 Invoice'}
                         </button>
+                      ) : bookingStatus === 'cancelled' ? (
+                        <span className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-500/15 text-gray-500 border border-gray-500/30">
+                          Unavailable
+                        </span>
                       ) : (
                         <button
                           onClick={() => handlePay(inst)}

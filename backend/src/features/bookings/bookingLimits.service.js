@@ -83,16 +83,15 @@ const canCreateBooking = async (userId, companyId) => {
     };
   }
 
-  // ── Per-vendor cap (with the "one already paid" exception) ────────────────
+  // ── Per-vendor cap (Requires at least one booking to be fully paid to unblock new bookings) ──
   if (
     companyId &&
-    status.vendorActive >= status.perVendorLimit &&
-    status.vendorPaid === 0
+    status.vendorActive >= status.perVendorLimit
   ) {
     return {
       allowed: false,
       code:    'VENDOR_LIMIT',
-      reason:  `You already have ${status.perVendorLimit} active bookings with this vendor. Please complete payment on one to proceed.`,
+      reason:  `You already have ${status.perVendorLimit} active bookings with this vendor. Please complete full payment on one to proceed.`,
       status,
     };
   }

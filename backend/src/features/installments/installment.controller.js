@@ -58,6 +58,9 @@ const setupInstallmentPlan = async (req, res) => {
   if (!booking) {
     return res.status(404).json({ success: false, message: 'Booking not found.' });
   }
+  if (booking.status === 'cancelled') {
+    return res.status(400).json({ success: false, message: 'This booking has been cancelled. Installment plans cannot be created.' });
+  }
   if (String(booking.customerId) !== String(req.user._id)) {
     return res.status(403).json({ success: false, message: 'Not authorized for this booking.' });
   }
@@ -188,7 +191,7 @@ const getBookingInstallments = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    data: { plan: booking.installmentPlan, installments: decorated },
+    data: { plan: booking.installmentPlan, installments: decorated, bookingStatus: booking.status },
   });
 };
 
@@ -218,6 +221,9 @@ const createInstallmentPaymentSession = async (req, res) => {
   const booking = await Booking.findById(installment.bookingId).populate('propertyId', 'title');
   if (!booking) {
     return res.status(404).json({ success: false, message: 'Parent booking not found.' });
+  }
+  if (booking.status === 'cancelled') {
+    return res.status(400).json({ success: false, message: 'This booking has been cancelled. Payments are no longer accepted.' });
   }
 
   const overdue       = isOverdue(installment.dueDate);

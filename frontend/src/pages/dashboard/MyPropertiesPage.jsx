@@ -101,9 +101,10 @@ const MyPropertiesPage = () => {
             const bookingAmount = booking.bookingAmount || 0;
             const totalPrice    = booking.totalPrice || 0;
             const dueAmount     = totalPrice - bookingAmount;
+            const isCancelled   = booking.status === 'cancelled';
             const isBookingPaid = booking.paymentStatus === 'booking_paid' || booking.paymentStatus === 'paid';
             const isFullyPaid   = booking.paymentStatus === 'fully_paid';
-            const showDueBtn    = isBookingPaid && dueAmount > 0;
+            const showDueBtn    = !isCancelled && isBookingPaid && dueAmount > 0;
 
             // Get property image
             const propImage = prop?.mainImage || (prop?.galleryImages?.length > 0 ? prop.galleryImages[0] : null);

@@ -4,6 +4,7 @@ const Booking        = require('../bookings/booking.model');
 const Unit           = require('../units/unit.model');
 const Company        = require('../companies/company.model');
 const VendorLedger   = require('../vendorLedger/vendorLedger.model');
+const Commission     = require('../commissions/commission.model');
 const PlatformSettings = require('../settings/platformSettings.model');
 const { logAudit }     = require('../audit/audit.service');
 const { isWithinRefundWindow, daysBetween } = require('../../utils/dateUtils');
@@ -79,22 +80,29 @@ const requestRefund = async (req, res) => {
     notes:               'Auto-approved on request per Policy 2.',
   });
 
+  // Fetch Super Admin platform commission (margin) for this booking
+  const commission = await Commission.findOne({ bookingId: booking._id });
+  const commissionAmount = commission ? commission.commissionAmount : 0;
+
+  // Total amount deducted from vendor wallet: refund to customer (80%) + platform margin
+  const totalVendorDeduction = refundAmount + commissionAmount;
+
   // ── Debit the VENDOR's wallet (not the platform) + write ledger ──────────
   const company = await Company.findById(booking.companyId._id);
   let newBalance = 0;
   if (company) {
-    company.walletBalance = (company.walletBalance || 0) - refundAmount;
+    company.walletBalance = (company.walletBalance || 0) - totalVendorDeduction;
     newBalance = company.walletBalance;
     await company.save();
 
     await VendorLedger.create({
       companyId:       company._id,
       type:            'refund_debit',
-      amount:          -refundAmount,
+      amount:          -totalVendorDeduction,
       balanceAfter:    newBalance,
       bookingId:       booking._id,
       refundRequestId: refund._id,
-      notes:           `Refund to customer for "${booking.propertyId?.title || 'booking'}"`,
+      notes:           `Refund to customer: ৳${refundAmount.toLocaleString()} + Platform Commission Paid: ৳${commissionAmount.toLocaleString()}`,
     });
   }
 

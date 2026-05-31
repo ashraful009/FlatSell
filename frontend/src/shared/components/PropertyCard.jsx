@@ -35,7 +35,7 @@ const PropertyCard = ({ property }) => {
     <Link
       to={`/property/${_id}`}
       className="group block relative rounded-2xl overflow-hidden
-                 h-[340px] sm:h-[380px]
+                 h-[420px] sm:h-[420px]
                  hover:shadow-2xl hover:shadow-primary-500/10
                  transition-all duration-500 ring-1 ring-white/[0.06]
                  hover:ring-primary-500/30"

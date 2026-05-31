@@ -496,10 +496,167 @@ const installmentPaymentEmailTemplate = ({
 </html>
 `;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Booking Policy emails (Policy 1 — Auto-Cancellation, Policy 2 — Refund)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const fmtBdt = (n) => `৳${Number(n || 0).toLocaleString()}`;
+
+/** Minimal branded shell so every policy email shares the same look. */
+const policyShell = ({ bannerColor, bannerText, bodyHtml }) => `
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:#0f0f1a;font-family:'Inter',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f1a;padding:40px 0;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0"
+             style="background:#1a1a2e;border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;max-width:560px;width:100%;">
+        <tr><td style="background:linear-gradient(135deg,#4f52e6,#6370f1);padding:32px;text-align:center;">
+          <h1 style="margin:0;color:#fff;font-size:28px;font-weight:800;letter-spacing:-0.5px;">
+            Flat<span style="color:#fb923c;">Sell</span></h1>
+          <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">Real Estate Marketplace</p>
+        </td></tr>
+        <tr><td style="background:${bannerColor};padding:14px 36px;text-align:center;">
+          <p style="margin:0;color:#fff;font-size:15px;font-weight:700;">${bannerText}</p>
+        </td></tr>
+        <tr><td style="padding:36px;">${bodyHtml}
+          <div style="border-top:1px solid rgba(255,255,255,0.08);margin:28px 0 0;padding-top:20px;">
+            <p style="margin:0;color:#4b5563;font-size:12px;">© ${new Date().getFullYear()} FlatSell. All rights reserved.<br/>
+              House No. 2, Road No. 11, Block F, Banani, Dhaka-1213 | 01611-652333</p>
+          </div>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+
+/**
+ * Policy 1 — 2-month inactivity warning ("cancelled in 30 days").
+ * @param {Object} opts { customer, property, daysUntilCancel }
+ */
+const sendInactivityWarningEmail = async ({ customer, property, daysUntilCancel = 30 }) => {
+  const bodyHtml = `
+    <p style="margin:0 0 18px;color:#9ca3af;font-size:15px;line-height:1.6;">
+      Hi <strong style="color:#e5e7eb;">${customer.name}</strong>,</p>
+    <p style="margin:0 0 18px;color:#9ca3af;font-size:15px;line-height:1.6;">
+      We noticed no payment activity on your booking for
+      <strong style="color:#fff;">${property?.title || 'your property'}</strong> for a while.</p>
+    <div style="background:#7c2d12;border:1px solid #d97706;border-radius:8px;padding:14px 18px;margin:0 0 18px;">
+      <p style="margin:0;color:#fbbf24;font-size:14px;font-weight:700;">
+        ⚠️ Your booking will be automatically cancelled in ${daysUntilCancel} days due to no payment.</p>
+      <p style="margin:8px 0 0;color:#fcd34d;font-size:13px;">
+        Cancellation due to inactivity is final and <strong>no refund</strong> will be issued.</p>
+    </div>
+    <p style="margin:0 0 8px;color:#9ca3af;font-size:14px;line-height:1.6;">
+      To keep your booking, please make a payment (booking money, due, or your next installment)
+      from your dashboard before the deadline.</p>`;
+
+  return sendEmail({
+    to:      customer.email,
+    subject: '⚠️ Action Required — Your FlatSell Booking May Be Cancelled',
+    html:    policyShell({ bannerColor: '#b45309', bannerText: '⚠️ Payment Inactivity Warning', bodyHtml }),
+  });
+};
+
+/**
+ * Policy 1 — final auto-cancellation notice (no refund).
+ * @param {Object} opts { customer, property, monthsInactive }
+ */
+const sendAutoCancellationEmail = async ({ customer, property, monthsInactive }) => {
+  const bodyHtml = `
+    <p style="margin:0 0 18px;color:#9ca3af;font-size:15px;line-height:1.6;">
+      Hi <strong style="color:#e5e7eb;">${customer.name}</strong>,</p>
+    <p style="margin:0 0 18px;color:#9ca3af;font-size:15px;line-height:1.6;">
+      Your booking for <strong style="color:#fff;">${property?.title || 'your property'}</strong>
+      has been <strong style="color:#f87171;">automatically cancelled</strong> after
+      ${monthsInactive} months with no payment.</p>
+    <div style="background:#7f1d1d;border:1px solid #ef4444;border-radius:8px;padding:14px 18px;margin:0 0 18px;">
+      <p style="margin:0;color:#fca5a5;font-size:14px;font-weight:700;">🚫 Cancelled — No Refund</p>
+      <p style="margin:8px 0 0;color:#fecaca;font-size:13px;">
+        As per our payment-inactivity policy, no refund is issued for inactivity cancellations.</p>
+    </div>
+    <p style="margin:0 0 8px;color:#9ca3af;font-size:14px;line-height:1.6;">
+      The unit has been released and is available for others. You're welcome to browse and book again anytime.</p>`;
+
+  return sendEmail({
+    to:      customer.email,
+    subject: '🚫 Your FlatSell Booking Was Cancelled (No Payment)',
+    html:    policyShell({ bannerColor: '#991b1b', bannerText: '🚫 Booking Cancelled — No Refund', bodyHtml }),
+  });
+};
+
+/**
+ * Policy 2 — refund approval confirmation to the CUSTOMER.
+ * @param {Object} opts { customer, property, refundAmount, retentionAmount, amountPaid }
+ */
+const sendRefundApprovedEmail = async ({ customer, property, refundAmount, retentionAmount, amountPaid }) => {
+  const bodyHtml = `
+    <p style="margin:0 0 18px;color:#9ca3af;font-size:15px;line-height:1.6;">
+      Hi <strong style="color:#e5e7eb;">${customer.name}</strong>,</p>
+    <p style="margin:0 0 18px;color:#9ca3af;font-size:15px;line-height:1.6;">
+      Your refund request for <strong style="color:#fff;">${property?.title || 'your booking'}</strong>
+      has been <strong style="color:#4ade80;">approved</strong>.</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;border-collapse:collapse;">
+      <tr style="background:#0f0f1a;"><td style="padding:10px 14px;color:#6b7280;font-size:12px;border:1px solid rgba(255,255,255,0.06);">Amount Paid</td>
+        <td style="padding:10px 14px;color:#e5e7eb;font-size:12px;font-weight:600;text-align:right;border:1px solid rgba(255,255,255,0.06);">${fmtBdt(amountPaid)}</td></tr>
+      <tr style="background:#1a1a2e;"><td style="padding:10px 14px;color:#6b7280;font-size:12px;border:1px solid rgba(255,255,255,0.06);">Retention (non-refundable)</td>
+        <td style="padding:10px 14px;color:#fbbf24;font-size:12px;font-weight:600;text-align:right;border:1px solid rgba(255,255,255,0.06);">− ${fmtBdt(retentionAmount)}</td></tr>
+      <tr style="background:#15803d;"><td style="padding:12px 14px;color:#fff;font-size:13px;font-weight:700;border:1px solid rgba(255,255,255,0.06);">Refund Amount</td>
+        <td style="padding:12px 14px;color:#fff;font-size:14px;font-weight:700;text-align:right;border:1px solid rgba(255,255,255,0.06);">${fmtBdt(refundAmount)}</td></tr>
+    </table>
+    <p style="margin:0 0 8px;color:#9ca3af;font-size:14px;line-height:1.6;">
+      Your refund of <strong style="color:#4ade80;">${fmtBdt(refundAmount)}</strong> is being processed and
+      will reach your original payment method within <strong>7–10 business days</strong>.
+      Your booking has been cancelled and the unit released.</p>`;
+
+  return sendEmail({
+    to:      customer.email,
+    subject: '✅ Refund Approved — FlatSell',
+    html:    policyShell({ bannerColor: '#15803d', bannerText: '✅ Refund Approved', bodyHtml }),
+  });
+};
+
+/**
+ * Policy 2 — refund deduction notice to the VENDOR.
+ * @param {Object} opts { vendorEmail, companyName, property, customerName, refundAmount, walletBalance }
+ */
+const sendVendorRefundDeductionEmail = async ({ vendorEmail, companyName, property, customerName, refundAmount, walletBalance }) => {
+  const bodyHtml = `
+    <p style="margin:0 0 18px;color:#9ca3af;font-size:15px;line-height:1.6;">
+      Hi <strong style="color:#e5e7eb;">${companyName}</strong>,</p>
+    <p style="margin:0 0 18px;color:#9ca3af;font-size:15px;line-height:1.6;">
+      A customer refund has been processed against your account. The refund amount has been
+      <strong style="color:#f87171;">deducted from your vendor wallet</strong>.</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;border-collapse:collapse;">
+      <tr style="background:#0f0f1a;"><td style="padding:10px 14px;color:#6b7280;font-size:12px;border:1px solid rgba(255,255,255,0.06);">Property</td>
+        <td style="padding:10px 14px;color:#e5e7eb;font-size:12px;font-weight:600;text-align:right;border:1px solid rgba(255,255,255,0.06);">${property?.title || '—'}</td></tr>
+      <tr style="background:#1a1a2e;"><td style="padding:10px 14px;color:#6b7280;font-size:12px;border:1px solid rgba(255,255,255,0.06);">Customer</td>
+        <td style="padding:10px 14px;color:#e5e7eb;font-size:12px;font-weight:600;text-align:right;border:1px solid rgba(255,255,255,0.06);">${customerName || '—'}</td></tr>
+      <tr style="background:#7f1d1d;"><td style="padding:12px 14px;color:#fff;font-size:13px;font-weight:700;border:1px solid rgba(255,255,255,0.06);">Deducted from Wallet</td>
+        <td style="padding:12px 14px;color:#fff;font-size:14px;font-weight:700;text-align:right;border:1px solid rgba(255,255,255,0.06);">− ${fmtBdt(refundAmount)}</td></tr>
+      <tr style="background:#0f0f1a;"><td style="padding:10px 14px;color:#6b7280;font-size:12px;border:1px solid rgba(255,255,255,0.06);">New Wallet Balance</td>
+        <td style="padding:10px 14px;color:#e5e7eb;font-size:12px;font-weight:600;text-align:right;border:1px solid rgba(255,255,255,0.06);">${fmtBdt(walletBalance)}</td></tr>
+    </table>
+    <p style="margin:0 0 8px;color:#6b7280;font-size:13px;line-height:1.6;">
+      You can review all refund deductions in your vendor dashboard under "Refunds".</p>`;
+
+  return sendEmail({
+    to:      vendorEmail,
+    subject: '💸 Customer Refund Deducted from Your Wallet — FlatSell',
+    html:    policyShell({ bannerColor: '#991b1b', bannerText: '💸 Refund Deduction', bodyHtml }),
+  });
+};
+
 module.exports = {
   sendEmail,
   otpEmailTemplate,
   sendPaymentConfirmationEmail,
   sendVendorApprovalEmail,
   sendInstallmentPaymentEmail,
+  // Booking policy emails
+  sendInactivityWarningEmail,
+  sendAutoCancellationEmail,
+  sendRefundApprovedEmail,
+  sendVendorRefundDeductionEmail,
 };

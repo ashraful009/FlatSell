@@ -41,21 +41,21 @@ const VendorPolicyModal = ({ content, title, onAccept, onClose }) => {
     /* Backdrop */
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6
                     bg-black/70 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-2xl glass-card flex flex-col
+      <div className="w-full max-w-5xl glass-card flex flex-col
                       max-h-[90vh] animate-slideUp overflow-hidden">
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4
-                        border-b border-white/10 flex-shrink-0">
+                        border-b border-blue-100 flex-shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-white">{title || 'Terms & Conditions'}</h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <h2 className="text-lg font-bold text-gray-900">{title || 'Terms & Conditions'}</h2>
+            <p className="text-xs text-gray-500 mt-0.5">
               Please read the entire policy before continuing
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10
+            className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-blue-50
                        transition-all flex-shrink-0"
             aria-label="Close"
           >
@@ -67,7 +67,7 @@ const VendorPolicyModal = ({ content, title, onAccept, onClose }) => {
         </div>
 
         {/* Scroll Progress Bar */}
-        <div className="h-1 bg-white/5 flex-shrink-0">
+        <div className="h-1 bg-slate-50 flex-shrink-0">
           <div
             className="h-full bg-gradient-to-r from-primary-600 to-primary-400
                        transition-all duration-300"
@@ -81,15 +81,15 @@ const VendorPolicyModal = ({ content, title, onAccept, onClose }) => {
           onScroll={handleScroll}
           className="flex-1 overflow-y-auto px-6 py-5 min-h-0
                      prose prose-invert prose-sm max-w-none
-                     [&_h2]:text-white [&_h2]:text-base [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-5
-                     [&_h3]:text-gray-200 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mb-2 [&_h3]:mt-4
-                     [&_p]:text-gray-400 [&_p]:text-sm [&_p]:leading-relaxed [&_p]:mb-3
-                     [&_strong]:text-gray-200"
+                     [&_h2]:text-gray-900 [&_h2]:text-base [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-5
+                     [&_h3]:text-gray-800 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mb-2 [&_h3]:mt-4
+                     [&_p]:text-gray-500 [&_p]:text-sm [&_p]:leading-relaxed [&_p]:mb-3
+                     [&_strong]:text-gray-800"
           dangerouslySetInnerHTML={{ __html: content }}
         />
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-white/10 flex-shrink-0">
+        <div className="px-6 py-4 border-t border-blue-100 flex-shrink-0">
           {/* Hint when not scrolled */}
           {!canContinue && (
             <p className="text-gray-500 text-xs text-center mb-3 animate-fadeIn flex items-center justify-center gap-1">

@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../shared/hooks/useAuth';
 
 const STATUS_CONFIG = {
-  available: { label: 'Available', color: 'text-emerald-400', bg: 'bg-emerald-500/15 border-emerald-500/30' },
-  booked:    { label: 'Booked',    color: 'text-amber-400',   bg: 'bg-amber-500/15 border-amber-500/30'   },
-  sold:      { label: 'Sold Out',  color: 'text-red-400',     bg: 'bg-red-500/15 border-red-500/30'       },
+  available: { label: 'Available', color: 'text-emerald-600', bg: 'bg-emerald-500/15 border-emerald-500/30' },
+  booked:    { label: 'Booked',    color: 'text-amber-600',   bg: 'bg-amber-500/15 border-amber-500/30'   },
+  sold:      { label: 'Sold Out',  color: 'text-red-600',     bg: 'bg-red-500/15 border-red-500/30'       },
 };
 
 /**
@@ -54,26 +54,26 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
                     bg-black/70 backdrop-blur-sm animate-fadeIn px-0 sm:px-4"
          onClick={(e) => e.target === e.currentTarget && onClose()}>
 
-      <div className="w-full sm:max-w-md glass-card rounded-t-3xl sm:rounded-2xl
-                      p-6 pb-8 sm:pb-6 animate-slideUp max-h-[90vh] overflow-y-auto">
+      <div className="w-full h-full sm:h-auto sm:max-w-4xl glass-card rounded-none sm:rounded-2xl
+                      p-6 pb-8 sm:pb-6 animate-slideUp sm:max-h-[90vh] overflow-y-auto">
 
         {/* Handle bar (mobile) */}
-        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-5 sm:hidden" />
+        <div className="w-10 h-1 bg-blue-100 rounded-full mx-auto mb-5 sm:hidden" />
 
         {/* Header */}
         <div className="flex items-start justify-between mb-5">
           <div>
             {property?.category === 'apartment' ? (
               <>
-                <p className="text-gray-400 text-xs uppercase tracking-widest mb-1">
+                <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">
                   Floor {unit.floor}
                 </p>
-                <h2 className="text-2xl font-black text-white">
+                <h2 className="text-2xl font-black text-gray-900">
                   Unit {unit.unitNumber}
                 </h2>
               </>
             ) : (
-              <h2 className="text-2xl font-black text-white capitalize">
+              <h2 className="text-2xl font-black text-gray-900 capitalize">
                 {property?.category} Booking
               </h2>
             )}
@@ -84,8 +84,8 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
               {cfg.label}
             </span>
             <button onClick={onClose}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-white
-                         hover:bg-white/10 transition-colors">
+              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900
+                         hover:bg-blue-50 transition-colors">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M6 18L18 6M6 6l12 12" />
@@ -99,14 +99,14 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
           <div className="space-y-4 mb-5">
             {/* Type header */}
             <div className="flex items-center gap-2 p-3 rounded-xl bg-primary-500/10 border border-primary-500/20">
-              <span className="text-primary-400 text-sm">🏷️</span>
-              <span className="text-primary-300 font-semibold text-sm">
+              <span className="text-primary-600 text-sm">🏷️</span>
+              <span className="text-primary-600 font-semibold text-sm">
                 {flatType.label || 'Unnamed Type'}
               </span>
             </div>
 
             {/* Details grid */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 { icon: '📐', label: 'Square Feet',     value: flatType.sqft ? `${flatType.sqft} sft` : '—' },
                 { icon: '💰', label: 'Price (BDT)',      value: flatType.pricePerUnit ? `৳${Number(flatType.pricePerUnit).toLocaleString()}` : '—' },
@@ -118,24 +118,24 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
                 { icon: '🅿️', label: 'Parking Area',     value: flatType.parking || '—' },
               ].map(({ icon, label, value }) => (
                 <div key={label}
-                  className="bg-dark-800/60 border border-white/8 rounded-xl px-3 py-2.5">
+                  className="bg-slate-50 border border-blue-100 rounded-xl px-3 py-2.5">
                   <p className="text-gray-500 text-xs mb-0.5">{icon} {label}</p>
-                  <p className="text-white font-semibold text-sm">{value}</p>
+                  <p className="text-gray-900 font-semibold text-sm">{value}</p>
                 </div>
               ))}
             </div>
 
             {/* Type Description */}
             {flatType.description && (
-              <div className="bg-dark-800/60 border border-white/8 rounded-xl px-3 py-2.5">
+              <div className="bg-slate-50 border border-blue-100 rounded-xl px-3 py-2.5">
                 <p className="text-gray-500 text-xs mb-1">📝 Type Description</p>
-                <p className="text-gray-300 text-sm leading-relaxed">{flatType.description}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">{flatType.description}</p>
               </div>
             )}
           </div>
         ) : (
           /* Fallback: generic unit details (non-apartment or no flatTypes) */
-          <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
             {[
               { label: 'Type',   value: unit.type   || '—' },
               { label: 'Size',   value: unit.size || property?.landSize || (property?.landDetails?.totalSize ? `${property.landDetails.totalSize} Katha` : null) || (property?.villaDetails?.totalLandSize ? `${property.villaDetails.totalLandSize} Katha` : null) || '—' },
@@ -148,9 +148,9 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
               .filter((item) => !item.hide)
               .map(({ label, value }) => (
               <div key={label}
-                className="bg-dark-800/60 border border-white/8 rounded-xl px-3 py-2.5">
+                className="bg-slate-50 border border-blue-100 rounded-xl px-3 py-2.5">
                 <p className="text-gray-500 text-xs mb-0.5">{label}</p>
-                <p className="text-white font-semibold text-sm">{value}</p>
+                <p className="text-gray-900 font-semibold text-sm">{value}</p>
               </div>
             ))}
           </div>
@@ -159,12 +159,12 @@ const UnitDetailModal = ({ unit, property, onClose }) => {
         {/* Features */}
         {unit.features?.length > 0 && (
           <div className="mb-5">
-            <p className="text-gray-400 text-xs uppercase tracking-wider mb-2">Features</p>
+            <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">Features</p>
             <div className="flex flex-wrap gap-1.5">
               {unit.features.map((f) => (
                 <span key={f}
-                  className="text-xs px-2 py-1 bg-white/5 border border-white/10
-                             text-gray-300 rounded-lg">
+                  className="text-xs px-2 py-1 bg-slate-50 border border-blue-100
+                             text-gray-600 rounded-lg">
                   ✦ {f}
                 </span>
               ))}

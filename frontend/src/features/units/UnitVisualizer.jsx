@@ -3,19 +3,19 @@ import { useState } from 'react';
 const STATUS_CONFIG = {
   available: {
     bg:    'bg-emerald-500/20 border-emerald-500/50 hover:bg-emerald-500/30 hover:border-emerald-400',
-    text:  'text-emerald-400',
+    text:  'text-emerald-600',
     dot:   'bg-emerald-400',
     label: 'Available',
   },
   booked: {
     bg:    'bg-amber-500/20 border-amber-500/50 hover:bg-amber-500/30 hover:border-amber-400',
-    text:  'text-amber-400',
+    text:  'text-amber-600',
     dot:   'bg-amber-400',
     label: 'Booked',
   },
   sold: {
     bg:    'bg-red-500/20 border-red-500/40 cursor-not-allowed',
-    text:  'text-red-400',
+    text:  'text-red-600',
     dot:   'bg-red-400',
     label: 'Sold',
   },
@@ -44,10 +44,10 @@ const VillaVisualizer = ({ property }) => {
   return (
     <div className="space-y-6">
       {/* Duplex House SVG Visualizer */}
-      <div className="bg-dark-800/40 border border-white/8 rounded-2xl p-6 overflow-hidden">
-        <p className="text-xs text-gray-400 mb-4 flex items-center gap-1.5">
+      <div className="bg-slate-50 border border-blue-100 rounded-2xl p-6 overflow-hidden">
+        <p className="text-xs text-gray-500 mb-4 flex items-center gap-1.5">
           <span className="w-2 h-2 bg-primary-400 rounded-full inline-block" />
-          Villa Duplex Preview — <strong className="text-white">{floorCount} Floor{floorCount > 1 ? 's' : ''}</strong>
+          Villa Duplex Preview — <strong className="text-gray-900">{floorCount} Floor{floorCount > 1 ? 's' : ''}</strong>
         </p>
 
         <div className="flex justify-center">
@@ -73,8 +73,8 @@ const VillaVisualizer = ({ property }) => {
                 const isBottom = fi === Math.min(floorCount, 4) - 1;
                 return (
                   <div key={fi}
-                    className={`border-x-2 border-b-2 ${isTop ? 'border-t-2' : ''} border-white/15
-                                bg-dark-700/60 px-4 py-3 flex items-center justify-between gap-2`}>
+                    className={`border-x-2 border-b-2 ${isTop ? 'border-t-2' : ''} border-blue-200
+                                bg-slate-50 px-4 py-3 flex items-center justify-between gap-2`}>
                     <span className="text-xs text-gray-500 w-8 flex-shrink-0">F{floorCount - fi}</span>
                     <div className="flex gap-2 flex-wrap justify-center flex-1">
                       {/* Bedrooms */}
@@ -209,18 +209,18 @@ const LandVisualizer = ({ property }) => {
         <div className={`${shapeStyles[shape]} border-2 border-dashed border-emerald-500/50
                          bg-emerald-500/10 flex flex-col items-center justify-center gap-1
                          transition-all duration-300`}>
-          <span className="text-emerald-400 font-bold text-lg">{l.totalSize || '—'} Katha</span>
-          <span className="text-gray-400 text-xs">{shape} Plot</span>
+          <span className="text-emerald-600 font-bold text-lg">{l.totalSize || '—'} Katha</span>
+          <span className="text-gray-500 text-xs">{shape} Plot</span>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="bg-dark-800/40 border border-white/8 rounded-2xl p-6">
-      <p className="text-xs text-gray-400 mb-5 flex items-center gap-1.5">
+    <div className="bg-slate-50 border border-blue-100 rounded-2xl p-6">
+      <p className="text-xs text-gray-500 mb-5 flex items-center gap-1.5">
         <span className="w-2 h-2 bg-emerald-400 rounded-full inline-block" />
-        Land Plot Preview — <strong className="text-white">{shape}</strong>
+        Land Plot Preview — <strong className="text-gray-900">{shape}</strong>
       </p>
       {renderShape()}
 
@@ -232,8 +232,8 @@ const LandVisualizer = ({ property }) => {
           { label: 'Road Access', value: l.roadAccess || '—' },
           { label: 'Construction', value: l.constructionReady || '—' },
         ].map(({ label, value }) => (
-          <div key={label} className="bg-dark-700/50 border border-white/5 rounded-xl px-3 py-2 text-center">
-            <p className="text-white text-sm font-medium">{value}</p>
+          <div key={label} className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-center">
+            <p className="text-gray-900 text-sm font-medium">{value}</p>
             <p className="text-gray-500 text-xs">{label}</p>
           </div>
         ))}
@@ -294,7 +294,7 @@ const ApartmentVisualizer = ({ units, grouped, stats, property, onUnitClick }) =
   if (units.length === 0) {
     return (
       <div className="glass-card py-12 text-center">
-        <p className="text-gray-400 text-sm">No units available for this property yet.</p>
+        <p className="text-gray-500 text-sm">No units available for this property yet.</p>
       </div>
     );
   }
@@ -304,13 +304,13 @@ const ApartmentVisualizer = ({ units, grouped, stats, property, onUnitClick }) =
       {/* Stats bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Total Units',  value: stats.total,     color: 'text-white'         },
-          { label: 'Available',    value: stats.available, color: 'text-emerald-400'   },
-          { label: 'Booked',       value: stats.booked,    color: 'text-amber-400'     },
-          { label: 'Sold',         value: stats.sold,      color: 'text-red-400'       },
+          { label: 'Total Units',  value: stats.total,     color: 'text-gray-900'         },
+          { label: 'Available',    value: stats.available, color: 'text-emerald-600'   },
+          { label: 'Booked',       value: stats.booked,    color: 'text-amber-600'     },
+          { label: 'Sold',         value: stats.sold,      color: 'text-red-600'       },
         ].map(({ label, value, color }) => (
           <div key={label}
-            className="bg-dark-800/60 border border-white/8 rounded-xl px-4 py-3 text-center">
+            className="bg-slate-50 border border-blue-100 rounded-xl px-4 py-3 text-center">
             <p className={`text-2xl font-bold ${color}`}>{value ?? 0}</p>
             <p className="text-gray-500 text-xs mt-0.5">{label}</p>
           </div>
@@ -319,12 +319,12 @@ const ApartmentVisualizer = ({ units, grouped, stats, property, onUnitClick }) =
 
       {/* Flat type legend (when flatTypes exist) */}
       {hasFlatTypes && (
-        <div className="flex flex-wrap gap-3 mb-4 p-3 bg-white/3 rounded-xl border border-white/5">
+        <div className="flex flex-wrap gap-3 mb-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
           <span className="text-xs text-gray-500 self-center">Unit Types:</span>
           {flatTypes.map((ft, idx) => (
-            <div key={idx} className="flex items-center gap-1.5 text-xs text-gray-400">
+            <div key={idx} className="flex items-center gap-1.5 text-xs text-gray-500">
               <span className={`w-3 h-3 rounded-full ${TYPE_COLORS[idx % TYPE_COLORS.length].dot}`} />
-              <span className="text-white font-medium">{ft.label || `Type ${String.fromCharCode(65 + idx)}`}</span>
+              <span className="text-gray-900 font-medium">{ft.label || `Type ${String.fromCharCode(65 + idx)}`}</span>
               {ft.sqft && <span className="text-gray-600">({ft.sqft} sft)</span>}
             </div>
           ))}
@@ -340,8 +340,8 @@ const ApartmentVisualizer = ({ units, grouped, stats, property, onUnitClick }) =
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
                         border transition-all duration-200
                         ${filter === f
-                          ? 'bg-primary-500/20 border-primary-500/50 text-primary-300'
-                          : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20'
+                          ? 'bg-primary-500/20 border-primary-500/50 text-primary-600'
+                          : 'bg-slate-50 border-blue-100 text-gray-500 hover:text-gray-900 hover:border-blue-200'
                         }`}
           >
             {f !== 'all' && (
@@ -356,7 +356,7 @@ const ApartmentVisualizer = ({ units, grouped, stats, property, onUnitClick }) =
       </div>
 
       {/* Floor plan grid */}
-      <div className="bg-dark-800/40 border border-white/8 rounded-2xl p-4 sm:p-6 overflow-x-auto">
+      <div className="bg-slate-50 border border-blue-100 rounded-2xl p-4 sm:p-6 overflow-x-auto">
         {filteredFloors.length === 0 ? (
           <p className="text-gray-500 text-center py-8 text-sm">
             No {filter} units found.
@@ -416,7 +416,7 @@ const ApartmentVisualizer = ({ units, grouped, stats, property, onUnitClick }) =
         {Object.entries(STATUS_CONFIG).map(([key, { dot, label }]) => (
           <div key={key} className="flex items-center gap-1.5">
             <span className={`w-3 h-3 rounded ${dot}`} />
-            <span className="text-gray-400 text-xs">{label}</span>
+            <span className="text-gray-500 text-xs">{label}</span>
           </div>
         ))}
       </div>

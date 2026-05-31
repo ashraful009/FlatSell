@@ -7,70 +7,69 @@
 /* ─── Base ─────────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
-  html { scroll-behavior: smooth; color-scheme: dark; }
+  html { scroll-behavior: smooth; color-scheme: light; }
 
   body {
-    @apply bg-dark-900 text-gray-100 font-sans antialiased;
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
     min-height: 100vh;
   }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { @apply bg-dark-800; }
-  ::-webkit-scrollbar-thumb { @apply bg-primary-700 rounded-full; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-primary-600; }
+  ::-webkit-scrollbar-track { @apply bg-slate-100; }
+  ::-webkit-scrollbar-thumb { @apply bg-primary-300 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-primary-400; }
 
   /* ── Global Select / Option styling ─────────────────────────── */
   /* Native <select> options are OS-rendered — must use solid colors */
   select {
-    background-color: #13111f !important;
-    color: #e2e8f0 !important;
-    border-color: rgba(139, 92, 246, 0.25);
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #e5e7eb;
   }
   select option {
-    background-color: #1c1830;
-    color: #e2e8f0;
+    background-color: #ffffff;
+    color: #0f172a;
     padding: 8px 12px;
   }
   select option:hover,
   select option:focus,
   select option:checked {
-    background-color: #5b21b6;
-    color: #ffffff;
+    background-color: #dbeafe;
+    color: #1e3a8a;
   }
 
-  /* Date / time inputs — match dark theme */
+  /* Date / time inputs — match light theme */
   input[type="date"],
   input[type="time"],
   input[type="datetime-local"] {
-    color-scheme: dark;
+    color-scheme: light;
   }
 }
 
 /* ─── Components ────────────────────────────────────────────────── */
 @layer components {
 
-  /* Glass card */
+  /* Card (light theme — solid white with subtle blue border + soft shadow) */
   .glass-card {
-    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+    @apply bg-white border border-blue-100 rounded-2xl shadow-sm;
   }
 
   /* Buttons */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2
-           bg-gradient-to-r from-primary-600 to-primary-500
-           hover:from-primary-500 hover:to-primary-400
+           bg-blue-600 hover:bg-blue-700
            text-white font-semibold px-5 py-2.5 rounded-xl
-           transition-all duration-200 shadow-glow
-           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-900
+           transition-all duration-200 shadow-sm
+           focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-white
            disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none;
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2
-           border border-white/20 text-gray-200 hover:bg-white/10
+           border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100
            font-semibold px-5 py-2.5 rounded-xl transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-white/30;
+           focus:outline-none focus:ring-2 focus:ring-blue-100;
   }
 
   .btn-danger {
@@ -87,48 +86,48 @@
 
   /* Form input */
   .form-input {
-    @apply w-full border border-white/15 text-gray-100 placeholder-gray-500
+    @apply w-full border border-gray-200 text-gray-900 placeholder-gray-400
            rounded-xl px-4 py-3 text-sm
-           focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent
+           focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400
            transition-all duration-200;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: #ffffff;
   }
 
   /* Select-specific override — must use solid bg so OS-rendered options are visible */
   select.form-input,
   select {
-    background-color: #13111f !important;
-    border-color: rgba(139, 92, 246, 0.3) !important;
+    background-color: #ffffff !important;
+    border-color: #e5e7eb !important;
     cursor: pointer;
   }
   select.form-input:focus,
   select:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
-    border-color: rgba(139, 92, 246, 0.6) !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    border-color: #60a5fa !important;
   }
   select.form-input:hover,
   select:hover {
-    border-color: rgba(139, 92, 246, 0.5) !important;
-    background-color: #1a1630 !important;
+    border-color: #93c5fd !important;
+    background-color: #f8fafc !important;
   }
 
   .form-label {
-    @apply block text-sm font-medium text-gray-300 mb-1.5;
+    @apply block text-sm font-medium text-gray-600 mb-1.5;
   }
 
   /* Layout */
   .container-main { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
-  .section-title   { @apply text-2xl sm:text-3xl lg:text-4xl font-bold text-white; }
+  .section-title   { @apply text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900; }
 
   /* ── Skeleton Loading ─────────────────────────────────────── */
   .skeleton {
-    @apply rounded-xl bg-white/5 relative overflow-hidden;
+    @apply rounded-xl bg-slate-100 relative overflow-hidden;
   }
   .skeleton::after {
     content: '';
     @apply absolute inset-0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, rgba(15,23,42,0.05) 50%, transparent 100%);
     background-size: 1000px 100%;
     animation: shimmer 2s infinite linear;
   }
@@ -137,21 +136,21 @@
   .skeleton-card   { @apply skeleton rounded-2xl; }
 
   /* ── Badges ───────────────────────────────────────────────── */
-  .badge-available { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30; }
-  .badge-booked    { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30; }
-  .badge-sold      { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30; }
-  .badge-pending   { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30; }
-  .badge-approved  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30; }
-  .badge-rejected  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30; }
+  .badge-available { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200; }
+  .badge-booked    { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200; }
+  .badge-sold      { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200; }
+  .badge-pending   { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200; }
+  .badge-approved  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200; }
+  .badge-rejected  { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200; }
 }
 
 /* ─── Utilities ─────────────────────────────────────────────────── */
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-accent-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-500;
   }
   .bg-glass {
-    background: rgba(255,255,255,0.03);
+    background: rgba(255,255,255,0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }

@@ -345,6 +345,7 @@ const confirmInstallmentPayment = async (req, res) => {
   const booking = await Booking.findById(installment.bookingId);
   if (booking) {
     booking.bookingAmount = (booking.bookingAmount || 0) + installment.baseAmount;
+    booking.lastPaymentDate = new Date(); // Policy 1: reset the inactivity clock
 
     // Check if all installments for this booking are paid
     const remaining = await Installment.countDocuments({

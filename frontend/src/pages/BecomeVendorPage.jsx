@@ -35,12 +35,12 @@ const BecomeVendorPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-gray-50">
       {/* ── Page Header ────────────────────────────────────────────────────── */}
-      <div className="bg-gradient-to-b from-primary-950/40 to-transparent border-b border-white/5">
+      <div className="bg-gradient-to-b from-primary-950/40 to-transparent border-b border-slate-100">
         <div className="container-main py-10">
           <div className="max-w-xl">
-            <div className="flex items-center gap-2 text-primary-400 text-sm font-medium mb-3">
+            <div className="flex items-center gap-2 text-primary-600 text-sm font-medium mb-3">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9
@@ -53,7 +53,7 @@ const BecomeVendorPage = () => {
               List your properties on{' '}
               <span className="text-gradient">FlatSell</span>
             </h1>
-            <p className="text-gray-400">
+            <p className="text-gray-500">
               Join thousands of real estate companies already selling on our platform.
             </p>
           </div>
@@ -66,14 +66,14 @@ const BecomeVendorPage = () => {
             ].map(({ id, label }) => (
               <div key={id} className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                  step === id ? 'bg-primary-400' : 'bg-white/20'
+                  step === id ? 'bg-primary-400' : 'bg-blue-100'
                 }`} />
                 <span className={`text-sm transition-colors duration-300 ${
-                  step === id ? 'text-white font-medium' : 'text-gray-500'
+                  step === id ? 'text-gray-900 font-medium' : 'text-gray-500'
                 }`}>
                   {label}
                 </span>
-                {id === 'policy' && <span className="text-white/20 text-sm">›</span>}
+                {id === 'policy' && <span className="text-gray-300 text-sm">›</span>}
               </div>
             ))}
           </div>
@@ -85,7 +85,7 @@ const BecomeVendorPage = () => {
         {step === 'form' ? (
           <div className="max-w-2xl mx-auto">
             <div className="glass-card p-6 sm:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
                 Company Application
               </h2>
               <VendorApplicationForm />
@@ -106,7 +106,7 @@ const BecomeVendorPage = () => {
               </div>
             ) : policyError ? (
               <div className="glass-card p-8 text-center">
-                <p className="text-red-400 mb-4">{policyError}</p>
+                <p className="text-red-600 mb-4">{policyError}</p>
                 <button onClick={() => window.location.reload()} className="btn-primary">
                   Retry
                 </button>
@@ -114,7 +114,7 @@ const BecomeVendorPage = () => {
             ) : (
               <>
                 <div className="glass-card p-6 sm:p-8 mb-5">
-                  <p className="text-gray-400 text-sm leading-relaxed">
+                  <p className="text-gray-500 text-sm leading-relaxed">
                     Before applying to list your properties on FlatSell, please carefully
                     read and accept our Vendor Terms & Conditions. Click the button below
                     to open and review the policy.

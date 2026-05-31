@@ -35,7 +35,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96
@@ -50,12 +50,12 @@ const RegisterPage = () => {
                             flex items-center justify-center shadow-glow">
               <span className="text-white font-black text-xl">F</span>
             </div>
-            <span className="text-2xl font-black text-white">
+            <span className="text-2xl font-black text-gray-900">
               Flat<span className="text-gradient">Sell</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white">Create your account</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
+          <p className="text-gray-500 text-sm mt-1">
             Join FlatSell — it&apos;s free
           </p>
         </div>
@@ -64,7 +64,7 @@ const RegisterPage = () => {
         <div className="glass-card p-7 sm:p-8">
           {error && (
             <div className="mb-5 px-4 py-3 bg-red-500/10 border border-red-500/30
-                            rounded-xl text-red-400 text-sm animate-fadeIn">
+                            rounded-xl text-red-600 text-sm animate-fadeIn">
               {error}
             </div>
           )}
@@ -106,8 +106,8 @@ const RegisterPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPass((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400
-                             hover:text-gray-200 transition-colors p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500
+                             hover:text-gray-800 transition-colors p-1"
                   aria-label="Toggle password"
                 >
                   {showPass ? (
@@ -138,7 +138,7 @@ const RegisterPage = () => {
                       className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
                         form.password.length > i * 2 + 2
                           ? i < 2 ? 'bg-red-500' : i < 3 ? 'bg-yellow-500' : 'bg-green-500'
-                          : 'bg-white/10'
+                          : 'bg-blue-50'
                       }`}
                     />
                   ))}
@@ -161,9 +161,9 @@ const RegisterPage = () => {
             </button>
           </form>
 
-          <p className="text-center text-gray-400 text-sm mt-6">
+          <p className="text-center text-gray-500 text-sm mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-400 hover:text-primary-300
+            <Link to="/login" className="text-primary-600 hover:text-primary-600
                                          font-medium transition-colors">
               Sign in
             </Link>
@@ -172,7 +172,7 @@ const RegisterPage = () => {
 
         <p className="text-center text-gray-500 text-xs mt-6">
           By creating an account you agree to our{' '}
-          <span className="text-gray-400 cursor-pointer hover:text-white transition-colors">
+          <span className="text-gray-500 cursor-pointer hover:text-gray-900 transition-colors">
             Terms & Conditions
           </span>
         </p>

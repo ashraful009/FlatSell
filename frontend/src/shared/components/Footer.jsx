@@ -16,7 +16,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-white/5 bg-dark-950/80 mt-auto">
+    <footer className="border-t border-slate-100 bg-slate-100 mt-auto">
       <div className="container-main py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
@@ -27,11 +27,11 @@ const Footer = () => {
                               flex items-center justify-center shadow-glow">
                 <span className="text-white font-black text-base">F</span>
               </div>
-              <span className="text-xl font-black text-white">
+              <span className="text-xl font-black text-gray-900">
                 Flat<span className="text-gradient">Sell</span>
               </span>
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
+            <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
               The #1 multi-vendor real estate marketplace. Browse, compare and book
               apartments from verified companies — all in one place.
             </p>
@@ -44,9 +44,9 @@ const Footer = () => {
                 { label: 'LinkedIn', icon: 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z' },
               ].map(({ label, icon }) => (
                 <a key={label} href="#" aria-label={label}
-                   className="w-9 h-9 rounded-lg bg-white/5 border border-white/10
-                              flex items-center justify-center text-gray-400
-                              hover:text-white hover:bg-white/10 hover:border-white/20
+                   className="w-9 h-9 rounded-lg bg-slate-50 border border-blue-100
+                              flex items-center justify-center text-gray-500
+                              hover:text-gray-900 hover:bg-blue-50 hover:border-blue-200
                               transition-all duration-200">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor"
                        viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -60,13 +60,13 @@ const Footer = () => {
           {/* Link columns */}
           {Object.entries(FOOTER_LINKS).map(([title, links]) => (
             <div key={title}>
-              <h3 className="text-white font-semibold text-sm mb-4">{title}</h3>
+              <h3 className="text-gray-900 font-semibold text-sm mb-4">{title}</h3>
               <ul className="space-y-2.5">
                 {links.map(({ label, path }) => (
                   <li key={path}>
                     <Link
                       to={path}
-                      className="text-gray-400 hover:text-white text-sm
+                      className="text-gray-500 hover:text-gray-900 text-sm
                                  transition-colors duration-200"
                     >
                       {label}
@@ -79,7 +79,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/5 mt-10 pt-6 flex flex-col sm:flex-row
+        <div className="border-t border-slate-100 mt-10 pt-6 flex flex-col sm:flex-row
                         items-center justify-between gap-3">
           <p className="text-gray-500 text-xs">
             © {year} FlatSell. All rights reserved.
@@ -87,7 +87,7 @@ const Footer = () => {
           <div className="flex gap-5">
             {['Privacy Policy', 'Terms of Service'].map((t) => (
               <a key={t} href="#"
-                 className="text-gray-500 hover:text-gray-300 text-xs transition-colors">
+                 className="text-gray-500 hover:text-gray-600 text-xs transition-colors">
                 {t}
               </a>
             ))}

@@ -52,10 +52,10 @@ const LAND_DEFAULTS = {
 // Section Header
 // ─────────────────────────────────────────────────────────────────────────────
 const SectionHeader = ({ icon, title, subtitle }) => (
-  <div className="flex items-center gap-3 mb-5 pb-3 border-b border-white/10">
+  <div className="flex items-center gap-3 mb-5 pb-3 border-b border-blue-100">
     <span className="text-2xl">{icon}</span>
     <div>
-      <h3 className="text-white font-semibold text-base">{title}</h3>
+      <h3 className="text-gray-900 font-semibold text-base">{title}</h3>
       {subtitle && <p className="text-gray-500 text-xs mt-0.5">{subtitle}</p>}
     </div>
   </div>
@@ -67,7 +67,7 @@ const SectionHeader = ({ icon, title, subtitle }) => (
 const FormField = ({ label, required, children, span2 }) => (
   <div className={span2 ? 'sm:col-span-2' : ''}>
     <label className="form-label">
-      {label} {required && <span className="text-red-400">*</span>}
+      {label} {required && <span className="text-red-600">*</span>}
     </label>
     {children}
   </div>
@@ -311,12 +311,12 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
       <div className="text-center py-14 animate-fadeIn">
         <div className="w-24 h-24 rounded-full bg-green-500/20 border-2 border-green-500/40
                         flex items-center justify-center mx-auto mb-6">
-          <svg className="w-12 h-12 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-12 h-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Property Submitted! 🏠</h2>
-        <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Submitted! 🏠</h2>
+        <p className="text-gray-500 text-sm mb-8 max-w-sm mx-auto">
           Your property is pending review. It will appear publicly once approved by the admin.
         </p>
         <div className="flex gap-3 justify-center">
@@ -346,7 +346,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
 
       {error && (
         <div className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl
-                        text-red-400 text-sm animate-fadeIn flex items-center gap-2">
+                        text-red-600 text-sm animate-fadeIn flex items-center gap-2">
           <span>⚠️</span> {error}
         </div>
       )}
@@ -358,7 +358,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
 
           {/* Category */}
           <div className="sm:col-span-2">
-            <label className="form-label">Category <span className="text-red-400">*</span></label>
+            <label className="form-label">Category <span className="text-red-600">*</span></label>
             <div className="grid grid-cols-3 gap-2 max-w-lg">
               {CATEGORIES.map((cat) => (
                 <button
@@ -367,8 +367,8 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-medium
                     transition-all duration-200
                     ${form.category === cat
-                      ? 'bg-primary-500/20 border-primary-500/50 text-primary-300'
-                      : 'border-white/10 text-gray-400 hover:border-white/25 hover:text-white'
+                      ? 'bg-primary-500/20 border-primary-500/50 text-primary-600'
+                      : 'border-blue-100 text-gray-500 hover:border-blue-200 hover:text-gray-900'
                     }`}
                 >
                   <span className="text-xl">{CATEGORY_ICONS[cat]}</span>
@@ -462,18 +462,18 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
             <div className="space-y-6">
               {flatTypes.map((ft, idx) => (
                 <div key={idx}
-                  className="bg-white/3 border border-white/8 rounded-xl p-5 relative">
+                  className="bg-slate-50 border border-blue-100 rounded-xl p-5 relative">
                   {/* Remove button */}
                   {flatTypes.length > 1 && (
                     <button type="button" onClick={() => removeFlatType(idx)}
                       className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center
-                                rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30
+                                rounded-full bg-red-500/20 text-red-600 hover:bg-red-500/30
                                 text-sm transition-colors">
                       ✕
                     </button>
                   )}
 
-                  <p className="text-primary-400 text-xs font-semibold mb-4 uppercase tracking-wider">
+                  <p className="text-primary-600 text-xs font-semibold mb-4 uppercase tracking-wider">
                     Type {idx + 1}
                   </p>
 
@@ -547,7 +547,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
               {flatTypes.length < unitsPerFlr && (
                 <button type="button" onClick={addFlatType}
                   className="w-full py-3 rounded-xl border-2 border-dashed border-primary-500/30
-                            text-primary-400 hover:border-primary-500/60 hover:bg-primary-500/5
+                            text-primary-600 hover:border-primary-500/60 hover:bg-primary-500/5
                             text-sm font-medium transition-all duration-200 flex items-center
                             justify-center gap-2">
                   <span className="text-lg">+</span> Add Another Type ({flatTypes.length}/{unitsPerFlr})
@@ -571,7 +571,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
             {/* Type color legend */}
             <div className="flex flex-wrap gap-4 mb-5">
               {flatTypes.map((ft, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-xs text-gray-400">
+                <div key={idx} className="flex items-center gap-2 text-xs text-gray-500">
                   <span className={`w-3 h-3 rounded-full ${TYPE_COLORS[idx % TYPE_COLORS.length].dot}`} />
                   {ft.label?.trim() || `Type ${String.fromCharCode(65 + idx)}`}
                   {idx === flatTypes.length - 1 && flatTypes.length < unitsPerFlr && (
@@ -585,19 +585,19 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
             </div>
 
             {/* Stats bar */}
-            <div className="flex items-center gap-2 mb-4 p-3 bg-white/3 rounded-xl text-sm">
-              <span className="text-green-400 font-semibold">{floors * unitsPerFlr}</span>
-              <span className="text-gray-400">total units</span>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-slate-50 rounded-xl text-sm">
+              <span className="text-green-600 font-semibold">{floors * unitsPerFlr}</span>
+              <span className="text-gray-500">total units</span>
               <span className="text-gray-600">·</span>
-              <span className="text-gray-400">{floors} floors</span>
+              <span className="text-gray-500">{floors} floors</span>
               <span className="text-gray-600">×</span>
-              <span className="text-gray-400">{unitsPerFlr} units/floor</span>
+              <span className="text-gray-500">{unitsPerFlr} units/floor</span>
               <span className="text-gray-600">·</span>
-              <span className="text-gray-400">{flatTypes.length} type{flatTypes.length > 1 ? 's' : ''}</span>
+              <span className="text-gray-500">{flatTypes.length} type{flatTypes.length > 1 ? 's' : ''}</span>
             </div>
 
             {/* Visualizer grid */}
-            <div className="bg-dark-800/60 rounded-xl p-4 border border-white/5
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100
                             max-h-72 overflow-y-auto">
               <div className="flex flex-col-reverse gap-1.5">
                 {Array.from({ length: Math.min(floors, 20) }).map((_, fi) => (
@@ -617,7 +617,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
                             className={`w-12 h-9 rounded-lg ${colors.bg} border ${colors.border}
                                       flex items-center justify-center ${colors.text} text-[10px] font-mono
                                       hover:brightness-125 transition-all cursor-pointer
-                                      ${isSelected ? 'ring-2 ring-white/60 scale-110 z-10' : ''}`}>
+                                      ${isSelected ? 'ring-2 ring-blue-200 scale-110 z-10' : ''}`}>
                             {unitLabel}
                           </button>
                         );
@@ -639,13 +639,13 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
               const colors = TYPE_COLORS[selectedUnit.typeIndex % TYPE_COLORS.length];
               const label = ft.label?.trim() || `Type ${String.fromCharCode(65 + selectedUnit.typeIndex)}`;
               return (
-                <div className="mt-4 p-5 rounded-xl border border-white/10 bg-white/3 animate-fadeIn relative">
+                <div className="mt-4 p-5 rounded-xl border border-blue-100 bg-slate-50 animate-fadeIn relative">
                   <button type="button" onClick={() => setSelectedUnit(null)}
                     className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center
-                              rounded-full bg-white/10 text-gray-400 hover:bg-white/20 text-sm">✕</button>
+                              rounded-full bg-blue-50 text-gray-500 hover:bg-blue-100 text-sm">✕</button>
                   <div className="flex items-center gap-2 mb-4">
                     <span className={`w-3 h-3 rounded-full ${colors.dot}`} />
-                    <h4 className="text-white font-semibold text-sm">
+                    <h4 className="text-gray-900 font-semibold text-sm">
                       Unit {getUnitLabel(selectedUnit.floor, selectedUnit.col)} — {label}
                     </h4>
                   </div>
@@ -661,16 +661,16 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
                       ['🖼️ Drawing',         ft.drawing],
                       ['🅿️ Parking Area',    ft.parking],
                     ].map(([lbl, val]) => (
-                      <div key={lbl} className="bg-white/3 rounded-lg p-2.5 border border-white/5">
+                      <div key={lbl} className="bg-slate-50 rounded-lg p-2.5 border border-slate-100">
                         <p className="text-gray-500 text-xs mb-0.5">{lbl}</p>
-                        <p className="text-white font-medium text-xs">{val}</p>
+                        <p className="text-gray-900 font-medium text-xs">{val}</p>
                       </div>
                     ))}
                   </div>
                   {ft.description && (
-                    <div className="mt-3 p-3 bg-white/3 rounded-lg border border-white/5">
+                    <div className="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
                       <p className="text-gray-500 text-xs mb-1">📝 Type Description</p>
-                      <p className="text-gray-300 text-xs">{ft.description}</p>
+                      <p className="text-gray-600 text-xs">{ft.description}</p>
                     </div>
                   )}
                 </div>
@@ -922,8 +922,8 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
 
         {/* Main Image */}
         <div className="mb-6">
-          <p className="text-sm font-semibold text-gray-200 mb-3">
-            Main Building Image <span className="text-red-400">*</span>
+          <p className="text-sm font-semibold text-gray-800 mb-3">
+            Main Building Image <span className="text-red-600">*</span>
             <span className="text-gray-500 font-normal ml-1">(shown on homepage cards)</span>
           </p>
           <div
@@ -932,7 +932,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
               transition-all duration-200 overflow-hidden
               ${mainPreview
                 ? 'border-primary-500/40 bg-transparent'
-                : 'border-white/15 hover:border-primary-500/50 hover:bg-white/3 h-40 flex items-center justify-center'
+                : 'border-blue-200 hover:border-primary-500/50 hover:bg-slate-50 h-40 flex items-center justify-center'
               }`}>
             {mainPreview ? (
               <div className="relative group">
@@ -940,7 +940,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
                   className="w-full h-56 object-cover rounded-xl" />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100
                                 transition-opacity flex items-center justify-center rounded-xl">
-                  <span className="text-white text-sm font-medium">Change Image</span>
+                  <span className="text-gray-900 text-sm font-medium">Change Image</span>
                 </div>
                 <span className="absolute top-2 left-2 bg-primary-500 text-white text-xs
                                   px-2 py-1 rounded-lg font-semibold">
@@ -950,7 +950,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
             ) : (
               <div className="text-center">
                 <span className="text-4xl block mb-2">🏢</span>
-                <p className="text-gray-400 text-sm font-medium">Click to upload main image</p>
+                <p className="text-gray-500 text-sm font-medium">Click to upload main image</p>
                 <p className="text-gray-600 text-xs mt-1">JPG, PNG, WebP · Max 10 MB</p>
               </div>
             )}
@@ -961,7 +961,7 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
 
         {/* Gallery Images */}
         <div>
-          <p className="text-sm font-semibold text-gray-200 mb-3">
+          <p className="text-sm font-semibold text-gray-800 mb-3">
             Gallery Images
             <span className="text-gray-500 font-normal ml-1">
               (shown in property detail — {gallery.length}/10)
@@ -972,10 +972,10 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
           {gallery.length < 10 && (
             <label htmlFor="gallery-images"
               className="flex flex-col items-center gap-2 px-6 py-5 rounded-xl border-2
-                border-dashed border-white/10 hover:border-primary-500/40 hover:bg-white/2
+                border-dashed border-blue-100 hover:border-primary-500/40 hover:bg-slate-50
                 cursor-pointer transition-all duration-200 mb-4">
               <span className="text-2xl">🖼️</span>
-              <p className="text-gray-400 text-sm">Upload gallery images</p>
+              <p className="text-gray-500 text-sm">Upload gallery images</p>
               <p className="text-gray-600 text-xs">Up to {10 - gallery.length} more</p>
               <input id="gallery-images" type="file" accept="image/*" multiple
                 className="hidden" ref={galleryImgRef} onChange={handleGallery} />
@@ -987,11 +987,11 @@ const AddPropertyWizard = ({ onSuccess, defaultCategory = 'Apartments' }) => {
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {galleryPreviews.map((src, i) => (
                 <div key={i}
-                  className="relative group aspect-square rounded-lg overflow-hidden border border-white/10">
+                  className="relative group aspect-square rounded-lg overflow-hidden border border-blue-100">
                   <img src={src} alt="" className="w-full h-full object-cover" />
                   <button type="button" onClick={() => removeGallery(i)}
                     className="absolute top-1 right-1 w-5 h-5 bg-black/70 rounded-full
-                               text-white flex items-center justify-center opacity-0
+                               text-gray-900 flex items-center justify-center opacity-0
                                group-hover:opacity-100 transition-opacity text-xs">
                     ✕
                   </button>

@@ -169,10 +169,10 @@ const ManageProperties = ({ mode = 'company' }) => {
       {/* ── Stats Bar ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Total',    count: properties.length,                              color: 'text-white'        },
-          { label: 'Approved', count: properties.filter(p=>p.status==='approved').length, color: 'text-green-400' },
-          { label: 'Pending',  count: properties.filter(p=>p.status==='pending').length,  color: 'text-amber-400' },
-          { label: 'Active',   count: properties.filter(p=>p.isActive!==false).length,    color: 'text-primary-400'},
+          { label: 'Total',    count: properties.length,                              color: 'text-gray-900'        },
+          { label: 'Approved', count: properties.filter(p=>p.status==='approved').length, color: 'text-green-600' },
+          { label: 'Pending',  count: properties.filter(p=>p.status==='pending').length,  color: 'text-amber-600' },
+          { label: 'Active',   count: properties.filter(p=>p.isActive!==false).length,    color: 'text-primary-600'},
         ].map(({ label, count, color }) => (
           <div key={label} className="glass-card p-4 text-center">
             <p className={`text-2xl font-bold ${color}`}>{count}</p>
@@ -185,8 +185,8 @@ const ManageProperties = ({ mode = 'company' }) => {
       {filtered.length === 0 && (
         <div className="glass-card py-16 text-center">
           <span className="text-5xl block mb-3">📭</span>
-          <p className="text-white font-semibold text-lg">No properties found</p>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-900 font-semibold text-lg">No properties found</p>
+          <p className="text-gray-500 text-sm mt-1">
             {search || filterStatus !== 'all' || filterActive !== 'all'
               ? 'Try adjusting your filters.'
               : 'No properties have been added yet.'}
@@ -203,12 +203,12 @@ const ManageProperties = ({ mode = 'company' }) => {
           return (
             <div key={p._id}
               className={`glass-card p-4 flex flex-col sm:flex-row sm:items-center gap-4
-                transition-all duration-200 hover:border-white/20
+                transition-all duration-200 hover:border-blue-200
                 ${isInactive ? 'opacity-60' : ''}`}>
 
               {/* Cover */}
               <div className="w-full sm:w-16 h-28 sm:h-16 rounded-xl overflow-hidden
-                              bg-dark-800 flex-shrink-0">
+                              bg-white flex-shrink-0">
                 {p.mainImage || p.images?.[0] ? (
                   <img src={p.mainImage || p.images[0]} alt={p.title}
                     className="w-full h-full object-cover" />
@@ -222,7 +222,7 @@ const ManageProperties = ({ mode = 'company' }) => {
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <p className="text-white font-semibold text-sm truncate">{p.title}</p>
+                  <p className="text-gray-900 font-semibold text-sm truncate">{p.title}</p>
                   {/* Status badge */}
                   <span className={`${STATUS_BADGE[p.status]} text-xs`}>
                     {STATUS_ICON[p.status]} {p.status}
@@ -230,12 +230,12 @@ const ManageProperties = ({ mode = 'company' }) => {
                   {/* Inactive badge */}
                   {isInactive && (
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs
-                                     font-medium bg-gray-500/20 text-gray-400 border border-gray-500/30">
+                                     font-medium bg-gray-500/20 text-gray-500 border border-gray-500/30">
                       Hidden
                     </span>
                   )}
                 </div>
-                <p className="text-gray-400 text-xs">
+                <p className="text-gray-500 text-xs">
                   {CATEGORY_ICONS[p.category]} {p.category}
                   <span className="mx-1.5 text-gray-600">·</span>
                   📍 {p.city}
@@ -243,7 +243,7 @@ const ManageProperties = ({ mode = 'company' }) => {
                   ৳{p.price?.toLocaleString()}
                 </p>
                 {p.companyId && mode === 'admin' && (
-                  <p className="text-primary-400 text-xs mt-0.5">{p.companyId.name}</p>
+                  <p className="text-primary-600 text-xs mt-0.5">{p.companyId.name}</p>
                 )}
                 {p.totalFloors && (
                   <p className="text-gray-600 text-xs mt-0.5">
@@ -279,7 +279,7 @@ const ManageProperties = ({ mode = 'company' }) => {
                   onClick={() => setEditTarget(p)}
                   disabled={isProcessing}
                   className="px-3 py-1.5 bg-primary-500/15 border border-primary-500/30
-                             text-primary-400 hover:bg-primary-500/25 text-xs font-semibold
+                             text-primary-600 hover:bg-primary-500/25 text-xs font-semibold
                              rounded-lg transition-colors disabled:opacity-50">
                   ✏️ Edit
                 </button>
@@ -289,7 +289,7 @@ const ManageProperties = ({ mode = 'company' }) => {
                   onClick={() => setDeleteTarget(p)}
                   disabled={isProcessing}
                   className="px-3 py-1.5 bg-red-500/10 border border-red-500/30
-                             text-red-400 hover:bg-red-500/20 text-xs font-semibold
+                             text-red-600 hover:bg-red-500/20 text-xs font-semibold
                              rounded-lg transition-colors disabled:opacity-50">
                   {processing[p._id] === 'deleting' ? '...' : '🗑️ Delete'}
                 </button>
@@ -315,9 +315,9 @@ const ManageProperties = ({ mode = 'company' }) => {
           <div className="w-full max-w-sm glass-card p-6 animate-slideUp">
             <div className="text-center mb-6">
               <span className="text-5xl block mb-3">⚠️</span>
-              <h3 className="text-white font-bold text-lg mb-2">Delete Property?</h3>
-              <p className="text-gray-400 text-sm">
-                <span className="text-white font-medium">&ldquo;{deleteTarget.title}&rdquo;</span>
+              <h3 className="text-gray-900 font-bold text-lg mb-2">Delete Property?</h3>
+              <p className="text-gray-500 text-sm">
+                <span className="text-gray-900 font-medium">&ldquo;{deleteTarget.title}&rdquo;</span>
                 {' '}and all its associated units will be permanently deleted. This cannot be undone.
               </p>
             </div>

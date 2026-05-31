@@ -7,28 +7,31 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Brand primary — retuned from indigo to a blue light-theme scale
         primary: {
-          50:  '#f0f4ff',
-          100: '#e0e9ff',
-          200: '#c7d6fe',
-          300: '#a5b8fc',
-          400: '#8193f8',
-          500: '#6370f1',
-          600: '#4f52e6',
-          700: '#4141cb',
-          800: '#3636a4',
-          900: '#313282',
-          950: '#1e1c4c',
+          50:  '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#172554',
         },
         accent: {
           400: '#fb923c',
           500: '#f97316',
           600: '#ea670c',
         },
+        // "dark" scale repurposed as light surface tokens so every existing
+        // bg-dark-* / *-dark-900 reference flips to the light theme at once.
         dark: {
-          800: '#1a1a2e',
-          900: '#0f0f1a',
-          950: '#07070e',
+          800: '#ffffff', // elevated surface / cards
+          900: '#f8fafc', // app background (slate-50)
+          950: '#eef2f7', // deepest panel
         },
       },
       fontFamily: {
@@ -54,9 +57,9 @@ export default {
         slideUp: 'slideUp 0.3s ease-out',
       },
       boxShadow: {
-        glass: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        card:  '0 4px 24px rgba(0, 0, 0, 0.12)',
-        glow:  '0 0 20px rgba(99, 112, 241, 0.4)',
+        glass: '0 8px 32px 0 rgba(37, 99, 235, 0.08)',
+        card:  '0 4px 24px rgba(15, 23, 42, 0.06)',
+        glow:  '0 0 20px rgba(37, 99, 235, 0.25)',
       },
     },
   },

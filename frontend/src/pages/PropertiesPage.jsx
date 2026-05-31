@@ -105,8 +105,8 @@ const PropertiesPage = () => {
               onClick={() => applyFilters({ category: value })}
               className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-all
                 ${category === value
-                  ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300 font-medium'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                  ? 'bg-primary-500/20 border border-primary-500/40 text-primary-600 font-medium'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-slate-50 border border-transparent'
                 }`}
             >
               {label}
@@ -133,7 +133,7 @@ const PropertiesPage = () => {
       {(city || category || sort !== 'newest') && (
         <button
           onClick={() => applyFilters({ city: '', category: '', sort: 'newest', page: 1 })}
-          className="w-full py-2 text-sm text-red-400 hover:text-red-300
+          className="w-full py-2 text-sm text-red-600 hover:text-red-300
                      hover:bg-red-500/10 rounded-xl transition-colors"
         >
           ✕ Clear All Filters
@@ -143,15 +143,15 @@ const PropertiesPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-dark-900 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="container-main">
 
         {/* ── Page header ──────────────────────────────────────────────────── */}
         <div className="mb-8">
-          <nav className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+            <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
             <span>/</span>
-            <span className="text-gray-300">Properties</span>
+            <span className="text-gray-600">Properties</span>
           </nav>
           <div className="flex flex-col sm:flex-row sm:items-end gap-4 justify-between">
             <div>
@@ -159,10 +159,10 @@ const PropertiesPage = () => {
                 {category
                   ? `${category.charAt(0).toUpperCase() + category.slice(1)}s`
                   : 'All Properties'}
-                {city && <span className="text-gray-400 font-normal"> in {city}</span>}
+                {city && <span className="text-gray-500 font-normal"> in {city}</span>}
               </h1>
               {!loading && (
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-500 text-sm">
                   {total} {total === 1 ? 'property' : 'properties'} found
                 </p>
               )}
@@ -191,7 +191,7 @@ const PropertiesPage = () => {
           {/* ── Desktop Sidebar ───────────────────────────────────────────── */}
           <aside className="hidden sm:block w-56 flex-shrink-0">
             <div className="glass-card p-5 sticky top-20">
-              <h2 className="text-white font-semibold mb-5 text-sm uppercase tracking-wider">
+              <h2 className="text-gray-900 font-semibold mb-5 text-sm uppercase tracking-wider">
                 Filters
               </h2>
               <FilterContent />
@@ -219,8 +219,8 @@ const PropertiesPage = () => {
             ) : (
               <div className="glass-card py-20 text-center">
                 <p className="text-4xl mb-3">🔍</p>
-                <p className="text-white font-semibold mb-1">No properties found</p>
-                <p className="text-gray-400 text-sm mb-5">
+                <p className="text-gray-900 font-semibold mb-1">No properties found</p>
+                <p className="text-gray-500 text-sm mb-5">
                   Try adjusting your filters or clearing them.
                 </p>
                 <button
@@ -238,8 +238,8 @@ const PropertiesPage = () => {
                 <button
                   onClick={() => applyFilters({ page: page - 1 })}
                   disabled={page <= 1}
-                  className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300
-                             hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed
+                  className="px-4 py-2 rounded-xl bg-slate-50 border border-blue-100 text-gray-600
+                             hover:bg-blue-50 disabled:opacity-30 disabled:cursor-not-allowed
                              transition-all text-sm"
                 >
                   ← Prev
@@ -255,7 +255,7 @@ const PropertiesPage = () => {
                       className={`w-9 h-9 rounded-xl text-sm font-medium transition-all
                         ${page === p
                           ? 'bg-primary-500 text-white border border-primary-500'
-                          : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'
+                          : 'bg-slate-50 border border-blue-100 text-gray-600 hover:bg-blue-50'
                         }`}
                     >
                       {p}
@@ -266,8 +266,8 @@ const PropertiesPage = () => {
                 <button
                   onClick={() => applyFilters({ page: page + 1 })}
                   disabled={page >= totalPages}
-                  className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300
-                             hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed
+                  className="px-4 py-2 rounded-xl bg-slate-50 border border-blue-100 text-gray-600
+                             hover:bg-blue-50 disabled:opacity-30 disabled:cursor-not-allowed
                              transition-all text-sm"
                 >
                   Next →
@@ -286,9 +286,9 @@ const PropertiesPage = () => {
           <div className="absolute bottom-0 left-0 right-0 glass-card rounded-t-3xl
                           p-6 pb-10 max-h-[80vh] overflow-y-auto animate-slideUp">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-white font-bold">Filters</h2>
+              <h2 className="text-gray-900 font-bold">Filters</h2>
               <button onClick={() => setMobileFilterOpen(false)}
-                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10">
+                className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-blue-50">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M6 18L18 6M6 6l12 12" />

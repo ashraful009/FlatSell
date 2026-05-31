@@ -7,6 +7,8 @@ const Commission = require('../commissions/commission.model');
 const generateInvoicePDF           = require('../../utils/generateInvoicePDF');
 const generateReportPDF            = require('../../utils/generateReportPDF');
 const { sendPaymentConfirmationEmail } = require('../../utils/sendEmail');
+const { canCreateBooking, getLimitStatus } = require('./bookingLimits.service');
+const { logAudit }                 = require('../audit/audit.service');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // @desc    Request a booking for an available unit
@@ -28,6 +30,20 @@ const createBooking = async (req, res) => {
 
   if (unit.status !== 'available') {
     return res.status(400).json({ success: false, message: `Unit is already ${unit.status}` });
+  }
+
+  // ── Policy 3: enforce booking limits before creating ──────────────────────
+  const companyId = unit.propertyId.companyId;
+  const limitCheck = await canCreateBooking(req.user._id, companyId);
+  if (!limitCheck.allowed) {
+    await logAudit({
+      action:      'booking_limit_blocked',
+      userId:      req.user._id,
+      performedBy: req.user._id,
+      notes:       limitCheck.reason,
+      meta:        { code: limitCheck.code, companyId: String(companyId) },
+    });
+    return res.status(409).json({ success: false, code: limitCheck.code, message: limitCheck.reason });
   }
 
   // Create the booking
@@ -181,6 +197,7 @@ const confirmStripeBooking = async (req, res) => {
       }
       
       booking.bookingAmount = (booking.bookingAmount || 0) + paidAmount;
+      booking.lastPaymentDate = new Date(); // Policy 1: reset the inactivity clock
 
       // Check if the property is now fully paid
       if (booking.bookingAmount >= booking.totalPrice) {
@@ -233,6 +250,7 @@ const confirmStripeBooking = async (req, res) => {
         status:       'confirmed',
         paymentStatus:'booking_paid',
         bookingAmount: fallbackPaidAmount,
+        lastPaymentDate: new Date(), // Policy 1: payment activity baseline
       });
 
       unit.status = 'booked';
@@ -243,6 +261,7 @@ const confirmStripeBooking = async (req, res) => {
       booking.status = 'confirmed';
       booking.paymentStatus = 'booking_paid';
       booking.bookingStripeSessionId = sessionId;
+      booking.lastPaymentDate = new Date(); // Policy 1: reset the inactivity clock
       await booking.save();
     }
 
@@ -470,6 +489,62 @@ const getSalesReportPDF = async (req, res) => {
   res.end(pdfBuffer);
 };
 
+// ───────────────────────────────────────────────────────────────────────────────
+// @desc    Policy 3 — current user's booking-limit status (for the booking flow)
+// @route   GET /api/bookings/limit-check?companyId=<id>
+// @access  Protected
+// ───────────────────────────────────────────────────────────────────────────────
+const checkMyBookingLimit = async (req, res) => {
+  const { companyId } = req.query;
+  const status = await getLimitStatus(req.user._id, companyId || null);
+
+  // Determine whether a *new* booking from this vendor would currently be blocked.
+  let blocked = null;
+  if (status.totalActive >= status.totalLimit) {
+    blocked = {
+      code:   'TOTAL_LIMIT',
+      reason: `You have reached the maximum of ${status.totalLimit} active bookings. Please contact the Super Admin to book more.`,
+    };
+  } else if (
+    companyId &&
+    status.vendorActive >= status.perVendorLimit &&
+    status.vendorPaid === 0
+  ) {
+    blocked = {
+      code:   'VENDOR_LIMIT',
+      reason: `You already have ${status.perVendorLimit} active bookings with this vendor. Please complete payment on one to proceed.`,
+    };
+  }
+
+  res.status(200).json({ success: true, data: { ...status, allowed: !blocked, blocked } });
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
+// @desc    Policy 1 — Super Admin list of auto-cancelled (inactivity) bookings
+// @route   GET /api/bookings/auto-cancelled?reason=inactivity
+// @access  Super Admin
+// ───────────────────────────────────────────────────────────────────────────────
+const getAutoCancelledBookings = async (req, res) => {
+  const { reason } = req.query;
+  const query = { status: 'cancelled' };
+
+  if (reason && ['inactivity', 'manual', 'refund_requested'].includes(reason)) {
+    query.cancellationReason = reason;
+  } else {
+    // Default view = system auto-cancellations only.
+    query.cancellationReason = 'inactivity';
+  }
+
+  const bookings = await Booking.find(query)
+    .populate('propertyId', 'title category city')
+    .populate('companyId',  'name')
+    .populate('customerId', 'name email phone')
+    .populate('unitId',     'floor unitNumber')
+    .sort('-cancelledAt');
+
+  res.status(200).json({ success: true, data: { bookings, count: bookings.length } });
+};
+
 module.exports = {
   createBooking,
   getMyBookings,
@@ -479,4 +554,6 @@ module.exports = {
   getBookingInvoice,
   getSalesReport,
   getSalesReportPDF,
+  checkMyBookingLimit,
+  getAutoCancelledBookings,
 };

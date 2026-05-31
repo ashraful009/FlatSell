@@ -113,9 +113,9 @@ const VerifyOTPPage = () => {
 
   if (!email) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-gray-400 mb-4">Invalid verification link.</p>
+          <p className="text-gray-500 mb-4">Invalid verification link.</p>
           <Link to="/register" className="btn-primary">Back to Register</Link>
         </div>
       </div>
@@ -123,7 +123,7 @@ const VerifyOTPPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-80 h-80
                         bg-primary-600/15 rounded-full blur-3xl" />
@@ -137,23 +137,23 @@ const VerifyOTPPage = () => {
                             flex items-center justify-center shadow-glow">
               <span className="text-white font-black text-xl">F</span>
             </div>
-            <span className="text-2xl font-black text-white">
+            <span className="text-2xl font-black text-gray-900">
               Flat<span className="text-gradient">Sell</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white">Verify your email</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Verify your email</h1>
+          <p className="text-gray-500 text-sm mt-1">
             We sent a 6-digit code to{' '}
-            <span className="text-primary-400 font-medium">{email}</span>
+            <span className="text-primary-600 font-medium">{email}</span>
           </p>
         </div>
 
         <div className="glass-card p-7 sm:p-8">
           {/* OTP expiry countdown */}
           <div className="flex items-center justify-between mb-6">
-            <span className="text-gray-400 text-sm">Code expires in</span>
+            <span className="text-gray-500 text-sm">Code expires in</span>
             <span className={`font-mono font-semibold text-sm ${
-              countdown < 60 ? 'text-red-400' : 'text-primary-400'
+              countdown < 60 ? 'text-red-600' : 'text-primary-600'
             }`}>
               {formatTime(countdown)}
             </span>
@@ -161,7 +161,7 @@ const VerifyOTPPage = () => {
 
           {error && (
             <div className="mb-5 px-4 py-3 bg-red-500/10 border border-red-500/30
-                            rounded-xl text-red-400 text-sm animate-fadeIn">
+                            rounded-xl text-red-600 text-sm animate-fadeIn">
               {error}
             </div>
           )}
@@ -180,10 +180,10 @@ const VerifyOTPPage = () => {
                   onChange={(e) => handleDigitChange(e, idx)}
                   onKeyDown={(e) => handleKeyDown(e, idx)}
                   className={`w-11 h-14 sm:w-12 sm:h-16 text-center text-xl font-bold
-                    bg-white/5 border rounded-xl text-white
+                    bg-slate-50 border rounded-xl text-gray-900
                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
                     transition-all duration-200 caret-transparent
-                    ${digit ? 'border-primary-500 bg-primary-500/10' : 'border-white/15'}`}
+                    ${digit ? 'border-primary-500 bg-primary-500/10' : 'border-blue-200'}`}
                   autoFocus={idx === 0}
                 />
               ))}
@@ -207,7 +207,7 @@ const VerifyOTPPage = () => {
 
           {/* Resend */}
           <div className="text-center mt-5">
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-500 text-sm">
               Didn&apos;t receive the code?{' '}
               <button
                 type="button"
@@ -216,7 +216,7 @@ const VerifyOTPPage = () => {
                 className={`font-medium transition-colors ${
                   resendCooldown > 0
                     ? 'text-gray-500 cursor-not-allowed'
-                    : 'text-primary-400 hover:text-primary-300'
+                    : 'text-primary-600 hover:text-primary-600'
                 }`}
               >
                 {resending
@@ -230,7 +230,7 @@ const VerifyOTPPage = () => {
           </div>
 
           <p className="text-center text-gray-500 text-xs mt-5">
-            <Link to="/register" className="hover:text-gray-300 transition-colors">
+            <Link to="/register" className="hover:text-gray-600 transition-colors">
               ← Use a different email
             </Link>
           </p>

@@ -101,20 +101,20 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
       onClick={onClose}
     >
       <div
-        className="glass-card w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10"
+        className="glass-card w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-blue-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between">
+        <div className="px-6 py-5 border-b border-blue-100 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white">Set Installment Plan</h2>
-            <p className="text-gray-400 text-xs mt-0.5">
+            <h2 className="text-lg font-bold text-gray-900">Set Installment Plan</h2>
+            <p className="text-gray-500 text-xs mt-0.5">
               Split your remaining dues into easy monthly installments.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-gray-400 hover:text-white transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 hover:bg-blue-100 text-gray-500 hover:text-gray-900 transition-colors"
           >
             ✕
           </button>
@@ -124,33 +124,33 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
         <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-5 space-y-5">
 
           {/* Policy Card */}
-          <section className="bg-dark-800/60 border border-white/8 rounded-xl p-4">
-            <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+          <section className="bg-slate-50 border border-blue-100 rounded-xl p-4">
+            <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
               📋 Installment Policy
             </h3>
-            <ul className="space-y-2 text-xs text-gray-300">
+            <ul className="space-y-2 text-xs text-gray-600">
               <li className="flex gap-2">
-                <span className="text-emerald-400 font-bold">a.</span>
+                <span className="text-emerald-600 font-bold">a.</span>
                 Up to <strong>4 installments</strong>: 0% extra charge (Free).
               </li>
               <li className="flex gap-2">
-                <span className="text-amber-400 font-bold">b.</span>
+                <span className="text-amber-600 font-bold">b.</span>
                 <span><strong>5 to 12 installments</strong>: a 7% charge is added per installment.</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-orange-400 font-bold">c.</span>
+                <span className="text-orange-600 font-bold">c.</span>
                 <span><strong>13 to 24 installments</strong>: a 12% charge is added per installment.</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-red-400 font-bold">d.</span>
+                <span className="text-red-600 font-bold">d.</span>
                 <span>Maximum allowed limit is <strong>24 installments</strong>.</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-blue-400 font-bold">e.</span>
+                <span className="text-blue-600 font-bold">e.</span>
                 Every installment must be paid between the <strong>1st and 15th</strong> of the running month.
               </li>
               <li className="flex gap-2">
-                <span className="text-rose-400 font-bold">f.</span>
+                <span className="text-rose-600 font-bold">f.</span>
                 <span>If an installment is missed (paid after the 15th), a <strong>৳5,000 BDT fine</strong> is added to that specific installment.</span>
               </li>
             </ul>
@@ -158,13 +158,13 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
 
           {/* Due summary */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/3 border border-white/8 rounded-lg p-3">
+            <div className="bg-slate-50 border border-blue-100 rounded-lg p-3">
               <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Total Price</p>
-              <p className="text-sm font-bold text-white">{fmt(booking?.totalPrice)}</p>
+              <p className="text-sm font-bold text-gray-900">{fmt(booking?.totalPrice)}</p>
             </div>
-            <div className="bg-white/3 border border-white/8 rounded-lg p-3">
+            <div className="bg-slate-50 border border-blue-100 rounded-lg p-3">
               <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Booking Paid</p>
-              <p className="text-sm font-bold text-emerald-400">{fmt(booking?.bookingAmount)}</p>
+              <p className="text-sm font-bold text-emerald-600">{fmt(booking?.bookingAmount)}</p>
             </div>
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
               <p className="text-[10px] text-amber-300 uppercase tracking-wider mb-1">Remaining Due</p>
@@ -175,7 +175,7 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
           {/* Input */}
           <div>
             <label className="form-label">
-              Number of Installments <span className="text-red-400">*</span>
+              Number of Installments <span className="text-red-600">*</span>
             </label>
             <input
               type="number"
@@ -189,7 +189,7 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
               autoFocus
             />
             {error && (
-              <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1.5">
+              <p className="text-red-600 text-xs mt-1.5 flex items-center gap-1.5">
                 <span>⚠️</span> {error}
               </p>
             )}
@@ -201,27 +201,27 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
           {/* Live preview */}
           {preview && (
             <section className="bg-primary-500/10 border border-primary-500/30 rounded-xl p-4 animate-fadeIn">
-              <h4 className="text-sm font-bold text-primary-300 mb-3 flex items-center gap-2">
+              <h4 className="text-sm font-bold text-primary-600 mb-3 flex items-center gap-2">
                 💡 Plan Preview
               </h4>
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                <div className="text-gray-400">Tier</div>
-                <div className="text-white font-semibold text-right">
+                <div className="text-gray-500">Tier</div>
+                <div className="text-gray-900 font-semibold text-right">
                   {preview.extraPct === 0
                     ? 'Free (no extra charge)'
                     : `${preview.extraPct}% per installment`}
                 </div>
-                <div className="text-gray-400">Each Installment</div>
-                <div className="text-white font-semibold text-right">
+                <div className="text-gray-500">Each Installment</div>
+                <div className="text-gray-900 font-semibold text-right">
                   {fmt(preview.perInst)}
                   {!preview.allEqual && <span className="text-gray-500"> (last: {fmt(preview.lastInst)})</span>}
                 </div>
-                <div className="text-gray-400">Total Payable Over {preview.n} Month{preview.n > 1 ? 's' : ''}</div>
-                <div className="font-bold text-emerald-400 text-right">{fmt(preview.totalPay)}</div>
+                <div className="text-gray-500">Total Payable Over {preview.n} Month{preview.n > 1 ? 's' : ''}</div>
+                <div className="font-bold text-emerald-600 text-right">{fmt(preview.totalPay)}</div>
                 {preview.extraPct > 0 && (
                   <>
-                    <div className="text-gray-400">Premium vs. Lump Sum</div>
-                    <div className="text-amber-400 text-right">+ {fmt(preview.totalPay - dueAmount)}</div>
+                    <div className="text-gray-500">Premium vs. Lump Sum</div>
+                    <div className="text-amber-600 text-right">+ {fmt(preview.totalPay - dueAmount)}</div>
                   </>
                 )}
               </div>
@@ -235,7 +235,7 @@ const InstallmentSetupModal = ({ open, onClose, booking, onSuccess }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-white/10 flex justify-end gap-3 bg-dark-900/40">
+        <div className="px-6 py-4 border-t border-blue-100 flex justify-end gap-3 bg-white/70">
           <button
             onClick={onClose}
             disabled={loading}

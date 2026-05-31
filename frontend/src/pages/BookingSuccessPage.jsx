@@ -68,20 +68,20 @@ const BookingSuccessPage = () => {
         {status === 'processing' && (
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-500 mb-4"></div>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-gray-900">
               {isDuePayment ? 'Confirming Full Payment...' : 'Confirming Payment...'}
             </h2>
-            <p className="text-gray-400 mt-2">Please do not close this window.</p>
+            <p className="text-gray-500 mt-2">Please do not close this window.</p>
           </div>
         )}
 
         {status === 'success' && (
           <div className="flex flex-col items-center animate-fadeIn">
             <CheckCircleIcon className="h-20 w-20 text-emerald-500 mb-4" />
-            <h2 className="text-3xl font-black text-white">
+            <h2 className="text-3xl font-black text-gray-900">
               {isDuePayment ? 'Payment Complete!' : 'Booking Successful!'}
             </h2>
-            <p className="text-gray-400 mt-2">
+            <p className="text-gray-500 mt-2">
               {isDuePayment
                 ? 'Your full payment has been processed. The property is now fully paid and confirmed.'
                 : 'Your booking money has been paid and your unit is reserved. You can pay the remaining balance from your dashboard.'}
@@ -90,13 +90,13 @@ const BookingSuccessPage = () => {
             {/* Payment type badge */}
             <div className={`mt-4 px-4 py-2 rounded-xl border text-sm font-semibold ${
               isDuePayment
-                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
-                : 'bg-blue-500/15 border-blue-500/30 text-blue-400'
+                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600'
+                : 'bg-blue-500/15 border-blue-500/30 text-blue-600'
             }`}>
               {isDuePayment ? '✅ Fully Paid' : '💳 Booking Money Paid'}
             </div>
 
-            <p className="text-sm text-primary-400 mt-4">
+            <p className="text-sm text-primary-600 mt-4">
               Redirecting to My Properties...
             </p>
           </div>
@@ -105,8 +105,8 @@ const BookingSuccessPage = () => {
         {status === 'error' && (
           <div className="flex flex-col items-center animate-fadeIn">
             <XCircleIcon className="h-20 w-20 text-red-500 mb-4" />
-            <h2 className="text-3xl font-black text-white">Confirmation Failed</h2>
-            <p className="text-gray-400 mt-2">
+            <h2 className="text-3xl font-black text-gray-900">Confirmation Failed</h2>
+            <p className="text-gray-500 mt-2">
               We could not verify your payment session. If you were charged, please contact support.
             </p>
             <Link to="/" className="btn-primary mt-6">

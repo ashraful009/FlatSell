@@ -3,6 +3,8 @@ const Unit     = require('../units/unit.model');
 const Property = require('../properties/property.model');
 const Booking  = require('../bookings/booking.model');
 const BookingPolicy = require('../policies/bookingPolicy.model');
+const { canCreateBooking } = require('../bookings/bookingLimits.service');
+const { logAudit }         = require('../audit/audit.service');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper: Calculate total price for a unit/property based on category
@@ -29,10 +31,18 @@ const calculateTotalPrice = (property, unit) => {
 // @access  Protected
 // ─────────────────────────────────────────────────────────────────────────────
 const createCheckoutSession = async (req, res) => {
-  const { unitId, message, kycData, documents } = req.body;
+  const { unitId, message, kycData, documents, refundPolicyAccepted } = req.body;
 
   if (!unitId) {
     return res.status(400).json({ success: false, message: 'unitId is required' });
+  }
+
+  // ── Policy 2: the refund policy must be acknowledged before booking ───────
+  if (!refundPolicyAccepted) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must acknowledge the refund policy before completing your booking.',
+    });
   }
 
   // Find the unit and populate property
@@ -46,6 +56,19 @@ const createCheckoutSession = async (req, res) => {
   }
 
   const property = unit.propertyId;
+
+  // ── Policy 3: enforce booking limits before reserving the unit ────────────
+  const limitCheck = await canCreateBooking(req.user._id, property.companyId);
+  if (!limitCheck.allowed) {
+    await logAudit({
+      action:      'booking_limit_blocked',
+      userId:      req.user._id,
+      performedBy: req.user._id,
+      notes:       limitCheck.reason,
+      meta:        { code: limitCheck.code, companyId: String(property.companyId) },
+    });
+    return res.status(409).json({ success: false, code: limitCheck.code, message: limitCheck.reason });
+  }
   const totalPrice = calculateTotalPrice(property, unit);
 
   if (totalPrice <= 0) {
@@ -98,6 +121,7 @@ const createCheckoutSession = async (req, res) => {
       documents:            documents || null,
       status:               'pending',
       paymentStatus:        'unpaid',
+      refundPolicyAccepted: true, // Policy 2: acknowledged above
     });
 
     // Mark unit as booked

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "migrate:policies": "node src/scripts/migratePolicies.js",
     "lint": "echo 'No linter configured yet'"
   },
   "keywords": [

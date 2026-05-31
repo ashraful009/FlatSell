@@ -101,6 +101,19 @@ const getCompany = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// @desc    Get the authenticated vendor's own company (incl. wallet balance)
+// @route   GET /api/companies/my
+// @access  Company Admin / seller
+// ─────────────────────────────────────────────────────────────────────────────
+const getMyCompany = async (req, res) => {
+  const company = await Company.findOne({ ownerId: req.user._id });
+  if (!company) {
+    return res.status(404).json({ success: false, message: 'No company found for this user.' });
+  }
+  res.status(200).json({ success: true, data: { company } });
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // @desc    Update company status (Super Admin)
 // @route   PUT /api/companies/:id/status
 // @access  Super Admin
@@ -179,5 +192,6 @@ module.exports = {
   getAllCompanies,
   getApprovedCompanies,
   getCompany,
+  getMyCompany,
   updateCompanyStatus,
 };

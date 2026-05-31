@@ -4,18 +4,18 @@ import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
 const PAYMENT_STATUS_CONFIG = {
-  unpaid:       { label: 'Unpaid',       color: 'text-amber-400',   bg: 'bg-amber-500/15 border-amber-500/30',   icon: '⏳' },
-  booking_paid: { label: 'Booking Paid', color: 'text-blue-400',    bg: 'bg-blue-500/15 border-blue-500/30',     icon: '💳' },
-  fully_paid:   { label: 'Fully Paid',   color: 'text-emerald-400', bg: 'bg-emerald-500/15 border-emerald-500/30',icon: '✅' },
+  unpaid:       { label: 'Unpaid',       color: 'text-amber-600',   bg: 'bg-amber-500/15 border-amber-500/30',   icon: '⏳' },
+  booking_paid: { label: 'Booking Paid', color: 'text-blue-600',    bg: 'bg-blue-500/15 border-blue-500/30',     icon: '💳' },
+  fully_paid:   { label: 'Fully Paid',   color: 'text-emerald-600', bg: 'bg-emerald-500/15 border-emerald-500/30',icon: '✅' },
   // Legacy support
-  paid:         { label: 'Paid',         color: 'text-emerald-400', bg: 'bg-emerald-500/15 border-emerald-500/30',icon: '✅' },
+  paid:         { label: 'Paid',         color: 'text-emerald-600', bg: 'bg-emerald-500/15 border-emerald-500/30',icon: '✅' },
 };
 
 const STATUS_COLORS = {
-  pending:   'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  confirmed: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  rejected:  'bg-red-500/15 text-red-400 border-red-500/30',
-  cancelled: 'bg-gray-500/15 text-gray-400 border-gray-500/30',
+  pending:   'bg-amber-500/15 text-amber-600 border-amber-500/30',
+  confirmed: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30',
+  rejected:  'bg-red-500/15 text-red-600 border-red-500/30',
+  cancelled: 'bg-gray-500/15 text-gray-500 border-gray-500/30',
 };
 
 const MyPropertiesPage = () => {
@@ -79,16 +79,16 @@ const MyPropertiesPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-white">My Properties</h1>
-          <p className="text-gray-400 text-sm mt-1">Properties you have booked or purchased</p>
+          <h1 className="text-2xl font-black text-gray-900">My Properties</h1>
+          <p className="text-gray-500 text-sm mt-1">Properties you have booked or purchased</p>
         </div>
       </div>
 
       {bookings.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <span className="text-5xl block mb-4">📭</span>
-          <h3 className="text-lg font-bold text-white mb-2">No Properties Yet</h3>
-          <p className="text-gray-400 mb-4">You haven't booked any properties yet.</p>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No Properties Yet</h3>
+          <p className="text-gray-500 mb-4">You haven't booked any properties yet.</p>
           <Link to="/properties" className="btn-primary">Browse Properties</Link>
         </div>
       ) : (
@@ -120,7 +120,7 @@ const MyPropertiesPage = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-dark-800 flex items-center justify-center text-4xl">
+                      <div className="w-full h-full bg-white flex items-center justify-center text-4xl">
                         {prop?.category === 'villa' ? '🏡' : prop?.category === 'land' ? '🌿' : '🏢'}
                       </div>
                     )}
@@ -136,10 +136,10 @@ const MyPropertiesPage = () => {
                   <div className="flex-1 p-5 flex flex-col">
                     {/* Title & Location */}
                     <div className="mb-3">
-                      <Link to={`/property/${prop?._id}`} className="text-lg font-bold text-white hover:text-primary-400 transition-colors">
+                      <Link to={`/property/${prop?._id}`} className="text-lg font-bold text-gray-900 hover:text-primary-600 transition-colors">
                         {prop?.title || 'Unknown Property'}
                       </Link>
-                      <p className="text-gray-400 text-xs mt-1">
+                      <p className="text-gray-500 text-xs mt-1">
                         📍 {prop?.address}, {prop?.city}
                       </p>
                     </div>
@@ -147,48 +147,48 @@ const MyPropertiesPage = () => {
                     {/* Unit & Company Info */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                       {unit?.unitNumber && (
-                        <div className="bg-dark-800/50 rounded-lg p-2 border border-white/5">
+                        <div className="bg-slate-50 rounded-lg p-2 border border-slate-100">
                           <p className="text-xs text-gray-500">Unit</p>
-                          <p className="text-sm font-semibold text-white">{unit.unitNumber}</p>
+                          <p className="text-sm font-semibold text-gray-900">{unit.unitNumber}</p>
                         </div>
                       )}
                       {unit?.floor && (
-                        <div className="bg-dark-800/50 rounded-lg p-2 border border-white/5">
+                        <div className="bg-slate-50 rounded-lg p-2 border border-slate-100">
                           <p className="text-xs text-gray-500">Floor</p>
-                          <p className="text-sm font-semibold text-white">{unit.floor}</p>
+                          <p className="text-sm font-semibold text-gray-900">{unit.floor}</p>
                         </div>
                       )}
-                      <div className="bg-dark-800/50 rounded-lg p-2 border border-white/5">
+                      <div className="bg-slate-50 rounded-lg p-2 border border-slate-100">
                         <p className="text-xs text-gray-500">Company</p>
-                        <p className="text-sm font-semibold text-white truncate">{booking.companyId?.name || '—'}</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">{booking.companyId?.name || '—'}</p>
                       </div>
-                      <div className="bg-dark-800/50 rounded-lg p-2 border border-white/5">
+                      <div className="bg-slate-50 rounded-lg p-2 border border-slate-100">
                         <p className="text-xs text-gray-500">Booked</p>
-                        <p className="text-sm font-semibold text-white">
+                        <p className="text-sm font-semibold text-gray-900">
                           {new Date(booking.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
 
                     {/* ── Payment Status Section ──────────────────────────── */}
-                    <div className="border-t border-white/10 pt-4 mt-auto">
+                    <div className="border-t border-blue-100 pt-4 mt-auto">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {/* Booking Money */}
                         <div className={`rounded-xl p-3 border ${
                           isBookingPaid || isFullyPaid
                             ? 'bg-emerald-500/10 border-emerald-500/20'
-                            : 'bg-dark-800/50 border-white/5'
+                            : 'bg-slate-50 border-slate-100'
                         }`}>
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-gray-400">Booking Money</p>
+                            <p className="text-xs text-gray-500">Booking Money</p>
                             {(isBookingPaid || isFullyPaid) && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 font-semibold">
                                 ✓ PAID
                               </span>
                             )}
                           </div>
                           <p className={`text-sm font-bold ${
-                            isBookingPaid || isFullyPaid ? 'text-emerald-400' : 'text-white'
+                            isBookingPaid || isFullyPaid ? 'text-emerald-600' : 'text-gray-900'
                           }`}>
                             {formatCurrency(bookingAmount)}
                           </p>
@@ -200,9 +200,9 @@ const MyPropertiesPage = () => {
                         </div>
 
                         {/* Total Price */}
-                        <div className="bg-dark-800/50 rounded-xl p-3 border border-white/5">
-                          <p className="text-xs text-gray-400 mb-1">Total Price</p>
-                          <p className="text-sm font-bold text-white">
+                        <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                          <p className="text-xs text-gray-500 mb-1">Total Price</p>
+                          <p className="text-sm font-bold text-gray-900">
                             {formatCurrency(totalPrice)}
                           </p>
                         </div>
@@ -213,19 +213,19 @@ const MyPropertiesPage = () => {
                             ? 'bg-emerald-500/10 border-emerald-500/20'
                             : showDueBtn
                               ? 'bg-amber-500/10 border-amber-500/20'
-                              : 'bg-dark-800/50 border-white/5'
+                              : 'bg-slate-50 border-slate-100'
                         }`}>
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-gray-400">Due Payment</p>
+                            <p className="text-xs text-gray-500">Due Payment</p>
                             {isFullyPaid && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 font-semibold">
                                 ✓ CLEARED
                               </span>
                             )}
                           </div>
 
                           {isFullyPaid ? (
-                            <p className="text-sm font-bold text-emerald-400">৳0</p>
+                            <p className="text-sm font-bold text-emerald-600">৳0</p>
                           ) : showDueBtn ? (
                             <button
                               onClick={() => handleDuePayment(booking._id)}
@@ -249,7 +249,7 @@ const MyPropertiesPage = () => {
                               )}
                             </button>
                           ) : (
-                            <p className="text-sm font-bold text-gray-400">
+                            <p className="text-sm font-bold text-gray-500">
                               {dueAmount > 0 ? formatCurrency(dueAmount) : '—'}
                             </p>
                           )}
@@ -261,7 +261,7 @@ const MyPropertiesPage = () => {
                         <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${paymentCfg.bg} ${paymentCfg.color}`}>
                           {paymentCfg.icon} {paymentCfg.label}
                         </span>
-                        <Link to={`/property/${prop?._id}`} className="text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors">
+                        <Link to={`/property/${prop?._id}`} className="text-primary-600 hover:text-primary-600 text-sm font-medium transition-colors">
                           View Details →
                         </Link>
                       </div>

@@ -15,10 +15,10 @@ const PropertyPriceSection = ({ category, price, onChange }) => {
 
   return (
     <section className="glass-card p-6">
-      <div className="flex items-center gap-3 mb-5 pb-3 border-b border-white/10">
+      <div className="flex items-center gap-3 mb-5 pb-3 border-b border-blue-100">
         <span className="text-2xl">💰</span>
         <div>
-          <h3 className="text-white font-semibold text-base">Price Information</h3>
+          <h3 className="text-gray-900 font-semibold text-base">Price Information</h3>
           <p className="text-gray-500 text-xs mt-0.5">Property pricing and financial details</p>
         </div>
       </div>
@@ -26,7 +26,7 @@ const PropertyPriceSection = ({ category, price, onChange }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="form-label">
-            Total Price (BDT) <span className="text-red-400">*</span>
+            Total Price (BDT) <span className="text-red-600">*</span>
           </label>
           <input
             name="price"
@@ -41,7 +41,7 @@ const PropertyPriceSection = ({ category, price, onChange }) => {
         </div>
 
         <div className="flex items-end pb-0.5">
-          <p className="text-xs text-gray-500 bg-white/3 rounded-lg border border-white/8 p-3 w-full leading-relaxed">
+          <p className="text-xs text-gray-500 bg-slate-50 rounded-lg border border-blue-100 p-3 w-full leading-relaxed">
             {hint}
           </p>
         </div>

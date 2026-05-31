@@ -79,7 +79,7 @@ const Navbar = () => {
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300
-        bg-dark-900/85 backdrop-blur-xl border-b border-white/5
+        bg-white/90 backdrop-blur-xl border-b border-slate-100
         ${scrolled ? 'shadow-glass' : ''}`}
     >
       <div className="container-main">
@@ -92,7 +92,7 @@ const Navbar = () => {
                             flex items-center justify-center shadow-glow flex-shrink-0">
               <span className="text-white font-black text-base">F</span>
             </div>
-            <span className="text-xl font-black text-white tracking-tight">
+            <span className="text-xl font-black text-gray-900 tracking-tight">
               Flat<span className="text-gradient">Sell</span>
             </span>
           </Link>
@@ -107,8 +107,8 @@ const Navbar = () => {
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
                    ${isActive
-                     ? 'text-white bg-white/10'
-                     : 'text-gray-400 hover:text-white hover:bg-white/5'
+                     ? 'text-gray-900 bg-blue-50'
+                     : 'text-gray-500 hover:text-gray-900 hover:bg-slate-50'
                    }`
                 }
               >
@@ -165,16 +165,16 @@ const Navbar = () => {
                                     shadow-glass animate-fadeIn origin-top-right">
 
                       {/* User info */}
-                      <div className="px-4 py-2 border-b border-white/8 mb-1">
-                        <p className="text-sm font-semibold text-white truncate">
+                      <div className="px-4 py-2 border-b border-blue-100 mb-1">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
                           {user?.name}
                         </p>
-                        <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {user?.roles?.map((role) => (
                             <span key={role}
                               className="text-xs px-1.5 py-0.5 bg-primary-500/20
-                                         text-primary-400 rounded-md font-medium">
+                                         text-primary-600 rounded-md font-medium">
                               {role}
                             </span>
                           ))}
@@ -187,18 +187,18 @@ const Navbar = () => {
                           key={path}
                           to={path}
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300
-                                     hover:text-white hover:bg-white/8 transition-colors"
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600
+                                     hover:text-gray-900 hover:bg-blue-50 transition-colors"
                         >
                           <span>{icon}</span> {label}
                         </Link>
                       ))}
 
-                      <div className="border-t border-white/8 mt-1 pt-1">
+                      <div className="border-t border-blue-100 mt-1 pt-1">
                         <button
                           onClick={handleLogout}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm
-                                     text-red-400 hover:text-red-300 hover:bg-red-500/10
+                                     text-red-600 hover:text-red-300 hover:bg-red-500/10
                                      transition-colors text-left"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -217,8 +217,8 @@ const Navbar = () => {
               /* Guest — show Login & Register */
               <>
                 <Link to="/login"
-                  className="text-sm font-medium text-gray-300 hover:text-white
-                             px-4 py-2 rounded-lg hover:bg-white/5 transition-all">
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900
+                             px-4 py-2 rounded-lg hover:bg-slate-50 transition-all">
                   Login
                 </Link>
                 <Link to="/register" className="btn-primary text-sm py-2 px-4">
@@ -246,7 +246,7 @@ const Navbar = () => {
             <button
               id="mobile-menu-btn"
               onClick={() => setMobileOpen((o) => !o)}
-              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5
+              className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-slate-50
                          transition-all focus:outline-none"
               aria-label="Toggle menu"
               aria-expanded={mobileOpen}
@@ -267,7 +267,7 @@ const Navbar = () => {
 
       {/* ── Mobile Menu ─────────────────────────────────────────────────── */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-white/5 bg-dark-900/95 backdrop-blur-xl animate-fadeIn">
+        <div className="md:hidden border-t border-slate-100 bg-white/90 backdrop-blur-xl animate-fadeIn">
           <div className="container-main py-4 space-y-1">
 
             {/* Nav links */}
@@ -279,22 +279,22 @@ const Navbar = () => {
                 onClick={handleNavClick}
                 className={({ isActive }) =>
                   `block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors
-                   ${isActive ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`
+                   ${isActive ? 'bg-blue-50 text-gray-900' : 'text-gray-500 hover:text-gray-900 hover:bg-slate-50'}`
                 }
               >
                 {label}
               </NavLink>
             ))}
 
-            <div className="border-t border-white/8 pt-3 mt-3 space-y-1">
+            <div className="border-t border-blue-100 pt-3 mt-3 space-y-1">
               {loading ? (
                 <div className="skeleton h-10 rounded-xl" />
               ) : isAuthenticated ? (
                 <>
                   {/* User info */}
                   <div className="px-4 py-2 mb-1">
-                    <p className="text-sm font-semibold text-white">{user?.name}</p>
-                    <p className="text-xs text-gray-400">{user?.email}</p>
+                    <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
                   </div>
 
                   {/* Dashboard links */}
@@ -303,8 +303,8 @@ const Navbar = () => {
                       key={path}
                       to={path}
                       onClick={handleNavClick}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300
-                                 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600
+                                 hover:text-gray-900 hover:bg-slate-50 rounded-xl transition-colors"
                     >
                       <span>{icon}</span> {label}
                     </Link>
@@ -325,7 +325,7 @@ const Navbar = () => {
                   {/* Logout */}
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600
                                hover:bg-red-500/10 rounded-xl transition-colors mt-1"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,8 +339,8 @@ const Navbar = () => {
               ) : (
                 <>
                   <Link to="/login" onClick={handleNavClick}
-                    className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white
-                               hover:bg-white/5 rounded-xl transition-colors">
+                    className="block px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900
+                               hover:bg-slate-50 rounded-xl transition-colors">
                     Login
                   </Link>
                   <Link to="/register" onClick={handleNavClick}

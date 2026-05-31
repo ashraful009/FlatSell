@@ -77,14 +77,14 @@ const VendorApplicationForm = () => {
       <div className="text-center py-10 animate-slideUp">
         <div className="w-20 h-20 rounded-full bg-green-500/20 border-2 border-green-500/40
                         flex items-center justify-center mx-auto mb-6">
-          <svg className="w-10 h-10 text-green-400" fill="none" viewBox="0 0 24 24"
+          <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24"
                stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Application Submitted! 🎉</h2>
-        <p className="text-gray-400 text-sm max-w-sm mx-auto mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted! 🎉</h2>
+        <p className="text-gray-500 text-sm max-w-sm mx-auto mb-6">
           Your vendor application is under review. We&apos;ll notify you via email
           within 3–5 business days.
         </p>
@@ -99,7 +99,7 @@ const VendorApplicationForm = () => {
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="px-4 py-3 bg-red-500/10 border border-red-500/30
-                        rounded-xl text-red-400 text-sm animate-fadeIn">
+                        rounded-xl text-red-600 text-sm animate-fadeIn">
           {error}
         </div>
       )}
@@ -151,19 +151,19 @@ const VendorApplicationForm = () => {
             border-dashed cursor-pointer transition-all duration-200
             ${pdfFile
               ? 'border-green-500/50 bg-green-500/5'
-              : 'border-white/15 hover:border-primary-500/50 hover:bg-white/3'
+              : 'border-blue-200 hover:border-primary-500/50 hover:bg-slate-50'
             }`}
         >
           {pdfFile ? (
             <>
-              <svg className="w-10 h-10 text-green-400" fill="none" viewBox="0 0 24 24"
+              <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24"
                    stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1
                      1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               <div className="text-center">
-                <p className="text-green-400 font-medium text-sm">{pdfFile.name}</p>
+                <p className="text-green-600 font-medium text-sm">{pdfFile.name}</p>
                 <p className="text-gray-500 text-xs mt-0.5">
                   {(pdfFile.size / 1024 / 1024).toFixed(2)} MB — click to change
                 </p>
@@ -177,7 +177,7 @@ const VendorApplicationForm = () => {
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
               <div className="text-center">
-                <p className="text-gray-300 font-medium text-sm">
+                <p className="text-gray-600 font-medium text-sm">
                   Drop your Trade License here
                 </p>
                 <p className="text-gray-500 text-xs mt-1">

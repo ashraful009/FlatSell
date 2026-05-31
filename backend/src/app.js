@@ -60,6 +60,9 @@ app.use('/api/checkout',          require('./features/checkout/checkout.routes')
 app.use('/api/booking-policies',  require('./features/policies/bookingPolicy.routes'));
 app.use('/api/commissions',       require('./features/commissions/commission.routes'));
 app.use('/api/installments',      require('./features/installments/installment.routes'));
+app.use('/api/settings',          require('./features/settings/platformSettings.routes'));
+app.use('/api/refunds',           require('./features/refunds/refund.routes'));
+app.use('/api/admin',             require('./features/admin/admin.routes'));
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {

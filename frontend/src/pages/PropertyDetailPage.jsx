@@ -64,7 +64,7 @@ const PropertyDetailPage = () => {
     return (
       <div className="container-main py-20 text-center">
         <p className="text-4xl mb-3">😕</p>
-        <p className="text-white font-semibold mb-2">{error}</p>
+        <p className="text-gray-900 font-semibold mb-2">{error}</p>
         <Link to="/" className="btn-primary mt-4 inline-flex">← Back to Home</Link>
       </div>
     );
@@ -86,17 +86,17 @@ const PropertyDetailPage = () => {
   const hasMap = location?.lat && location?.lng;
 
   return (
-    <div className="min-h-screen bg-dark-900 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* ── Hero Image Gallery ──────────────────────────────────────────── */}
-      <div className="bg-dark-950">
+      <div className="bg-gray-100">
         <div className="container-main pt-6 pb-4">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+            <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
             <span>/</span>
-            <Link to="/properties" className="hover:text-white transition-colors">Properties</Link>
+            <Link to="/properties" className="hover:text-gray-900 transition-colors">Properties</Link>
             <span>/</span>
-            <span className="text-gray-300 truncate max-w-xs">{title}</span>
+            <span className="text-gray-600 truncate max-w-xs">{title}</span>
           </nav>
 
           {allImages.length > 0 ? (
@@ -154,7 +154,7 @@ const PropertyDetailPage = () => {
               )}
             </>
           ) : (
-            <div className="h-64 rounded-2xl bg-dark-800 flex items-center justify-center mb-3">
+            <div className="h-64 rounded-2xl bg-white flex items-center justify-center mb-3">
               <span className="text-6xl">{CATEGORY_ICONS[category] || '🏢'}</span>
             </div>
           )}
@@ -170,8 +170,8 @@ const PropertyDetailPage = () => {
             {/* Title + badges */}
             <div className="flex flex-wrap items-start gap-3 mb-3">
               <div className="flex-1">
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">{title}</h1>
-                <div className="flex items-center gap-2 mt-2 text-gray-400 text-sm">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{title}</h1>
+                <div className="flex items-center gap-2 mt-2 text-gray-500 text-sm">
                   <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -180,7 +180,7 @@ const PropertyDetailPage = () => {
                 </div>
               </div>
               <span className="text-xs px-3 py-1.5 rounded-xl bg-primary-500/15
-                               border border-primary-500/30 text-primary-400 font-medium capitalize">
+                               border border-primary-500/30 text-primary-600 font-medium capitalize">
                 {CATEGORY_ICONS[category]} {category}
               </span>
             </div>
@@ -204,23 +204,23 @@ const PropertyDetailPage = () => {
                 { label: 'Available',    value: unitData.stats?.available ?? '—' },
               ]).map(({ label, value }) => (
                 <div key={label} className="flex flex-col items-center px-4 py-2.5
-                                             bg-dark-800/60 border border-white/8 rounded-xl">
-                  <span className="text-lg font-bold text-white">{value}</span>
+                                             bg-slate-50 border border-blue-100 rounded-xl">
+                  <span className="text-lg font-bold text-gray-900">{value}</span>
                   <span className="text-gray-500 text-xs">{label}</span>
                 </div>
               ))}
             </div>
 
             {/* ── Tabs ─────────────────────────────────────────────────────── */}
-            <div className="flex gap-1 mb-6 bg-dark-800/50 p-1 rounded-xl">
+            <div className="flex gap-1 mb-6 bg-slate-50 p-1 rounded-xl">
               {TABS.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200
                     ${activeTab === tab
-                      ? 'bg-white/10 text-white'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-blue-50 text-gray-900'
+                      : 'text-gray-500 hover:text-gray-900'
                     }`}
                 >
                   {tab}
@@ -232,8 +232,8 @@ const PropertyDetailPage = () => {
             {activeTab === 'Overview' && (
               <div className="animate-fadeIn space-y-6">
                 <div>
-                  <h2 className="text-white font-semibold mb-3">About this Property</h2>
-                  <p className="text-gray-400 leading-relaxed text-sm whitespace-pre-line">
+                  <h2 className="text-gray-900 font-semibold mb-3">About this Property</h2>
+                  <p className="text-gray-500 leading-relaxed text-sm whitespace-pre-line">
                     {description}
                   </p>
                 </div>
@@ -242,7 +242,7 @@ const PropertyDetailPage = () => {
                 {cat === 'villa' && villaDetails && (
                   <>
                     <div>
-                      <h3 className="text-white font-semibold mb-3 text-sm">Construction Details</h3>
+                      <h3 className="text-gray-900 font-semibold mb-3 text-sm">Construction Details</h3>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {[
                           { l: 'Year',        v: villaDetails.constructionYear || '—' },
@@ -250,15 +250,15 @@ const PropertyDetailPage = () => {
                           { l: 'Materials',   v: villaDetails.materialsQuality || '—' },
                           { l: 'Earthquake',  v: villaDetails.earthquakeResistant || '—' },
                         ].map(({ l, v }) => (
-                          <div key={l} className="bg-dark-800/50 border border-white/5 rounded-xl px-3 py-2">
-                            <p className="text-white text-sm">{v}</p>
+                          <div key={l} className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
+                            <p className="text-gray-900 text-sm">{v}</p>
                             <p className="text-gray-500 text-xs">{l}</p>
                           </div>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-white font-semibold mb-3 text-sm">Features & Amenities</h3>
+                      <h3 className="text-gray-900 font-semibold mb-3 text-sm">Features & Amenities</h3>
                       <div className="flex flex-wrap gap-2">
                         {[
                           ['privatePool',    '🏊 Pool'],
@@ -272,7 +272,7 @@ const PropertyDetailPage = () => {
                             className={`text-xs px-3 py-1.5 rounded-lg border ${
                               villaDetails[key] === 'Yes'
                                 ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
-                                : 'bg-white/5 border-white/10 text-gray-500'
+                                : 'bg-slate-50 border-blue-100 text-gray-500'
                             }`}>
                             {label}: {villaDetails[key] || 'No'}
                           </span>
@@ -286,7 +286,7 @@ const PropertyDetailPage = () => {
                 {cat === 'land' && landDetails && (
                   <>
                     <div>
-                      <h3 className="text-white font-semibold mb-3 text-sm">Legal Information</h3>
+                      <h3 className="text-gray-900 font-semibold mb-3 text-sm">Legal Information</h3>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {[
                           { l: 'Khatian',    v: landDetails.khatianNumber  || '—' },
@@ -294,15 +294,15 @@ const PropertyDetailPage = () => {
                           { l: 'Ownership',   v: landDetails.landOwnership  || '—' },
                           { l: 'Dispute',     v: landDetails.anyDispute     || '—' },
                         ].map(({ l, v }) => (
-                          <div key={l} className="bg-dark-800/50 border border-white/5 rounded-xl px-3 py-2">
-                            <p className="text-white text-sm">{v}</p>
+                          <div key={l} className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
+                            <p className="text-gray-900 text-sm">{v}</p>
                             <p className="text-gray-500 text-xs">{l}</p>
                           </div>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-white font-semibold mb-3 text-sm">Utilities</h3>
+                      <h3 className="text-gray-900 font-semibold mb-3 text-sm">Utilities</h3>
                       <div className="flex flex-wrap gap-2">
                         {[
                           ['electricityLine',    '⚡ Electricity'],
@@ -313,7 +313,7 @@ const PropertyDetailPage = () => {
                             className={`text-xs px-3 py-1.5 rounded-lg border ${
                               landDetails[key] === 'Yes'
                                 ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
-                                : 'bg-white/5 border-white/10 text-gray-500'
+                                : 'bg-slate-50 border-blue-100 text-gray-500'
                             }`}>
                             {label}: {landDetails[key] || 'No'}
                           </span>
@@ -322,16 +322,16 @@ const PropertyDetailPage = () => {
                     </div>
                     {(landDetails.nearbySchool || landDetails.nearbyHospital || landDetails.nearbyMarket) && (
                       <div>
-                        <h3 className="text-white font-semibold mb-3 text-sm">Nearby Facilities</h3>
+                        <h3 className="text-gray-900 font-semibold mb-3 text-sm">Nearby Facilities</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           {[
                             { l: '🏫 School',   v: landDetails.nearbySchool },
                             { l: '🏥 Hospital', v: landDetails.nearbyHospital },
                             { l: '🏪 Market',   v: landDetails.nearbyMarket },
                           ].filter(({ v }) => v).map(({ l, v }) => (
-                            <div key={l} className="bg-dark-800/50 border border-white/5 rounded-xl px-3 py-2">
+                            <div key={l} className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
                               <p className="text-gray-500 text-xs mb-0.5">{l}</p>
-                              <p className="text-white text-sm">{v}</p>
+                              <p className="text-gray-900 text-sm">{v}</p>
                             </div>
                           ))}
                         </div>
@@ -344,7 +344,7 @@ const PropertyDetailPage = () => {
 
             {activeTab === 'Floor Plan' && (
               <div className="animate-fadeIn">
-                <h2 className="text-white font-semibold mb-4">
+                <h2 className="text-gray-900 font-semibold mb-4">
                   {cat === 'villa' ? 'Villa Visualizer' : cat === 'land' ? 'Plot Visualizer' : 'Interactive Floor Plan'}
                   {cat === 'apartment' && (
                     <span className="text-gray-500 font-normal text-sm ml-2">
@@ -364,9 +364,9 @@ const PropertyDetailPage = () => {
 
             {activeTab === 'Location' && (
               <div className="animate-fadeIn">
-                <h2 className="text-white font-semibold mb-4">Location</h2>
+                <h2 className="text-gray-900 font-semibold mb-4">Location</h2>
                 {hasMap ? (
-                  <div className="h-64 rounded-xl overflow-hidden border border-white/10">
+                  <div className="h-64 rounded-xl overflow-hidden border border-blue-100">
                     <MapContainer
                       center={[location.lat, location.lng]}
                       zoom={15}
@@ -382,7 +382,7 @@ const PropertyDetailPage = () => {
                   </div>
                 ) : (
                   <div className="glass-card py-10 text-center">
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-500 text-sm">
                       📍 {address}, {city}
                       <br />
                       <span className="text-gray-600">No map coordinates available for this property.</span>
@@ -397,8 +397,8 @@ const PropertyDetailPage = () => {
           <div className="space-y-4">
             {/* Price card */}
             <div className="glass-card p-5 sticky top-20">
-              <p className="text-gray-400 text-xs mb-1">Total Price</p>
-              <p className="text-3xl font-black text-white mb-1">
+              <p className="text-gray-500 text-xs mb-1">Total Price</p>
+              <p className="text-3xl font-black text-gray-900 mb-1">
                 {cat === 'villa' && villaDetails?.totalPrice
                   ? `৳${villaDetails.totalPrice.toLocaleString()}`
                   : cat === 'land' && landDetails?.totalPrice
@@ -436,7 +436,7 @@ const PropertyDetailPage = () => {
             {/* Company card */}
             {companyId && (
               <div className="glass-card p-5">
-                <p className="text-gray-400 text-xs uppercase tracking-wider mb-3">Listed by</p>
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-3">Listed by</p>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-600/30
                                   to-primary-800/30 border border-primary-500/20 flex items-center
@@ -444,9 +444,9 @@ const PropertyDetailPage = () => {
                     🏢
                   </div>
                   <div className="min-w-0">
-                    <p className="text-white font-semibold text-sm truncate">{companyId.name}</p>
+                    <p className="text-gray-900 font-semibold text-sm truncate">{companyId.name}</p>
                     {companyId.email && (
-                      <p className="text-gray-400 text-xs truncate">{companyId.email}</p>
+                      <p className="text-gray-500 text-xs truncate">{companyId.email}</p>
                     )}
                   </div>
                 </div>

@@ -35,6 +35,13 @@ const companySchema = new mongoose.Schema(
     approvedAt:     { type: Date },
     rejectedReason: { type: String, default: '' },
 
+    // ── Wallet ────────────────────────────────────────────────
+    // Vendor account balance. Refunds (Policy 2) are debited from here — the
+    // 80% refund is paid out of the vendor's funds, not the platform's.
+    // May go negative (represents what the vendor owes the platform).
+    // Every change is mirrored in the VendorLedger collection.
+    walletBalance: { type: Number, default: 0 },
+
     // ── Logo (set by Company Admin later) ────────────────────
     logo: { type: String, default: '' },
   },

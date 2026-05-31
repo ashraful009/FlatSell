@@ -78,9 +78,9 @@ const FIELD_SECTIONS = [
 ];
 
 const CATEGORIES = [
-  { key: 'apartment', label: 'Apartments', icon: '🏢', color: 'from-blue-600 to-blue-800',   border: 'border-blue-500/30',   activeBg: 'bg-blue-500/15',   activeText: 'text-blue-400' },
-  { key: 'villa',     label: 'Villas',     icon: '🏡', color: 'from-emerald-600 to-emerald-800', border: 'border-emerald-500/30', activeBg: 'bg-emerald-500/15', activeText: 'text-emerald-400' },
-  { key: 'land',      label: 'Land',       icon: '🌿', color: 'from-amber-600 to-amber-800', border: 'border-amber-500/30', activeBg: 'bg-amber-500/15', activeText: 'text-amber-400' },
+  { key: 'apartment', label: 'Apartments', icon: '🏢', color: 'from-blue-600 to-blue-800',   border: 'border-blue-500/30',   activeBg: 'bg-blue-500/15',   activeText: 'text-blue-600' },
+  { key: 'villa',     label: 'Villas',     icon: '🏡', color: 'from-emerald-600 to-emerald-800', border: 'border-emerald-500/30', activeBg: 'bg-emerald-500/15', activeText: 'text-emerald-600' },
+  { key: 'land',      label: 'Land',       icon: '🌿', color: 'from-amber-600 to-amber-800', border: 'border-amber-500/30', activeBg: 'bg-amber-500/15', activeText: 'text-amber-600' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -176,10 +176,10 @@ const BookingPoliciesSettings = () => {
     <div className="space-y-6 animate-fadeIn">
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div>
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
           📋 Booking Policies
         </h2>
-        <p className="text-gray-400 text-sm mt-1">
+        <p className="text-gray-500 text-sm mt-1">
           Configure KYC requirements and booking money percentage for each property category.
           Customers will be required to fill out the selected fields before proceeding to payment.
         </p>
@@ -202,7 +202,7 @@ const BookingPoliciesSettings = () => {
               className={`relative p-4 rounded-xl border transition-all duration-300 text-left group
                 ${isActive
                   ? `${cat.activeBg} ${cat.border} ${cat.activeText} ring-1 ring-inset`
-                  : 'border-white/10 text-gray-400 hover:border-white/20 hover:bg-white/3'
+                  : 'border-blue-100 text-gray-500 hover:border-blue-200 hover:bg-slate-50'
                 }`}
             >
               <div className="flex items-center gap-2 mb-2">
@@ -230,7 +230,7 @@ const BookingPoliciesSettings = () => {
       <div className="glass-card p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-white font-semibold text-sm flex items-center gap-2">
+            <h3 className="text-gray-900 font-semibold text-sm flex items-center gap-2">
               💰 Booking Money Percentage
             </h3>
             <p className="text-gray-500 text-xs mt-0.5">
@@ -246,10 +246,10 @@ const BookingPoliciesSettings = () => {
               onChange={(e) => setPercentage(Math.max(1, Math.min(100, Number(e.target.value) || 1)))}
               className="form-input w-20 text-center text-lg font-bold"
             />
-            <span className="text-gray-400 text-lg font-bold">%</span>
+            <span className="text-gray-500 text-lg font-bold">%</span>
           </div>
         </div>
-        <div className="w-full bg-dark-800 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-white rounded-full h-2 overflow-hidden">
           <div
             className={`h-full rounded-full bg-gradient-to-r ${activeCat?.color} transition-all duration-500`}
             style={{ width: `${percentage}%` }}
@@ -266,7 +266,7 @@ const BookingPoliciesSettings = () => {
       <div className="glass-card p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="text-white font-semibold text-sm flex items-center gap-2">
+            <h3 className="text-gray-900 font-semibold text-sm flex items-center gap-2">
               ✅ Required KYC & Booking Fields
             </h3>
             <p className="text-gray-500 text-xs mt-0.5">
@@ -278,11 +278,11 @@ const BookingPoliciesSettings = () => {
               {selectedCount} / {totalFields}
             </span>
             <button onClick={selectAll}
-              className="text-xs text-gray-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5">
+              className="text-xs text-gray-500 hover:text-gray-900 transition-colors px-2 py-1 rounded-lg hover:bg-slate-50">
               Select All
             </button>
             <button onClick={deselectAll}
-              className="text-xs text-gray-400 hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/5">
+              className="text-xs text-gray-500 hover:text-gray-900 transition-colors px-2 py-1 rounded-lg hover:bg-slate-50">
               Clear
             </button>
           </div>
@@ -294,9 +294,9 @@ const BookingPoliciesSettings = () => {
             return (
               <div key={section.id}>
                 {/* Section header */}
-                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/5">
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
                   <span className="text-base">{section.icon}</span>
-                  <h4 className="text-gray-200 font-medium text-sm">{section.title}</h4>
+                  <h4 className="text-gray-800 font-medium text-sm">{section.title}</h4>
                   <span className="text-xs text-gray-600 ml-auto">
                     {sectionSelected}/{section.fields.length}
                   </span>
@@ -313,7 +313,7 @@ const BookingPoliciesSettings = () => {
                           transition-all duration-200 group select-none
                           ${isChecked
                             ? `${activeCat?.activeBg} ${activeCat?.border}`
-                            : 'border-white/5 hover:border-white/15 hover:bg-white/2'
+                            : 'border-slate-100 hover:border-blue-200 hover:bg-slate-50'
                           }`}
                       >
                         {/* Custom checkbox */}
@@ -325,12 +325,12 @@ const BookingPoliciesSettings = () => {
                           }`}
                         >
                           {isChecked && (
-                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="w-3 h-3 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
                         </div>
-                        <span className={`text-sm transition-colors ${isChecked ? 'text-white' : 'text-gray-400 group-hover:text-gray-200'}`}>
+                        <span className={`text-sm transition-colors ${isChecked ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-800'}`}>
                           {field.label}
                         </span>
                         <input

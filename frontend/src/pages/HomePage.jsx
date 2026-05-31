@@ -43,11 +43,11 @@ const useCounter = (target, duration = 1500) => {
 const StatItem = ({ target, suffix = '+', label }) => {
   const { count, ref } = useCounter(target);
   return (
-    <div ref={ref} className="text-center">
-      <p className="text-3xl sm:text-4xl font-black text-white">
+    <div ref={ref} className="text-center bg-white border border-blue-100 shadow-sm rounded-xl py-6 px-4">
+      <p className="text-3xl sm:text-4xl font-bold text-blue-600">
         {count.toLocaleString()}{suffix}
       </p>
-      <p className="text-gray-400 text-sm mt-1">{label}</p>
+      <p className="text-gray-500 text-sm mt-1">{label}</p>
     </div>
   );
 };
@@ -82,14 +82,14 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-gray-50">
 
       {/* ══════════════════════════════════════════════════════════════════
           HERO SECTION
       ══════════════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden min-h-[88vh] flex items-center">
         {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-dark-950 via-dark-900 to-dark-900" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-blue-50 to-blue-100" />
         <div className="absolute top-20 left-10 w-80 h-80 bg-primary-600/20 rounded-full blur-3xl
                         animate-pulse" style={{ animationDuration: '4s' }} />
         <div className="absolute bottom-10 right-10 w-96 h-64 bg-accent-500/10 rounded-full blur-3xl
@@ -103,18 +103,18 @@ const HomePage = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8
                             bg-primary-500/10 border border-primary-500/20">
               <span className="w-2 h-2 bg-primary-400 rounded-full animate-pulse" />
-              <span className="text-primary-400 text-sm font-medium">
+              <span className="text-primary-600 text-sm font-medium">
                 Bangladesh&apos;s #1 Real Estate Marketplace
               </span>
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white mb-6 leading-none tracking-tight">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-none tracking-tight">
               Find Your<br />
               <span className="text-gradient">Perfect Home</span><br />
               in Bangladesh
             </h1>
 
-            <p className="text-gray-400 text-lg sm:text-xl mb-10 max-w-xl leading-relaxed">
+            <p className="text-gray-500 text-lg sm:text-xl mb-10 max-w-xl leading-relaxed">
               Browse thousands of verified properties from trusted companies.
               Apartments, villas, land — all in one place.
             </p>
@@ -123,7 +123,7 @@ const HomePage = () => {
             <form onSubmit={handleSearch}
                   className="flex flex-col sm:flex-row gap-3 max-w-xl mb-6">
               <div className="relative flex-1">
-                <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -148,9 +148,9 @@ const HomePage = () => {
                 <button
                   key={city}
                   onClick={() => handleCityClick(city)}
-                  className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10
-                             text-gray-300 text-sm hover:text-white hover:bg-white/10
-                             hover:border-white/20 transition-all duration-200"
+                  className="px-3 py-1.5 rounded-full bg-white border border-blue-200
+                             text-blue-700 text-sm hover:bg-blue-50
+                             hover:border-blue-200 transition-all duration-200"
                 >
                   {city}
                 </button>
@@ -163,7 +163,7 @@ const HomePage = () => {
       {/* ══════════════════════════════════════════════════════════════════
           STATS
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="border-y border-white/5 bg-dark-950/50">
+      <section className="border-y border-slate-100 bg-slate-100">
         <div className="container-main py-12">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             <StatItem target={500}  suffix="+"  label="Properties Listed"  />
@@ -181,7 +181,7 @@ const HomePage = () => {
         <div className="container-main">
           <div className="text-center mb-10">
             <h2 className="section-title mb-2">Browse by Category</h2>
-            <p className="text-gray-400">Find exactly what you&apos;re looking for</p>
+            <p className="text-gray-500">Find exactly what you&apos;re looking for</p>
           </div>
           <div className="grid grid-cols-3 gap-3 sm:gap-4">
             {CATEGORIES.map(({ key, icon, label, gradient, border }) => (
@@ -189,14 +189,14 @@ const HomePage = () => {
                 key={key}
                 onClick={() => handleCategory(key)}
                 className={`group flex flex-col items-center gap-3 p-5 sm:p-6 rounded-2xl
-                  border border-white/8 bg-gradient-to-br ${gradient}
+                  border border-blue-100 bg-gradient-to-br ${gradient}
                   ${border} hover:scale-105 transition-all duration-300 cursor-pointer`}
               >
                 <span className="text-3xl sm:text-4xl group-hover:scale-110
                                  transition-transform duration-300">
                   {icon}
                 </span>
-                <span className="text-white font-semibold text-sm">{label}</span>
+                <span className="text-gray-900 font-semibold text-sm">{label}</span>
               </button>
             ))}
           </div>
@@ -206,15 +206,15 @@ const HomePage = () => {
       {/* ══════════════════════════════════════════════════════════════════
           FEATURED PROPERTIES
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-16 bg-dark-950/30">
+      <section className="py-16 bg-slate-100">
         <div className="container-main">
           <div className="flex items-end justify-between mb-10">
             <div>
               <h2 className="section-title mb-2">Featured Properties</h2>
-              <p className="text-gray-400">Handpicked listings from verified companies</p>
+              <p className="text-gray-500">Handpicked listings from verified companies</p>
             </div>
             <Link to="/properties"
-              className="text-primary-400 hover:text-primary-300 text-sm font-medium
+              className="text-primary-600 hover:text-primary-600 text-sm font-medium
                          flex items-center gap-1 transition-colors flex-shrink-0">
               View all →
             </Link>
@@ -231,8 +231,8 @@ const HomePage = () => {
           ) : (
             <div className="glass-card py-16 text-center">
               <p className="text-4xl mb-3">🏗️</p>
-              <p className="text-white font-semibold">No properties yet</p>
-              <p className="text-gray-400 text-sm mt-1">
+              <p className="text-gray-900 font-semibold">No properties yet</p>
+              <p className="text-gray-500 text-sm mt-1">
                 Check back soon — companies are listing properties daily.
               </p>
             </div>
@@ -264,10 +264,10 @@ const HomePage = () => {
 
             <div className="relative">
               <span className="text-5xl mb-5 block">🏢</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+              <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
                 Are you a Real Estate Company?
               </h2>
-              <p className="text-gray-300 text-lg mb-8 max-w-xl mx-auto">
+              <p className="text-gray-600 text-lg mb-8 max-w-xl mx-auto">
                 Join 120+ verified companies already selling on FlatSell.
                 List your properties and reach thousands of verified buyers.
               </p>

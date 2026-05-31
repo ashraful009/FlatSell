@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../shared/lib/axiosInstance';
 import { toast } from 'react-hot-toast';
 
@@ -66,13 +66,18 @@ const SECTION_ICONS = {
 const BookingCheckoutPage = () => {
   const { unitId } = useParams();
   const navigate   = useNavigate();
-  const location   = useLocation();
 
   const [unit, setUnit]         = useState(null);
   const [property, setProperty] = useState(null);
   const [policy, setPolicy]     = useState(null);
   const [loading, setLoading]   = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  // Policy 2 — refund policy acknowledgment
+  const [settings, setSettings]             = useState(null);
+  const [refundAccepted, setRefundAccepted] = useState(false);
+  // Policy 3 — booking limit block (null = allowed)
+  const [limitBlock, setLimitBlock] = useState(null);
 
   // Form data
   const [formData, setFormData] = useState({});
@@ -98,6 +103,18 @@ const BookingCheckoutPage = () => {
         const category  = propObj.category;
         const policyRes = await axiosInstance.get(`/booking-policies/company/${companyId}/category/${category}`);
         setPolicy(policyRes.data.data.policy);
+
+        // 4. Platform refund settings + booking-limit pre-check (Policies 2 & 3)
+        try {
+          const [settingsRes, limitRes] = await Promise.all([
+            axiosInstance.get('/settings/public'),
+            axiosInstance.get(`/bookings/limit-check?companyId=${companyId}`),
+          ]);
+          setSettings(settingsRes.data.data.settings);
+          if (!limitRes.data.data.allowed) setLimitBlock(limitRes.data.data.blocked);
+        } catch {
+          // Non-fatal: fall back to default copy and allow the form to render
+        }
 
         // Pre-fill property fields if they're required
         const prefill = {};
@@ -187,6 +204,10 @@ const BookingCheckoutPage = () => {
       toast.error('Please fill in all required fields');
       return;
     }
+    if (!refundAccepted) {
+      toast.error('Please acknowledge the refund policy to continue');
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -210,6 +231,7 @@ const BookingCheckoutPage = () => {
         message: formData.message || '',
         kycData,
         documents: Object.keys(documents).length > 0 ? documents : null,
+        refundPolicyAccepted: refundAccepted,
       });
 
       if (response.data.checkoutUrl) {
@@ -227,7 +249,7 @@ const BookingCheckoutPage = () => {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading checkout form...</p>
+          <p className="text-gray-500">Loading checkout form...</p>
         </div>
       </div>
     );
@@ -237,25 +259,54 @@ const BookingCheckoutPage = () => {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="glass-card p-8 text-center">
-          <p className="text-red-400">Unable to load property data.</p>
+          <p className="text-red-600">Unable to load property data.</p>
           <button onClick={() => navigate(-1)} className="btn-primary mt-4">Go Back</button>
         </div>
       </div>
     );
   }
 
+  // ── Policy 3: booking limit reached — block the form ──────────────────────
+  if (limitBlock) {
+    const isTotal = limitBlock.code === 'TOTAL_LIMIT';
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <div className="glass-card p-8 text-center max-w-md">
+          <span className="text-5xl block mb-4">{isTotal ? '🚦' : '⛔'}</span>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Booking Limit Reached</h2>
+          <p className="text-gray-500 text-sm mb-6">{limitBlock.reason}</p>
+          <div className="flex flex-col gap-3">
+            {isTotal && (
+              <a
+                href="mailto:icsteamservice@gmail.com?subject=Booking%20Limit%20Override%20Request"
+                className="btn-primary w-full"
+              >
+                📨 Contact Super Admin
+              </a>
+            )}
+            <button onClick={() => navigate(-1)} className="btn-secondary w-full">
+              ← Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const hasFields = activeFieldKeys.length > 0;
+  const retentionPct = settings?.refundRetentionPercentage ?? 20;
+  const refundWindowDays = settings?.refundWindowDays ?? 30;
 
   return (
-    <div className="min-h-screen bg-dark-900 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <div className="container-main py-8">
         {/* ── Header ────────────────────────────────────────────────────── */}
         <div className="mb-8">
-          <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-white text-sm mb-4 flex items-center gap-1 transition-colors">
+          <button onClick={() => navigate(-1)} className="text-gray-500 hover:text-gray-900 text-sm mb-4 flex items-center gap-1 transition-colors">
             ← Back to Property
           </button>
-          <h1 className="text-2xl sm:text-3xl font-black text-white">Booking Checkout</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Booking Checkout</h1>
+          <p className="text-gray-500 text-sm mt-1">
             Complete the form below to proceed with your booking payment
           </p>
         </div>
@@ -266,7 +317,7 @@ const BookingCheckoutPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Property Summary Card */}
               <div className="glass-card p-5 flex gap-4">
-                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-dark-800">
+                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-white">
                   {property.mainImage ? (
                     <img src={property.mainImage} alt={property.title} className="w-full h-full object-cover" />
                   ) : (
@@ -274,17 +325,17 @@ const BookingCheckoutPage = () => {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-white font-bold text-lg truncate">{property.title}</h3>
-                  <p className="text-gray-400 text-xs mt-0.5">📍 {property.address}, {property.city}</p>
+                  <h3 className="text-gray-900 font-bold text-lg truncate">{property.title}</h3>
+                  <p className="text-gray-500 text-xs mt-0.5">📍 {property.address}, {property.city}</p>
                   <div className="flex items-center gap-3 mt-2">
-                    <span className="text-xs px-2 py-1 rounded-lg bg-primary-500/15 border border-primary-500/30 text-primary-400 capitalize">
+                    <span className="text-xs px-2 py-1 rounded-lg bg-primary-500/15 border border-primary-500/30 text-primary-600 capitalize">
                       {property.category}
                     </span>
                     {unit.unitNumber && (
-                      <span className="text-xs text-gray-400">Unit: {unit.unitNumber}</span>
+                      <span className="text-xs text-gray-500">Unit: {unit.unitNumber}</span>
                     )}
                     {unit.floor && (
-                      <span className="text-xs text-gray-400">Floor: {unit.floor}</span>
+                      <span className="text-xs text-gray-500">Floor: {unit.floor}</span>
                     )}
                   </div>
                 </div>
@@ -298,9 +349,9 @@ const BookingCheckoutPage = () => {
 
                   return (
                     <div key={sectionName} className="glass-card p-5">
-                      <div className="flex items-center gap-2 mb-5 pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2 mb-5 pb-3 border-b border-blue-100">
                         <span className="text-xl">{SECTION_ICONS[sectionName]}</span>
-                        <h3 className="text-white font-semibold text-sm">{sectionName}</h3>
+                        <h3 className="text-gray-900 font-semibold text-sm">{sectionName}</h3>
                         <span className="text-xs text-gray-600 ml-auto">
                           {sectionFields.length} field{sectionFields.length > 1 ? 's' : ''}
                         </span>
@@ -310,7 +361,7 @@ const BookingCheckoutPage = () => {
                         {sectionFields.map(({ key, label, type, options }) => (
                           <div key={key} className={type === 'textarea' ? 'sm:col-span-2' : ''}>
                             <label className="form-label">
-                              {label} <span className="text-red-400">*</span>
+                              {label} <span className="text-red-600">*</span>
                             </label>
 
                             {type === 'textarea' ? (
@@ -340,12 +391,12 @@ const BookingCheckoutPage = () => {
                                     ? 'border-emerald-500/40 bg-emerald-500/5'
                                     : errors[key]
                                       ? 'border-red-500/40 hover:border-red-500/60'
-                                      : 'border-white/15 hover:border-primary-500/40 hover:bg-white/2'
+                                      : 'border-blue-200 hover:border-primary-500/40 hover:bg-slate-50'
                                   }`}
                                 >
                                   <span className="text-lg">{fileData[key] ? '✅' : '📎'}</span>
                                   <div className="min-w-0 flex-1">
-                                    <p className={`text-sm truncate ${fileData[key] ? 'text-emerald-300' : 'text-gray-400'}`}>
+                                    <p className={`text-sm truncate ${fileData[key] ? 'text-emerald-300' : 'text-gray-500'}`}>
                                       {fileData[key]?.name || `Upload ${label}`}
                                     </p>
                                     <p className="text-xs text-gray-600">JPG, PNG, PDF · Max 5MB</p>
@@ -369,7 +420,7 @@ const BookingCheckoutPage = () => {
                             )}
 
                             {errors[key] && (
-                              <p className="text-red-400 text-xs mt-1">{errors[key]}</p>
+                              <p className="text-red-600 text-xs mt-1">{errors[key]}</p>
                             )}
                           </div>
                         ))}
@@ -380,17 +431,44 @@ const BookingCheckoutPage = () => {
               ) : (
                 <div className="glass-card p-6 text-center">
                   <span className="text-3xl block mb-2">📋</span>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-gray-500 text-sm">
                     No additional information required. You can proceed directly to payment.
                   </p>
                 </div>
               )}
 
+              {/* ── Refund Policy (Policy 2) + Acknowledgment ───────────── */}
+              <div className="glass-card p-5 border border-amber-500/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">↩️</span>
+                  <h3 className="text-gray-900 font-semibold text-sm">Refund Policy</h3>
+                </div>
+                <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                  You may request a refund within{' '}
+                  <strong className="text-amber-300">{refundWindowDays} days</strong> of booking.{' '}
+                  <strong className="text-amber-300">{retentionPct}%</strong> of your paid amount
+                  will be retained (non-refundable). After this period,{' '}
+                  <strong className="text-amber-300">no refund will be accepted</strong>. Refunds are
+                  paid from the vendor&apos;s account.
+                </p>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={refundAccepted}
+                    onChange={(e) => setRefundAccepted(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 accent-primary-500 cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-600">
+                    I have read and acknowledge the refund policy above.
+                  </span>
+                </label>
+              </div>
+
               {/* ── Submit Button ────────────────────────────────────────── */}
               <button
                 type="submit"
-                disabled={submitting}
-                className="btn-primary w-full py-4 text-base font-semibold flex items-center justify-center gap-2"
+                disabled={submitting || !refundAccepted}
+                className="btn-primary w-full py-4 text-base font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <>
@@ -410,27 +488,27 @@ const BookingCheckoutPage = () => {
           {/* ── Right: Payment Summary ──────────────────────────────────── */}
           <div>
             <div className="glass-card p-5 sticky top-20 space-y-4">
-              <h3 className="text-white font-bold text-sm border-b border-white/10 pb-3">
+              <h3 className="text-gray-900 font-bold text-sm border-b border-blue-100 pb-3">
                 💰 Payment Summary
               </h3>
 
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Total Price</span>
-                  <span className="text-white font-semibold">৳{totalPrice.toLocaleString()}</span>
+                  <span className="text-gray-500">Total Price</span>
+                  <span className="text-gray-900 font-semibold">৳{totalPrice.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Booking Money ({percentage}%)</span>
-                  <span className="text-emerald-400 font-bold">৳{bookingMoney.toLocaleString()}</span>
+                  <span className="text-gray-500">Booking Money ({percentage}%)</span>
+                  <span className="text-emerald-600 font-bold">৳{bookingMoney.toLocaleString()}</span>
                 </div>
-                <div className="border-t border-white/10 pt-3 flex justify-between text-sm">
-                  <span className="text-gray-400">Due After Booking</span>
-                  <span className="text-amber-400 font-semibold">৳{dueAmount.toLocaleString()}</span>
+                <div className="border-t border-blue-100 pt-3 flex justify-between text-sm">
+                  <span className="text-gray-500">Due After Booking</span>
+                  <span className="text-amber-600 font-semibold">৳{dueAmount.toLocaleString()}</span>
                 </div>
               </div>
 
               <div className="p-3 bg-primary-500/10 border border-primary-500/20 rounded-xl">
-                <p className="text-primary-300 text-xs leading-relaxed">
+                <p className="text-primary-600 text-xs leading-relaxed">
                   💡 You will pay <strong>৳{bookingMoney.toLocaleString()}</strong> now as booking money.
                   The remaining <strong>৳{dueAmount.toLocaleString()}</strong> can be paid later from your dashboard.
                 </p>
@@ -439,7 +517,7 @@ const BookingCheckoutPage = () => {
               {/* Security badges */}
               <div className="flex flex-wrap gap-2 pt-2">
                 {['🔒 Secure', '💳 Stripe', '🛡️ Protected'].map((badge) => (
-                  <span key={badge} className="text-xs px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg text-gray-500">
+                  <span key={badge} className="text-xs px-2.5 py-1 bg-slate-50 border border-blue-100 rounded-lg text-gray-500">
                     {badge}
                   </span>
                 ))}

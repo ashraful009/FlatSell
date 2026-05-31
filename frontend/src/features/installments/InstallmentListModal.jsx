@@ -105,14 +105,14 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
       onClick={onClose}
     >
       <div
-        className="glass-card w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10"
+        className="glass-card w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden border border-blue-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between">
+        <div className="px-6 py-5 border-b border-blue-100 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white">Installment Schedule</h2>
-            <p className="text-gray-400 text-xs mt-0.5">
+            <h2 className="text-lg font-bold text-gray-900">Installment Schedule</h2>
+            <p className="text-gray-500 text-xs mt-0.5">
               {plan
                 ? <>{plan.totalCount} installments · {plan.extraChargePercentage}% service charge</>
                 : 'Loading plan...'}
@@ -120,7 +120,7 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/15 text-gray-400 hover:text-white transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 hover:bg-blue-100 text-gray-500 hover:text-gray-900 transition-colors"
           >
             ✕
           </button>
@@ -128,11 +128,11 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
 
         {/* Stats strip */}
         {!loading && installments.length > 0 && (
-          <div className="px-6 py-3 grid grid-cols-4 gap-3 bg-dark-900/40 border-b border-white/8">
-            <Stat label="Paid"      value={`${paidCount}/${totalCount}`} color="text-emerald-400" />
-            <Stat label="Overdue"   value={overdueCount}                  color={overdueCount > 0 ? 'text-rose-400' : 'text-gray-400'} />
-            <Stat label="Total Paid" value={fmt(totalPaid)}                color="text-emerald-400" />
-            <Stat label="Remaining" value={fmt(remaining)}                color="text-amber-400" />
+          <div className="px-6 py-3 grid grid-cols-4 gap-3 bg-white/70 border-b border-blue-100">
+            <Stat label="Paid"      value={`${paidCount}/${totalCount}`} color="text-emerald-600" />
+            <Stat label="Overdue"   value={overdueCount}                  color={overdueCount > 0 ? 'text-rose-600' : 'text-gray-500'} />
+            <Stat label="Total Paid" value={fmt(totalPaid)}                color="text-emerald-600" />
+            <Stat label="Remaining" value={fmt(remaining)}                color="text-amber-600" />
           </div>
         )}
 
@@ -141,10 +141,10 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mb-3" />
-              <p className="text-gray-400 text-sm">Loading installments...</p>
+              <p className="text-gray-500 text-sm">Loading installments...</p>
             </div>
           ) : installments.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-16">
+            <p className="text-gray-500 text-sm text-center py-16">
               No installments found for this booking.
             </p>
           ) : (
@@ -160,29 +160,29 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
                       ? 'bg-emerald-500/5 border-emerald-500/25'
                       : isOverdue
                         ? 'bg-rose-500/5 border-rose-500/30'
-                        : 'bg-dark-800/50 border-white/8'}`}
+                        : 'bg-slate-50 border-blue-100'}`}
                 >
                   <div className="flex items-center justify-between flex-wrap gap-3">
                     {/* Left: number + due date */}
                     <div className="flex items-center gap-4 min-w-0">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm
                         ${isPaid
-                          ? 'bg-emerald-500/20 text-emerald-400'
+                          ? 'bg-emerald-500/20 text-emerald-600'
                           : isOverdue
-                            ? 'bg-rose-500/20 text-rose-400'
-                            : 'bg-primary-500/20 text-primary-400'}`}>
+                            ? 'bg-rose-500/20 text-rose-600'
+                            : 'bg-primary-500/20 text-primary-600'}`}>
                         #{inst.installmentNumber}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-white">
+                        <p className="text-sm font-semibold text-gray-900">
                           Installment {inst.installmentNumber} of {inst.totalInstallments}
                         </p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">
-                          Due: <span className={isOverdue && !isPaid ? 'text-rose-400 font-medium' : 'text-gray-300'}>
+                        <p className="text-[11px] text-gray-500 mt-0.5">
+                          Due: <span className={isOverdue && !isPaid ? 'text-rose-600 font-medium' : 'text-gray-600'}>
                             {fmtDate(inst.dueDate)}
                           </span>
                           {isPaid && inst.paidAt && (
-                            <> · Paid: <span className="text-emerald-400">{fmtDate(inst.paidAt)}</span></>
+                            <> · Paid: <span className="text-emerald-600">{fmtDate(inst.paidAt)}</span></>
                           )}
                         </p>
                       </div>
@@ -191,14 +191,14 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
                     {/* Right: amount + action */}
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className="text-sm font-bold text-white">{fmt(inst.amountDue)}</p>
+                        <p className="text-sm font-bold text-gray-900">{fmt(inst.amountDue)}</p>
                         {isOverdue && !isPaid && (
-                          <p className="text-[10px] text-rose-400 font-semibold mt-0.5">
+                          <p className="text-[10px] text-rose-600 font-semibold mt-0.5">
                             + ৳5,000 late fee
                           </p>
                         )}
                         {isPaid && inst.lateFee > 0 && (
-                          <p className="text-[10px] text-amber-400 font-semibold mt-0.5">
+                          <p className="text-[10px] text-amber-600 font-semibold mt-0.5">
                             (incl. ৳{inst.lateFee.toLocaleString()} late fee)
                           </p>
                         )}
@@ -209,7 +209,7 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
                           onClick={() => handleDownloadInvoice(inst)}
                           disabled={downloadingId === inst._id}
                           className="px-3 py-1.5 rounded-lg text-xs font-semibold
-                                     bg-primary-500/15 text-primary-400 border border-primary-500/25
+                                     bg-primary-500/15 text-primary-600 border border-primary-500/25
                                      hover:bg-primary-500/25 hover:border-primary-500/50 transition-all
                                      disabled:opacity-60"
                         >
@@ -249,7 +249,7 @@ const InstallmentListModal = ({ open, onClose, bookingId }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-white/10 bg-dark-900/40 flex justify-end">
+        <div className="px-6 py-3 border-t border-blue-100 bg-white/70 flex justify-end">
           <button onClick={onClose} className="btn-secondary px-5 py-2 text-sm">Close</button>
         </div>
       </div>

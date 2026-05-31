@@ -3,10 +3,10 @@ import axiosInstance from '../../shared/lib/axiosInstance';
 import { toast } from 'react-hot-toast';
 
 const STATUS_COLORS = {
-  pending:   'bg-amber-500/20  text-amber-400  border-amber-500/30',
-  confirmed: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  rejected:  'bg-red-500/20    text-red-400    border-red-500/30',
-  cancelled: 'bg-gray-500/20   text-gray-400   border-gray-500/30',
+  pending:   'bg-amber-500/20  text-amber-600  border-amber-500/30',
+  confirmed: 'bg-emerald-500/20 text-emerald-600 border-emerald-500/30',
+  rejected:  'bg-red-500/20    text-red-600    border-red-500/30',
+  cancelled: 'bg-gray-500/20   text-gray-500   border-gray-500/30',
 };
 
 const BookingManagement = () => {
@@ -37,13 +37,13 @@ const BookingManagement = () => {
     }
   };
 
-  if (loading) return <div className="text-gray-400 py-10 text-center">Loading bookings...</div>;
+  if (loading) return <div className="text-gray-500 py-10 text-center">Loading bookings...</div>;
 
   if (bookings.length === 0) {
     return (
       <div className="glass-card py-20 text-center">
         <p className="text-4xl mb-4">📭</p>
-        <p className="text-white font-medium">No Bookings Yet</p>
+        <p className="text-gray-900 font-medium">No Bookings Yet</p>
       </div>
     );
   }
@@ -57,23 +57,23 @@ const BookingManagement = () => {
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-lg font-bold text-white">{b.propertyId?.title || 'Unknown Property'}</h3>
+                <h3 className="text-lg font-bold text-gray-900">{b.propertyId?.title || 'Unknown Property'}</h3>
                 <span className={`px-2 py-0.5 rounded text-xs font-semibold border ${STATUS_COLORS[b.status]}`}>
                   {b.status.toUpperCase()}
                 </span>
               </div>
-              <p className="text-sm text-gray-300 mb-1">
+              <p className="text-sm text-gray-600 mb-1">
                 <span className="text-gray-500">Unit:</span> {b.unitId?.unitNumber} (Floor {b.unitId?.floor})
               </p>
-              <p className="text-sm text-gray-300 mb-1">
+              <p className="text-sm text-gray-600 mb-1">
                 <span className="text-gray-500">Customer:</span> {b.customerId?.name} ({b.customerId?.phone})
               </p>
-              <p className="text-sm text-gray-300">
+              <p className="text-sm text-gray-600">
                 <span className="text-gray-500">Email:</span> {b.customerId?.email}
               </p>
               
               {b.message && (
-                <div className="mt-3 p-3 bg-dark-900/50 rounded-lg text-sm text-gray-400 italic font-light">
+                <div className="mt-3 p-3 bg-white/70 rounded-lg text-sm text-gray-500 italic font-light">
                   &ldquo;{b.message}&rdquo;
                 </div>
               )}
@@ -89,7 +89,7 @@ const BookingManagement = () => {
                 </button>
                 <button 
                   onClick={() => handleStatusUpdate(b._id, 'rejected')}
-                  className="btn-secondary text-xs py-1.5 px-3 text-red-400 hover:text-red-300">
+                  className="btn-secondary text-xs py-1.5 px-3 text-red-600 hover:text-red-300">
                   Reject
                 </button>
               </div>
@@ -99,7 +99,7 @@ const BookingManagement = () => {
                <div className="flex sm:flex-col justify-end">
                  <button 
                   onClick={() => handleStatusUpdate(b._id, 'cancelled')}
-                  className="text-xs text-red-400 hover:underline">
+                  className="text-xs text-red-600 hover:underline">
                   Cancel Booking
                 </button>
                </div>

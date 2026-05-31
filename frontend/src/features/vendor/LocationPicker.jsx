@@ -57,7 +57,7 @@ const LocationPicker = ({ value, onChange }) => {
 
   return (
     <div>
-      <div className="rounded-xl overflow-hidden border border-white/10 h-64 sm:h-72 relative z-0">
+      <div className="rounded-xl overflow-hidden border border-blue-100 h-64 sm:h-72 relative z-0">
         <MapContainer
           center={center}
           zoom={13}
@@ -78,9 +78,9 @@ const LocationPicker = ({ value, onChange }) => {
 
       {/* Address display */}
       {value?.address && (
-        <div className="mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg
+        <div className="mt-2 px-3 py-2 bg-slate-50 border border-blue-100 rounded-lg
                         flex items-start gap-2">
-          <svg className="w-4 h-4 text-primary-400 mt-0.5 flex-shrink-0" fill="none"
+          <svg className="w-4 h-4 text-primary-600 mt-0.5 flex-shrink-0" fill="none"
                viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0
@@ -88,7 +88,7 @@ const LocationPicker = ({ value, onChange }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <p className="text-xs text-gray-300 leading-relaxed">{value.address}</p>
+          <p className="text-xs text-gray-600 leading-relaxed">{value.address}</p>
         </div>
       )}
 

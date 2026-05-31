@@ -100,7 +100,7 @@ const PropertyCard = ({ property }) => {
             </h3>
 
             {/* Location */}
-            <div className="flex items-center gap-1 text-gray-300/80 text-xs mt-1.5">
+            <div className="flex items-center gap-1 text-gray-200/90 text-xs mt-1.5">
               <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                    stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -111,7 +111,7 @@ const PropertyCard = ({ property }) => {
             </div>
 
             {/* Stats row */}
-            <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-gray-400 mt-2">
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-gray-300 mt-2">
               {category === 'apartment' && (
                 <>
                   <span className="flex items-center gap-0.5">
@@ -121,7 +121,7 @@ const PropertyCard = ({ property }) => {
                     </svg>
                     {totalFloors} Floor{totalFloors > 1 ? 's' : ''}
                   </span>
-                  <span className="text-white/20">·</span>
+                  <span className="text-gray-300">·</span>
                   <span>{totalUnits} Unit{totalUnits > 1 ? 's' : ''}</span>
                 </>
               )}
@@ -142,9 +142,9 @@ const PropertyCard = ({ property }) => {
               {companyId?.name && (
                 <>
                   {(category === 'apartment' || category === 'villa' || (category === 'land' && property.landDetails?.totalSize > 0)) && (
-                    <span className="text-white/20">·</span>
+                    <span className="text-gray-300">·</span>
                   )}
-                  <span className="truncate text-primary-400 font-medium">{companyId.name}</span>
+                  <span className="truncate text-primary-300 font-medium">{companyId.name}</span>
                 </>
               )}
             </div>
@@ -154,13 +154,13 @@ const PropertyCard = ({ property }) => {
           <div className="flex-shrink-0 text-right flex flex-col items-end justify-center">
             {(category === 'villa' || category === 'land') && (unitStatus === 'booked' || unitStatus === 'sold') ? (
               <div className={`px-3 py-1.5 rounded-lg font-bold text-sm border 
-                ${unitStatus === 'booked' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'}`}>
+                ${unitStatus === 'booked' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-red-500/20 text-red-300 border-red-500/30'}`}>
                 {unitStatus === 'booked' ? 'Booked' : 'Sold Out'}
               </div>
             ) : (
               <div className="flex flex-col items-end gap-2">
                 <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">
+                  <p className="text-[10px] text-gray-300 uppercase tracking-wider mb-0.5">
                     Booking ({bookingPct}%)
                   </p>
                   <p className="text-base sm:text-lg font-bold text-white leading-tight">
@@ -171,7 +171,7 @@ const PropertyCard = ({ property }) => {
                                 flex items-center justify-center
                                 group-hover:bg-primary-500 group-hover:border-primary-400
                                 transition-all duration-300">
-                  <svg className="w-4 h-4 text-primary-400 group-hover:text-white
+                  <svg className="w-4 h-4 text-primary-300 group-hover:text-white
                                   group-hover:translate-x-0.5 transition-all duration-300"
                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}

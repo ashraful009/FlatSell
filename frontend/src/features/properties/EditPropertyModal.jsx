@@ -12,7 +12,7 @@ const defaultFlatType = () => ({
 const FormField = ({ label, required, children }) => (
   <div>
     <label className="form-label">
-      {label} {required && <span className="text-red-400">*</span>}
+      {label} {required && <span className="text-red-600">*</span>}
     </label>
     {children}
   </div>
@@ -108,17 +108,17 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center
                     bg-black/75 backdrop-blur-sm overflow-y-auto py-6 px-4">
-      <div className="w-full max-w-3xl glass-card animate-fadeIn">
+      <div className="w-full max-w-6xl glass-card animate-fadeIn">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-6 border-b border-blue-100">
           <div>
-            <h2 className="text-xl font-bold text-white">Edit Property</h2>
-            <p className="text-gray-400 text-sm mt-0.5 truncate max-w-sm">{property.title}</p>
+            <h2 className="text-xl font-bold text-gray-900">Edit Property</h2>
+            <p className="text-gray-500 text-sm mt-0.5 truncate max-w-sm">{property.title}</p>
           </div>
           <button onClick={onClose}
             className="w-9 h-9 flex items-center justify-center rounded-xl
-                       bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white
+                       bg-slate-50 hover:bg-blue-50 text-gray-500 hover:text-gray-900
                        transition-colors text-lg">
             ✕
           </button>
@@ -127,14 +127,14 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {error && (
             <div className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl
-                            text-red-400 text-sm">
+                            text-red-600 text-sm">
               ⚠️ {error}
             </div>
           )}
 
           {/* Basic Info */}
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3 pb-2 border-b border-white/8">
+            <h4 className="text-gray-900 text-sm font-semibold mb-3 pb-2 border-b border-blue-100">
               Basic Information
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -173,7 +173,7 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
 
           {/* Overview */}
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3 pb-2 border-b border-white/8">
+            <h4 className="text-gray-900 text-sm font-semibold mb-3 pb-2 border-b border-blue-100">
               Property Overview
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -203,22 +203,22 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
           {/* Flat Types */}
           {showFlatTypes && (
             <div>
-              <h4 className="text-white text-sm font-semibold mb-3 pb-2 border-b border-white/8">
+              <h4 className="text-gray-900 text-sm font-semibold mb-3 pb-2 border-b border-blue-100">
                 Unit Types
               </h4>
               <div className="space-y-4">
                 {flatTypes.map((ft, idx) => (
                   <div key={idx}
-                    className="bg-white/3 border border-white/8 rounded-xl p-4 relative">
+                    className="bg-slate-50 border border-blue-100 rounded-xl p-4 relative">
                     {flatTypes.length > 1 && (
                       <button type="button" onClick={() => removeFlatType(idx)}
                         className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center
-                                   rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30
+                                   rounded-full bg-red-500/20 text-red-600 hover:bg-red-500/30
                                    text-xs transition-colors">
                         ✕
                       </button>
                     )}
-                    <p className="text-primary-400 text-xs font-semibold mb-3 uppercase">Type {idx + 1}</p>
+                    <p className="text-primary-600 text-xs font-semibold mb-3 uppercase">Type {idx + 1}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       <div className="col-span-2 sm:col-span-3">
                         <FormField label="Label">
@@ -268,7 +268,7 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
                 ))}
                 <button type="button" onClick={addFlatType}
                   className="w-full py-2.5 rounded-xl border border-dashed border-primary-500/30
-                             text-primary-400 hover:bg-primary-500/5 text-sm transition-all flex
+                             text-primary-600 hover:bg-primary-500/5 text-sm transition-all flex
                              items-center justify-center gap-1">
                   + Add Type
                 </button>
@@ -278,15 +278,15 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
 
           {/* Images */}
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3 pb-2 border-b border-white/8">
+            <h4 className="text-gray-900 text-sm font-semibold mb-3 pb-2 border-b border-blue-100">
               Images
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Main Image */}
               <div>
-                <p className="text-xs text-gray-400 mb-2">Main Cover Image</p>
+                <p className="text-xs text-gray-500 mb-2">Main Cover Image</p>
                 <div onClick={() => mainImgRef.current?.click()}
-                  className="relative rounded-xl border border-dashed border-white/15
+                  className="relative rounded-xl border border-dashed border-blue-200
                              hover:border-primary-500/40 cursor-pointer overflow-hidden h-32">
                   {mainPreview ? (
                     <img src={mainPreview} alt="" className="w-full h-full object-cover" />
@@ -297,7 +297,7 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
                   )}
                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100
                                   transition-opacity flex items-center justify-center">
-                    <span className="text-white text-xs">Change</span>
+                    <span className="text-gray-900 text-xs">Change</span>
                   </div>
                 </div>
                 <input ref={mainImgRef} type="file" accept="image/*"
@@ -306,7 +306,7 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
 
               {/* Gallery */}
               <div>
-                <p className="text-xs text-gray-400 mb-2">Gallery ({galleryPreviews.length}/10)</p>
+                <p className="text-xs text-gray-500 mb-2">Gallery ({galleryPreviews.length}/10)</p>
                 <div className="grid grid-cols-5 gap-1 mb-2">
                   {galleryPreviews.map((src, i) => (
                     <div key={i} className="aspect-square rounded-lg overflow-hidden">
@@ -316,8 +316,8 @@ const EditPropertyModal = ({ property, onClose, onUpdated }) => {
                 </div>
                 {newGallery.length < 10 && (
                   <label className="block text-center py-2 rounded-lg border border-dashed
-                                    border-white/10 text-gray-500 text-xs cursor-pointer
-                                    hover:border-white/25 transition-colors">
+                                    border-blue-100 text-gray-500 text-xs cursor-pointer
+                                    hover:border-blue-200 transition-colors">
                     + Add Images
                     <input type="file" accept="image/*" multiple className="hidden"
                       ref={galleryImgRef} onChange={handleGalleryAdd} />

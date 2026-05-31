@@ -27,8 +27,8 @@ const getPresetRange = (preset) => {
 };
 
 const STATUS_COLORS = {
-  booking_paid: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  fully_paid:   'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  booking_paid: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
+  fully_paid:   'bg-emerald-500/20 text-emerald-600 border-emerald-500/30',
 };
 
 const CAT_ICONS = { apartment: '🏢', villa: '🏡', land: '🌿' };
@@ -107,10 +107,10 @@ const SalesReport = ({ mode = 'company' }) => {
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap justify-between items-start gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-gray-900">
             {mode === 'admin' ? '📈 Platform Sales Report' : '📈 My Sales Report'}
           </h2>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-500 text-sm mt-1">
             {mode === 'admin'
               ? 'View all confirmed bookings and revenue across the platform.'
               : 'View confirmed bookings and revenue for your company.'}
@@ -133,17 +133,17 @@ const SalesReport = ({ mode = 'company' }) => {
 
       {/* ── Date Filter Bar ───────────────────────────────────────────────── */}
       <div className="glass-card p-4 flex flex-wrap gap-3 items-center">
-        <span className="text-gray-400 text-sm font-medium">Filter by:</span>
+        <span className="text-gray-500 text-sm font-medium">Filter by:</span>
 
-        <div className="flex gap-1 bg-dark-800/50 p-1 rounded-lg">
+        <div className="flex gap-1 bg-slate-50 p-1 rounded-lg">
           {PRESETS.map((p) => (
             <button
               key={p.key}
               onClick={() => { setPreset(p.key); setUseCustom(false); }}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150
                 ${!useCustom && preset === p.key
-                  ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
-                  : 'text-gray-400 hover:text-white'}`}
+                  ? 'bg-primary-500/20 text-primary-600 border border-primary-500/30'
+                  : 'text-gray-500 hover:text-gray-900'}`}
             >
               {p.label}
             </button>
@@ -152,8 +152,8 @@ const SalesReport = ({ mode = 'company' }) => {
             onClick={() => setUseCustom(true)}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150
               ${useCustom
-                ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
-                : 'text-gray-400 hover:text-white'}`}
+                ? 'bg-primary-500/20 text-primary-600 border border-primary-500/30'
+                : 'text-gray-500 hover:text-gray-900'}`}
           >
             Custom
           </button>
@@ -165,14 +165,14 @@ const SalesReport = ({ mode = 'company' }) => {
               type="date"
               value={customStart}
               onChange={(e) => setCustomStart(e.target.value)}
-              className="bg-dark-800 border border-white/10 text-gray-200 text-xs rounded-lg px-3 py-1.5 outline-none focus:border-primary-500"
+              className="bg-white border border-blue-100 text-gray-800 text-xs rounded-lg px-3 py-1.5 outline-none focus:border-primary-500"
             />
             <span className="text-gray-500 text-xs">to</span>
             <input
               type="date"
               value={customEnd}
               onChange={(e) => setCustomEnd(e.target.value)}
-              className="bg-dark-800 border border-white/10 text-gray-200 text-xs rounded-lg px-3 py-1.5 outline-none focus:border-primary-500"
+              className="bg-white border border-blue-100 text-gray-800 text-xs rounded-lg px-3 py-1.5 outline-none focus:border-primary-500"
             />
             <button
               onClick={fetchReport}
@@ -197,8 +197,8 @@ const SalesReport = ({ mode = 'company' }) => {
                 {icon}
               </div>
               <div>
-                <p className="text-gray-400 text-xs">{label}</p>
-                <p className="text-white font-bold text-lg">{value}</p>
+                <p className="text-gray-500 text-xs">{label}</p>
+                <p className="text-gray-900 font-bold text-lg">{value}</p>
               </div>
             </div>
           </div>
@@ -210,64 +210,64 @@ const SalesReport = ({ mode = 'company' }) => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500 mb-4" />
-            <p className="text-gray-400 text-sm">Loading sales data…</p>
+            <p className="text-gray-500 text-sm">Loading sales data…</p>
           </div>
         ) : bookings.length === 0 ? (
           <div className="py-20 text-center">
             <span className="text-5xl block mb-4">📭</span>
-            <h3 className="text-lg font-bold text-white mb-2">No Sales Found</h3>
-            <p className="text-gray-400 text-sm">No confirmed bookings for the selected period.</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">No Sales Found</h3>
+            <p className="text-gray-500 text-sm">No confirmed bookings for the selected period.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10 bg-dark-800/50">
-                  <th className="text-left text-gray-400 text-xs font-semibold px-5 py-3">#</th>
-                  <th className="text-left text-gray-400 text-xs font-semibold px-4 py-3">Property</th>
-                  {mode === 'admin' && <th className="text-left text-gray-400 text-xs font-semibold px-4 py-3">Company</th>}
-                  <th className="text-left text-gray-400 text-xs font-semibold px-4 py-3">Customer</th>
-                  <th className="text-left text-gray-400 text-xs font-semibold px-4 py-3">Category</th>
-                  <th className="text-left text-gray-400 text-xs font-semibold px-4 py-3">Status</th>
-                  <th className="text-right text-gray-400 text-xs font-semibold px-4 py-3">Total Price</th>
-                  <th className="text-right text-gray-400 text-xs font-semibold px-4 py-3">Paid</th>
-                  <th className="text-left text-gray-400 text-xs font-semibold px-4 py-3">Date</th>
+                <tr className="border-b border-blue-100 bg-slate-50">
+                  <th className="text-left text-gray-500 text-xs font-semibold px-5 py-3">#</th>
+                  <th className="text-left text-gray-500 text-xs font-semibold px-4 py-3">Property</th>
+                  {mode === 'admin' && <th className="text-left text-gray-500 text-xs font-semibold px-4 py-3">Company</th>}
+                  <th className="text-left text-gray-500 text-xs font-semibold px-4 py-3">Customer</th>
+                  <th className="text-left text-gray-500 text-xs font-semibold px-4 py-3">Category</th>
+                  <th className="text-left text-gray-500 text-xs font-semibold px-4 py-3">Status</th>
+                  <th className="text-right text-gray-500 text-xs font-semibold px-4 py-3">Total Price</th>
+                  <th className="text-right text-gray-500 text-xs font-semibold px-4 py-3">Paid</th>
+                  <th className="text-left text-gray-500 text-xs font-semibold px-4 py-3">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((b, i) => (
-                  <tr key={b._id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
+                  <tr key={b._id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-3.5 text-gray-500 text-xs">{i + 1}</td>
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2">
                         <span className="text-base">{CAT_ICONS[b.propertyId?.category] || '🏠'}</span>
-                        <span className="text-white font-medium truncate max-w-[160px]" title={b.propertyId?.title}>
+                        <span className="text-gray-900 font-medium truncate max-w-[160px]" title={b.propertyId?.title}>
                           {b.propertyId?.title || '—'}
                         </span>
                       </div>
                     </td>
                     {mode === 'admin' && (
-                      <td className="px-4 py-3.5 text-gray-300 text-xs">{b.companyId?.name || '—'}</td>
+                      <td className="px-4 py-3.5 text-gray-600 text-xs">{b.companyId?.name || '—'}</td>
                     )}
                     <td className="px-4 py-3.5">
-                      <p className="text-gray-200 text-xs">{b.customerId?.name || '—'}</p>
+                      <p className="text-gray-800 text-xs">{b.customerId?.name || '—'}</p>
                       <p className="text-gray-500 text-[11px]">{b.customerId?.email || ''}</p>
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-white/10 text-gray-300">
+                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-blue-50 text-gray-600">
                         {b.propertyId?.category || '—'}
                       </span>
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-semibold border ${STATUS_COLORS[b.paymentStatus] || 'text-gray-400'}`}>
+                      <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-semibold border ${STATUS_COLORS[b.paymentStatus] || 'text-gray-500'}`}>
                         {b.paymentStatus === 'fully_paid' ? 'Fully Paid' : 'Booking Paid'}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 text-right text-white font-semibold text-xs">{fmt(b.totalPrice)}</td>
-                    <td className="px-4 py-3.5 text-right text-emerald-400 font-bold text-xs">
+                    <td className="px-4 py-3.5 text-right text-gray-900 font-semibold text-xs">{fmt(b.totalPrice)}</td>
+                    <td className="px-4 py-3.5 text-right text-emerald-600 font-bold text-xs">
                       {fmt(b.paymentStatus === 'fully_paid' ? b.totalPrice : b.bookingAmount)}
                     </td>
-                    <td className="px-4 py-3.5 text-gray-400 text-xs whitespace-nowrap">
+                    <td className="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">
                       {new Date(b.createdAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </td>
                   </tr>

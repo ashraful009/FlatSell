@@ -4,7 +4,7 @@
  */
 const LoadingScreen = () => {
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="flex flex-col items-center gap-5">
         {/* Brand logo */}
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700

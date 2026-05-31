@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import axiosInstance from '../../shared/lib/axiosInstance';
 
 const STATUS_COLORS = {
-  approved: 'bg-green-500/20 text-green-400 border-green-500/30',
-  rejected: 'bg-red-500/20  text-red-400  border-red-500/30',
-  pending:  'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  approved: 'bg-green-500/20 text-green-600 border-green-500/30',
+  rejected: 'bg-red-500/20  text-red-600  border-red-500/30',
+  pending:  'bg-amber-500/20 text-amber-600 border-amber-500/30',
 };
 
 /**
@@ -81,10 +81,10 @@ const PropertyRequests = ({ mode = 'admin' }) => {
     return (
       <div className="glass-card py-14 text-center">
         <p className="text-4xl mb-3">{mode === 'admin' ? '✅' : '📭'}</p>
-        <p className="text-white font-medium">
+        <p className="text-gray-900 font-medium">
           {mode === 'admin' ? 'No pending properties' : 'No properties yet'}
         </p>
-        <p className="text-gray-400 text-sm mt-1">
+        <p className="text-gray-500 text-sm mt-1">
           {mode === 'admin'
             ? 'All caught up! New submissions will appear here.'
             : 'Submit your first property from the Add Property section.'}
@@ -103,11 +103,11 @@ const PropertyRequests = ({ mode = 'admin' }) => {
           return (
             <div key={p._id}
               className="glass-card p-4 flex flex-col sm:flex-row sm:items-center gap-4
-                         hover:border-white/20 transition-colors">
+                         hover:border-blue-200 transition-colors">
 
               {/* Cover image */}
               <div className="w-full sm:w-16 h-32 sm:h-16 rounded-xl overflow-hidden
-                              bg-dark-800 flex-shrink-0">
+                              bg-white flex-shrink-0">
                 {cover ? (
                   <img src={cover} alt={p.title}
                     className="w-full h-full object-cover" />
@@ -125,12 +125,12 @@ const PropertyRequests = ({ mode = 'admin' }) => {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm truncate">{p.title}</p>
-                <p className="text-gray-400 text-xs mt-0.5">
+                <p className="text-gray-900 font-semibold text-sm truncate">{p.title}</p>
+                <p className="text-gray-500 text-xs mt-0.5">
                   {p.city} · {p.category} · ৳{p.price?.toLocaleString()}
                 </p>
                 {p.companyId && (
-                  <p className="text-primary-400 text-xs mt-0.5">
+                  <p className="text-primary-600 text-xs mt-0.5">
                     {p.companyId.name}
                   </p>
                 )}
@@ -145,7 +145,7 @@ const PropertyRequests = ({ mode = 'admin' }) => {
                   </span>
                 )}
                 {p.rejectedReason && (
-                  <p className="text-red-400 text-xs mt-1">
+                  <p className="text-red-600 text-xs mt-1">
                     Reason: {p.rejectedReason}
                   </p>
                 )}
@@ -158,7 +158,7 @@ const PropertyRequests = ({ mode = 'admin' }) => {
                     onClick={() => handleStatus(p._id, 'approved')}
                     disabled={isActing}
                     className="px-3 py-1.5 bg-green-500/15 border border-green-500/30
-                               text-green-400 hover:bg-green-500/25 text-xs font-semibold
+                               text-green-600 hover:bg-green-500/25 text-xs font-semibold
                                rounded-lg transition-colors disabled:opacity-50"
                   >
                     {action[p._id] === 'approved' ? '...' : '✓ Approve'}
@@ -167,7 +167,7 @@ const PropertyRequests = ({ mode = 'admin' }) => {
                     onClick={() => setRejectModal({ id: p._id, reason: '' })}
                     disabled={isActing}
                     className="px-3 py-1.5 bg-red-500/10 border border-red-500/30
-                               text-red-400 hover:bg-red-500/20 text-xs font-semibold
+                               text-red-600 hover:bg-red-500/20 text-xs font-semibold
                                rounded-lg transition-colors disabled:opacity-50"
                   >
                     ✕ Reject
@@ -184,7 +184,7 @@ const PropertyRequests = ({ mode = 'admin' }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4
                         bg-black/70 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-sm glass-card p-6 animate-slideUp">
-            <h3 className="text-white font-semibold mb-4">Reason for Rejection</h3>
+            <h3 className="text-gray-900 font-semibold mb-4">Reason for Rejection</h3>
             <textarea
               rows={3}
               value={rejectModal.reason}
@@ -202,7 +202,7 @@ const PropertyRequests = ({ mode = 'admin' }) => {
               <button
                 onClick={() => handleStatus(rejectModal.id, 'rejected', rejectModal.reason)}
                 className="flex-1 px-4 py-2.5 bg-red-500/15 border border-red-500/30
-                           text-red-400 hover:bg-red-500/25 text-sm font-semibold
+                           text-red-600 hover:bg-red-500/25 text-sm font-semibold
                            rounded-xl transition-colors"
               >
                 Confirm Reject

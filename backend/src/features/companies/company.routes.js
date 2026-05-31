@@ -4,6 +4,7 @@ const {
   getAllCompanies,
   getApprovedCompanies,
   getCompany,
+  getMyCompany,
   updateCompanyStatus,
 } = require('./company.controller');
 const { protect, authorize } = require('../../middleware/auth.middleware');
@@ -14,6 +15,10 @@ const router = express.Router();
 // ── Public ────────────────────────────────────────────────────────────────────
 // GET  /api/companies/approved        — public company directory
 router.get('/approved', getApprovedCompanies);
+
+// GET  /api/companies/my              — vendor's own company + wallet balance
+// (MUST be declared before '/:id' so it isn't captured by the param route)
+router.get('/my', protect, authorize('Company Admin', 'seller'), getMyCompany);
 
 // GET  /api/companies/:id             — single company storefront
 router.get('/:id', getCompany);

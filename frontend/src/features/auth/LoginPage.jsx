@@ -39,7 +39,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96
@@ -54,12 +54,12 @@ const LoginPage = () => {
                             flex items-center justify-center shadow-glow">
               <span className="text-white font-black text-xl">F</span>
             </div>
-            <span className="text-2xl font-black text-white">
+            <span className="text-2xl font-black text-gray-900">
               Flat<span className="text-gradient">Sell</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-          <p className="text-gray-400 text-sm mt-1">Sign in to your account</p>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+          <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
         </div>
 
         {/* Form card */}
@@ -67,7 +67,7 @@ const LoginPage = () => {
           {/* Error alert */}
           {error && (
             <div className="mb-5 px-4 py-3 bg-red-500/10 border border-red-500/30
-                            rounded-xl text-red-400 text-sm animate-fadeIn">
+                            rounded-xl text-red-600 text-sm animate-fadeIn">
               {error}
             </div>
           )}
@@ -107,8 +107,8 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPass((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400
-                             hover:text-gray-200 transition-colors p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500
+                             hover:text-gray-800 transition-colors p-1"
                   aria-label="Toggle password visibility"
                 >
                   {showPass ? (
@@ -154,9 +154,9 @@ const LoginPage = () => {
           </form>
 
           {/* Footer links */}
-          <p className="text-center text-gray-400 text-sm mt-6">
+          <p className="text-center text-gray-500 text-sm mt-6">
             Don&apos;t have an account?{' '}
-            <Link to="/register" className="text-primary-400 hover:text-primary-300
+            <Link to="/register" className="text-primary-600 hover:text-primary-600
                                             font-medium transition-colors">
               Create account
             </Link>

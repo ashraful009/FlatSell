@@ -6,12 +6,14 @@ import PropertyRequests         from '../../features/properties/PropertyRequests
 import BookingManagement        from '../../features/bookings/BookingManagement';
 import BookingPoliciesSettings  from '../../features/commissions/companies/BookingPoliciesSettings';
 import SalesReport              from '../../features/bookings/SalesReport';
+import VendorRefunds            from '../../features/policies/vendor/VendorRefunds';
 
 const TABS = [
   { id: 'manage',  label: '📦 Manage Properties' },
   { id: 'add',     label: '➕ Add Property'       },
   { id: 'pending', label: '📋 My Submissions'     },
   { id: 'bookings',label: '📅 Bookings / Leads'   },
+  { id: 'refunds', label: '💸 Refunds'            },
   { id: 'sales',   label: '📈 Sales Report'       },
   { id: 'settings',label: '⚙️ Settings'            },
 ];
@@ -27,20 +29,20 @@ const CompanyAdminDashboard = () => {
       <div className="glass-card p-6 sm:p-8 mb-8 flex items-center justify-between
                       border-l-4 border-l-purple-500">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Company Dashboard</h1>
-          <p className="text-gray-400 text-sm truncate max-w-sm">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Company Dashboard</h1>
+          <p className="text-gray-500 text-sm truncate max-w-sm">
             Welcome back, {user?.name} (Admin)
           </p>
         </div>
         <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-purple-800
                         flex items-center justify-center text-white text-xl font-bold
-                        border-2 border-white/10 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                        border-2 border-blue-100 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
           {user?.name?.charAt(0).toUpperCase()}
         </div>
       </div>
 
       {/* ── Tab Bar ───────────────────────────────────────────────────────── */}
-      <div className="flex gap-1 mb-8 bg-dark-800/50 p-1.5 rounded-xl overflow-x-auto">
+      <div className="flex gap-1 mb-8 bg-slate-50 p-1.5 rounded-xl overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -48,8 +50,8 @@ const CompanyAdminDashboard = () => {
             className={`flex-1 min-w-[145px] py-2.5 px-4 rounded-lg text-sm font-medium
               transition-all duration-200 whitespace-nowrap
               ${activeTab === tab.id
-                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                ? 'bg-purple-500/20 text-purple-600 border border-purple-500/30'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-slate-50 border border-transparent'
               }`}
           >
             {tab.label}
@@ -65,8 +67,8 @@ const CompanyAdminDashboard = () => {
           <div>
             <div className="flex justify-between items-end mb-6">
               <div>
-                <h2 className="text-xl font-bold text-white">Manage Properties</h2>
-                <p className="text-gray-400 text-sm mt-1">Edit, activate, or delete your own properties</p>
+                <h2 className="text-xl font-bold text-gray-900">Manage Properties</h2>
+                <p className="text-gray-500 text-sm mt-1">Edit, activate, or delete your own properties</p>
               </div>
               <button onClick={() => setActiveTab('add')} className="btn-primary text-xs py-2 px-4">
                 ➕ Add New
@@ -80,8 +82,8 @@ const CompanyAdminDashboard = () => {
         {activeTab === 'add' && (
           <div className="max-w-4xl mx-auto">
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-white">Add New Property</h2>
-              <p className="text-gray-400 text-sm mt-1">
+              <h2 className="text-xl font-bold text-gray-900">Add New Property</h2>
+              <p className="text-gray-500 text-sm mt-1">
                 Your submission will be reviewed by the admin before going live.
               </p>
             </div>
@@ -92,7 +94,7 @@ const CompanyAdminDashboard = () => {
         {/* My Submissions (status tracking) */}
         {activeTab === 'pending' && (
           <div>
-            <h2 className="text-xl font-bold text-white mb-6">Submission Status</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Submission Status</h2>
             <PropertyRequests mode="company" />
           </div>
         )}
@@ -100,9 +102,14 @@ const CompanyAdminDashboard = () => {
         {/* Bookings */}
         {activeTab === 'bookings' && (
           <div>
-            <h2 className="text-xl font-bold text-white mb-6">Customer Bookings & Inquiries</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Customer Bookings & Inquiries</h2>
             <BookingManagement />
           </div>
+        )}
+
+        {/* Refunds (Policy 2 — incoming refund deductions + wallet) */}
+        {activeTab === 'refunds' && (
+          <VendorRefunds />
         )}
 
         {/* Settings */}

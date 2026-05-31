@@ -3,9 +3,9 @@ import axiosInstance from '../../../shared/lib/axiosInstance';
 import { toast } from 'react-hot-toast';
 
 const STATUS_COLORS = {
-  pending:  'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  approved: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  rejected: 'bg-red-500/20 text-red-400 border-red-500/30',
+  pending:  'bg-amber-500/20 text-amber-600 border-amber-500/30',
+  approved: 'bg-emerald-500/20 text-emerald-600 border-emerald-500/30',
+  rejected: 'bg-red-500/20 text-red-600 border-red-500/30',
 };
 
 const CompanyApproval = () => {
@@ -49,7 +49,7 @@ const CompanyApproval = () => {
     return /\.(jpg|jpeg|png|webp|gif)(\?|$)/.test(lower) || lower.includes('/image/');
   };
 
-  if (loading) return <div className="text-gray-400 py-10 text-center">Loading companies...</div>;
+  if (loading) return <div className="text-gray-500 py-10 text-center">Loading companies...</div>;
 
   return (
     <>
@@ -58,22 +58,22 @@ const CompanyApproval = () => {
           <div key={c._id} className="glass-card p-5 flex flex-col md:flex-row gap-5">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-xl font-bold text-white">{c.name}</h3>
+                <h3 className="text-xl font-bold text-gray-900">{c.name}</h3>
                 <span className={`px-2.5 py-0.5 rounded text-xs font-semibold border ${STATUS_COLORS[c.status]}`}>
                   {c.status.toUpperCase()}
                 </span>
               </div>
               
               <div className="grid grid-cols-2 gap-y-1 gap-x-6 text-sm mb-3">
-                <p className="text-gray-400"><span className="text-gray-500">Email:</span> {c.email}</p>
-                <p className="text-gray-400"><span className="text-gray-500">Phone:</span> {c.phone}</p>
-                <p className="text-gray-400"><span className="text-gray-500">Owner:</span> {c.ownerId?.name}</p>
-                <p className="text-gray-400"><span className="text-gray-500">Address:</span> {c.location?.address || 'N/A'}</p>
+                <p className="text-gray-500"><span className="text-gray-500">Email:</span> {c.email}</p>
+                <p className="text-gray-500"><span className="text-gray-500">Phone:</span> {c.phone}</p>
+                <p className="text-gray-500"><span className="text-gray-500">Owner:</span> {c.ownerId?.name}</p>
+                <p className="text-gray-500"><span className="text-gray-500">Address:</span> {c.location?.address || 'N/A'}</p>
               </div>
               
               <button 
                 onClick={() => setViewDoc(c.tradeLicense)}
-                className="text-primary-400 text-sm hover:underline flex items-center gap-1">
+                className="text-primary-600 text-sm hover:underline flex items-center gap-1">
                 📄 View Trade License Document
               </button>
             </div>
@@ -97,7 +97,7 @@ const CompanyApproval = () => {
           </div>
         ))}
         {companies.length === 0 && (
-          <div className="text-center py-10 text-gray-400">No applications found.</div>
+          <div className="text-center py-10 text-gray-500">No applications found.</div>
         )}
       </div>
 
@@ -105,14 +105,14 @@ const CompanyApproval = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
              onClick={() => setViewDoc(null)}>
           <div className="glass-card w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-4 border-b border-white/10">
-              <h3 className="text-white font-bold">Trade License Document</h3>
+            <div className="flex justify-between items-center p-4 border-b border-blue-100">
+              <h3 className="text-gray-900 font-bold">Trade License Document</h3>
               <div className="flex items-center gap-3">
                 <a href={viewDoc} target="_blank" rel="noopener noreferrer"
-                   className="text-primary-400 text-sm hover:underline">
+                   className="text-primary-600 text-sm hover:underline">
                   ↗ Open in New Tab
                 </a>
-                <button onClick={() => setViewDoc(null)} className="text-gray-400 hover:text-white text-lg">✕</button>
+                <button onClick={() => setViewDoc(null)} className="text-gray-500 hover:text-gray-900 text-lg">✕</button>
               </div>
             </div>
 
